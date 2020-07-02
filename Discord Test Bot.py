@@ -12,7 +12,7 @@ import json
 import asyncio
 
 bot = commands.Bot(command_prefix='.')
-Discord_Bot_Dir = str('C:\\MS VS Code Editor\\Projects\\Discord Bot\\Docs\\')
+Discord_Bot_Dir = str('.\\')
 
 @bot.event
 async def on_ready():
@@ -90,6 +90,22 @@ async def play(ctx, *, url):
                     colour = discord.Colour.dark_blue()
                 )
                 await ctx.channel.send(embed=embed)
+
+@client.command(pass_context=True, aliases=["l", "disconnect"])
+async def leave(ctx):
+    server = ctx.message.guild.voice_client
+    await server.disconnect()
+
+
+@client.command(pass_context=True, aliases=["r", "random"])
+async def shuffle(ctx):
+    PlayList.shuffle = not PlayList.shuffle
+
+
+@client.command()
+async def skip(ctx):
+    await play_next_song(ctx)
+
 
 @play.error
 async def play_error(ctx, error):

@@ -91,18 +91,18 @@ async def play(ctx, *, url):
                 )
                 await ctx.channel.send(embed=embed)
 
-@client.command(pass_context=True, aliases=["l", "disconnect"])
+@bot.command(pass_context=True, aliases=["l", "disconnect"])
 async def leave(ctx):
     server = ctx.message.guild.voice_client
     await server.disconnect()
 
 
-@client.command(pass_context=True, aliases=["r", "random"])
+@bot.command(pass_context=True, aliases=["r", "random"])
 async def shuffle(ctx):
     PlayList.shuffle = not PlayList.shuffle
 
 
-@client.command()
+@bot.command()
 async def skip(ctx):
     await play_next_song(ctx)
 
@@ -110,10 +110,6 @@ async def skip(ctx):
 @play.error
 async def play_error(ctx, error):
     await ctx.channel.send('Cant play the song!')
-
-@bot.command()
-async def skip(ctx):
-    await play_next_song(ctx)
 
 def check_queue(ctx):
     if not ctx.voice_client.is_playing():

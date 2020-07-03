@@ -388,7 +388,7 @@ async def fight(ctx, member : discord.Member):
             if str(msg.content) == 'punch' and str(msg.author.id) == challenge_member_id and (fight_turn % 2) == 0:
                 fight_turn += 1
                 duelers_health = duelers_health - punch_damage
-                hit_response = ['cRaZy',
+                hit_response = ['cRaZyy',
                                 'pOwerful',
                                 'DEADLY',
                                 'dangerous',

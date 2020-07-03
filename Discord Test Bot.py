@@ -398,7 +398,7 @@ async def fight(ctx, member : discord.Member):
                 ]
                 await ctx.channel.send('**' + challenge_member + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name[0] + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name[0] + '** is left with `' + f'{duelers_health}' + '` health!')
                                
-                if duelers_health == 0:
+                if duelers_health <= 0:
                     embed = discord.Embed(
                         title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
                         description = '**' + f'{challenge_member}' + '** wins with just `' + f'{challenge_member_health}' + ' HP` left!',

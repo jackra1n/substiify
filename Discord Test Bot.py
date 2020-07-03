@@ -436,12 +436,12 @@ async def fight(ctx, member : discord.Member):
             elif str(msg.content) == 'defend' and str(msg.author.id) == duelers_id and (fight_turn % 2) != 0:
                 fight_turn += 1
                 duelers_defence_points = int(random.randint(1,10))
-                await ctx.channel.send('**' + duel_authors_name[0] + '** boosted their defense by `' + f'{duelers_defence_points}' + '` points!')
+                await ctx.channel.send('**' + duel_authors_name[0] + '** boosted their defense by `' + f'{duelers_defence_points}' + '` points! :Kapp:')
                 await ctx.channel.send(member.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
             elif str(msg.content) == 'defend' and str(msg.author.id) == challenge_member_id and (fight_turn % 2) == 0:
                 fight_turn += 1
                 challengers_defence_points = int(random.randint(1,10))
-                await ctx.channel.send('**' + challenge_member + '** boosted their defense by `' + f'{challengers_defence_points}' + '` points!')
+                await ctx.channel.send('**' + challenge_member + '** boosted their defense by `' + f'{challengers_defence_points}' + '` points! :Kapp:')
                 await ctx.channel.send(ctx.author.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
             elif str(msg.content) == 'end' and str(msg.author.id) == duelers_id and (fight_turn % 2) != 0:
                 await ctx.channel.send(duel_authors_name[0] + ' has ended the fight. What a wimp.')

@@ -229,7 +229,7 @@ async def roast(ctx, member : discord.Member):
                 'You aint even worth it dawg 🤏',
                 'HA! Good one. 😂',
                 'You done yet? Pussy.',
-                'Fuck off!'
+                'Fuck off!!'
         ]
         await ctx.channel.send(f'{random.choice(replys)}')
     else:

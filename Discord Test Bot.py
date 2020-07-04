@@ -216,35 +216,15 @@ async def clear_error(ctx, error):
       await ctx.channel.send('Please put an amount to clear.')
 
 @bot.command(aliases=['penis','pipa','pene'], brief='Ego problems? No problem I can help you with that.')
-async def pp(ctx, member : discord.member):
-    i = 0
-    PP_Size = '='
-    while (i <= random.randint(1,18)):
-        PP_Size = PP_Size + '='
-        i += 1
+async def pp(ctx, member : discord.Member=None):
+    memberName = ctx.author.name if member is None else member.name
+    PP_Size = random.randint(1,18)
     embed = discord.Embed(
         title = 'AYE DAWG NICE PEEPEE!',
-        description = str(member.name) + '\'s penis size is ' + str(len(PP_Size)) + 'in 😘\n8' + PP_Size + 'D',
+        description = str(memberName) + '\'s penis size is ' + str(PP_Size) + 'in 😘\n8' + ("=" * PP_Size) + 'D',
         colour = discord.Colour.magenta()
     )
     await ctx.channel.send(embed=embed)
-
-@pp.error
-async def pp_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        PP_Size = '='
-        while (i <= random.randint(1,18)):
-            PP_Size = PP_Size + '='
-            i += 1
-        embed = discord.Embed(
-            title = 'AYE DAWG NICE PEEPEE!',
-            description = str(author[0]) + '\'s penis size is ' + str(len(PP_Size)) + 'in 😘\n8' + PP_Size + 'D',
-            colour = discord.Colour.magenta()
-        )
-        await ctx.channel.send(embed=embed)
 
 @bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
 async def roast(ctx, member : discord.Member):

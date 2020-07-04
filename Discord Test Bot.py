@@ -12,6 +12,7 @@ import json
 import asyncio
 
 bot = commands.Bot(command_prefix='.')
+bot.remove_command('help')
 Discord_Bot_Dir = str('.\\')
 
 marshDiscordId = "224618877626089483"
@@ -22,6 +23,26 @@ async def on_ready():
     activity = discord.Activity(type=discord.ActivityType.listening, name=".help")
     await bot.change_presence(activity=activity)
     print(f'Logged on and ready to use!')
+
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(
+            title="HomieBot Command List",
+            description='Those are availble categories:',
+            colour = discord.Colour.red()
+        )
+    embed.add_field(name='Fun', value="```.fun```", inline=True)
+    embed.add_field(name='Info', value="```.info```", inline=True)
+    await ctx.channel.send(embed=embed)
+
+@bot.command()
+async def info(ctx):
+    embed = discord.Embed(
+            title="Information",
+            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(marshDiscordId, jackDiscordId),
+            colour = discord.Colour.greyple()
+        )
+    await ctx.channel.send(embed=embed)
 
 @bot.event
 async def on_command_error(ctx, error):

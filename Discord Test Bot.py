@@ -13,7 +13,8 @@ import asyncio
 
 bot = commands.Bot(command_prefix='.')
 bot.remove_command('help')
-Discord_Bot_Dir = str('.\\')
+Discord_Bot_Dir = '.\\'
+gifsPath = ".\\gifs\\"
 
 marshDiscordId = "224618877626089483"
 jackDiscordId = "276462585690193921"
@@ -242,10 +243,10 @@ async def roast(ctx, member : discord.Member):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'insults.txt','rt')
+        file = open(gifsPath + 'insults.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'insults.txt','rt')
+        file = open(gifsPath + 'insults.txt','rt')
         for insultline in file:
             i += 1
             if i == this_num:
@@ -289,10 +290,10 @@ async def pickup(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'pickup.txt','rt')
+    file = open(gifsPath + 'pickup.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'pickup.txt','rt')
+    file = open(gifsPath + 'pickup.txt','rt')
     for pickupline in file:
         i += 1
         if i == this_num:
@@ -313,10 +314,10 @@ async def pickup_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'pickup.txt','rt')
+        file = open(gifsPath + 'pickup.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'pickup.txt','rt')
+        file = open(gifsPath + 'pickup.txt','rt')
         for pickupline in file:
             i += 1
             if i == this_num:
@@ -491,10 +492,10 @@ async def bite(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'bite.txt','rt')
+    file = open(gifsPath + 'bite.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'bite.txt','rt')
+    file = open(gifsPath + 'bite.txt','rt')
     for gifline in file:
         i += 1
         if i == this_num:
@@ -540,10 +541,10 @@ async def cuddle(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'cuddle.txt','rt')
+    file = open(gifsPath + 'cuddle.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'cuddle.txt','rt')
+    file = open(gifsPath + 'cuddle.txt','rt')
     for gifline in file:
         i += 1
         if i == this_num:
@@ -565,10 +566,10 @@ async def cuddle_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'cuddle.txt','rt')
+        file = open(gifsPath + 'cuddle.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'cuddle.txt','rt')
+        file = open(gifsPath + 'cuddle.txt','rt')
         for gifline in file:
             i += 1
             if i == this_num:
@@ -589,10 +590,10 @@ async def hug(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'hug.txt','rt')
+    file = open(gifsPath + 'hug.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'hug.txt','rt')
+    file = open(gifsPath + 'hug.txt','rt')
     for gifline in file:
         i += 1
         if i == this_num:
@@ -614,10 +615,10 @@ async def hug_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'hug.txt','rt')
+        file = open(gifsPath + 'hug.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'hug.txt','rt')
+        file = open(gifsPath + 'hug.txt','rt')
         for gifline in file:
             i += 1
             if i == this_num:
@@ -638,10 +639,10 @@ async def kiss(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'kiss.txt','rt')
+    file = open(gifsPath + 'kiss.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'kiss.txt','rt')
+    file = open(gifsPath + 'kiss.txt','rt')
     for gifline in file:
         i += 1
         if i == this_num:
@@ -663,10 +664,10 @@ async def kiss_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'kiss.txt','rt')
+        file = open(gifsPath + 'kiss.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'kiss.txt','rt')
+        file = open(gifsPath + 'kiss.txt','rt')
         for gifline in file:
             i += 1
             if i == this_num:
@@ -687,10 +688,10 @@ async def slap(ctx, member : discord.Member):
     self_message = str(ctx.author)
     author = self_message.split('#')
     i = 0
-    file = open(Discord_Bot_Dir + 'slap.txt','rt')
+    file = open(gifsPath + 'slap.txt','rt')
     num_lines = sum(1 for line in file)
     this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(Discord_Bot_Dir + 'slap.txt','rt')
+    file = open(gifsPath + 'slap.txt','rt')
     for gifline in file:
         i += 1
         if i == this_num:
@@ -712,10 +713,10 @@ async def slap_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'slap.txt','rt')
+        file = open(gifsPath + 'slap.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'slap.txt','rt')
+        file = open(gifsPath + 'slap.txt','rt')
         for gifline in file:
             i += 1
             if i == this_num:

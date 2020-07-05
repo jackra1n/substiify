@@ -16,8 +16,8 @@ bot.remove_command('help')
 Discord_Bot_Dir = '.\\'
 gifsPath = ".\\gifs\\"
 
-marshDiscordId = "224618877626089483"
-jackDiscordId = "276462585690193921"
+marshDiscordId = 224618877626089483
+jackDiscordId = 276462585690193921
 
 @bot.event
 async def on_ready():
@@ -40,7 +40,7 @@ async def help(ctx):
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
-            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(marshDiscordId, jackDiscordId),
+            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(marshDiscordId), str(jackDiscordId)),
             colour = discord.Colour.greyple()
         )
     await ctx.channel.send(embed=embed)
@@ -218,17 +218,22 @@ async def clear_error(ctx, error):
 
 @bot.command(aliases=['penis','pipa','pene'], brief='Ego problems? No problem I can help you with that.')
 async def pp(ctx, member : discord.Member=None):
-    memberName = ctx.author.name if member is None else member.name
+    member = ctx.author if member is None else member
     PP_Size = random.randint(1,18)
+    if member.id == jackDiscordId:
+        PP_Size = 20
+    elif member.id == 464861706665984010:
+        PP_Size = 1
     embed = discord.Embed(
         title = 'AYE DAWG NICE PEEPEE!',
-        description = str(memberName) + '\'s penis size is ' + str(PP_Size) + 'in 😘\n8' + ("=" * PP_Size) + 'D',
+        description = str(member.name) + '\'s penis size is ' + str(PP_Size) + 'in 😘\n8' + ("=" * PP_Size) + 'D',
         colour = discord.Colour.magenta()
     )
     await ctx.channel.send(embed=embed)
 
 @bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
 async def roast(ctx, member : discord.Member):
+    member = ctx.author if member is None else member
     if str(bot.user.id) == str(member.id):
         replys = ['Simmer down buddy 🔫',
                 'You dare challenge thy master?! 💪',
@@ -405,7 +410,7 @@ async def fight(ctx, member : discord.Member):
                 fight_turn += 1
                 
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
-                if str(msg.author.id) == jackDiscordId:
+                if msg.author.id == jackDiscordId:
                     punch_damage = 100
                 duelers_health -= punch_damage
                 await ctx.channel.send('**' + challenge_member + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name[0] + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name[0] + '** is left with `' + f'{duelers_health}' + '` health!')
@@ -425,7 +430,7 @@ async def fight(ctx, member : discord.Member):
                 fight_turn += 1
 
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
-                if str(msg.author.id) == jackDiscordId:
+                if msg.author.id == jackDiscordId:
                     punch_damage = 100
                 challenge_member_health -= punch_damage
                 await ctx.channel.send('**' + duel_authors_name[0] + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + challenge_member + '** is left with `' + f'{challenge_member_health}' + '` health!')

@@ -55,9 +55,7 @@ async def cd(ctx):
     Tday = datetime.date.today()
     f_date = datetime.date(2020, 8, 10)
     delta = f_date - Tday
-    if ctx.author.id == marshDiscordId:
-        await ctx.channel.send(delta)
-    elif ctx.author.id == 704589853974855770:
+    if ctx.author.id == marshDiscordId or ctx.author.id == 704589853974855770 or ctx.author.id == jackDiscordId:
         await ctx.channel.send(delta)
 
 @bot.command(pass_context=True, aliases=["p", "sing"])
@@ -232,9 +230,10 @@ async def pp(ctx, member : discord.Member=None):
     await ctx.channel.send(embed=embed)
 
 @bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
-async def roast(ctx, member : discord.Member):
+async def roast(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
-    if str(bot.user.id) == str(member.id):
+    author = bot.user if member is ctx.author else ctx.author
+    if bot.user.id == member.id:
         replys = ['Simmer down buddy 🔫',
                 'You dare challenge thy master?! 💪',
                 'OK homie relax.. 💩',
@@ -245,8 +244,6 @@ async def roast(ctx, member : discord.Member):
         ]
         await ctx.channel.send(f'{random.choice(replys)}')
     else:
-        self_message = str(ctx.author)
-        author = self_message.split('#')
         i = 0
         file = open(gifsPath + 'insults.txt','rt')
         num_lines = sum(1 for line in file)
@@ -259,41 +256,17 @@ async def roast(ctx, member : discord.Member):
                 break
         embed = discord.Embed(
             title = 'HOMIE INSULTS! 🔥',
-            description = str(author[0]) + ' says: ay ' + str(member.name) + ', ' + this_line,
+            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + this_line,
             colour = discord.Colour.orange()
         )
         await ctx.channel.send(embed=embed)
         file.close()
         this_line = None
 
-@roast.error
-async def roast_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'insults.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'insults.txt','rt')
-        for insultline in file:
-            i += 1
-            if i == this_num:
-                this_line = insultline
-                break
-        embed = discord.Embed(
-            title = 'HOMIE INSULTS! 🔥',
-            description = 'Homie Bot says: ay ' + str(author[0]) + ', ' + this_line,
-            colour = discord.Colour.red()
-        )
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-
 @bot.command(brief='Wanna hit on someone? Let me be your wingman!')
-async def pickup(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def pickup(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'pickup.txt','rt')
     num_lines = sum(1 for line in file)
@@ -306,36 +279,12 @@ async def pickup(ctx, member : discord.Member):
             break
     embed = discord.Embed(
         title = 'HOMIE PICKUPS! 🌈',
-        description = str(author[0]) + ' says: ay ' + str(member.name) + ', ' + this_line,
+        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + this_line,
         colour = discord.Colour.orange()
     )
     await ctx.channel.send(embed=embed)
     file.close()
     this_line = None
-
-@pickup.error
-async def pickup_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'pickup.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'pickup.txt','rt')
-        for pickupline in file:
-            i += 1
-            if i == this_num:
-                this_line = pickupline
-                break
-        embed = discord.Embed(
-            title = 'HOMIE PICKUPS! 🌈',
-            description = 'Homie Bot says: ay ' + str(author[0]) + ', ' + this_line,
-            colour = discord.Colour.orange()
-        )
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
 
 @bot.command(aliases=['duel'], brief='Fight someone on this server!')
 @commands.max_concurrency(1,per=BucketType.default,wait=True)
@@ -472,7 +421,8 @@ async def fight_error(ctx, error):
         await ctx.channel.send('Who you tryna fight, the air?! Choose someone to fight you pleb! 🤡')
 
 @bot.command(brief='Enlarge and view your profile picture or another member')
-async def av(ctx, member : discord.Member):
+async def av(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
     embed = discord.Embed(
         title = str(member.name),
         description = 'Avatar',
@@ -481,21 +431,10 @@ async def av(ctx, member : discord.Member):
     embed.set_image(url=member.avatar_url)
     await ctx.channel.send(embed=embed)
 
-@av.error
-async def av_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        embed = discord.Embed(
-        title = str(ctx.author),
-        description = 'Avatar',
-        colour = discord.Colour.light_grey()
-    )
-    embed.set_image(url=ctx.author.avatar_url)
-    await ctx.channel.send(embed=embed)
-
 @bot.command(brief='Bite someone or yourself')
-async def bite(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def bite(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'bite.txt','rt')
     num_lines = sum(1 for line in file)
@@ -507,7 +446,7 @@ async def bite(ctx, member : discord.Member):
             this_line = gifline
             break
     embed = discord.Embed(
-        title = str(author[0]) + ' bites ' + str(member.name),
+        title = str(author.name) + ' bites ' + str(member.name),
         colour = discord.Colour.from_rgb(0,0,0)
     )
     embed.set_image(url=this_line)
@@ -515,36 +454,11 @@ async def bite(ctx, member : discord.Member):
     file.close()
     this_line = None
     num_lines = None
-
-@bite.error
-async def bite_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'bite.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'bite.txt','rt')
-        for gifline in file:
-            i += 1
-            if i == this_num:
-                this_line = gifline
-                break
-        embed = discord.Embed(
-            title = 'Homie Bot bites ' + str(author[0]),
-            colour = discord.Colour.from_rgb(0,0,0)
-        )
-        embed.set_image(url=this_line)
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-        num_lines = None
 
 @bot.command(brief='Cuddle someone or yourself')
-async def cuddle(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def cuddle(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'cuddle.txt','rt')
     num_lines = sum(1 for line in file)
@@ -556,7 +470,7 @@ async def cuddle(ctx, member : discord.Member):
             this_line = gifline
             break
     embed = discord.Embed(
-        title = str(author[0]) + ' cuddles ' + str(member.name) + ' 🤗',
+        title = str(author.name) + ' cuddles ' + str(member.name) + ' 🤗',
         colour = discord.Colour.from_rgb(0,0,0)
     )
     embed.set_image(url=this_line)
@@ -564,36 +478,11 @@ async def cuddle(ctx, member : discord.Member):
     file.close()
     this_line = None
     num_lines = None
-
-@cuddle.error
-async def cuddle_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'cuddle.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'cuddle.txt','rt')
-        for gifline in file:
-            i += 1
-            if i == this_num:
-                this_line = gifline
-                break
-        embed = discord.Embed(
-            title = 'Homie Bot cuddles ' + str(author[0]) + ' 🤗',
-            colour = discord.Colour.from_rgb(0,0,0)
-        )
-        embed.set_image(url=this_line)
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-        num_lines = None
 
 @bot.command(brief='Hug someone or yourself')
-async def hug(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def hug(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'hug.txt','rt')
     num_lines = sum(1 for line in file)
@@ -605,7 +494,7 @@ async def hug(ctx, member : discord.Member):
             this_line = gifline
             break
     embed = discord.Embed(
-        title = str(author[0]) + ' hugs ' + str(member.name) + ' 🤗',
+        title = str(author.name) + ' hugs ' + str(member.name) + ' 🤗',
         colour = discord.Colour.from_rgb(0,0,0)
     )
     embed.set_image(url=this_line)
@@ -613,36 +502,11 @@ async def hug(ctx, member : discord.Member):
     file.close()
     this_line = None
     num_lines = None
-
-@hug.error
-async def hug_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'hug.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'hug.txt','rt')
-        for gifline in file:
-            i += 1
-            if i == this_num:
-                this_line = gifline
-                break
-        embed = discord.Embed(
-            title = 'Homie Bot hugs ' + str(author[0]) + ' 🤗',
-            colour = discord.Colour.from_rgb(0,0,0)
-        )
-        embed.set_image(url=this_line)
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-        num_lines = None
 
 @bot.command(brief='Kiss someone or yourself')
-async def kiss(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def kiss(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'kiss.txt','rt')
     num_lines = sum(1 for line in file)
@@ -654,7 +518,7 @@ async def kiss(ctx, member : discord.Member):
             this_line = gifline
             break
     embed = discord.Embed(
-        title = str(author[0]) + ' kisses ' + str(member.name) + ' 💋',
+        title = str(author.name) + ' kisses ' + str(member.name) + ' 💋',
         colour = discord.Colour.from_rgb(0,0,0)
     )
     embed.set_image(url=this_line)
@@ -662,36 +526,11 @@ async def kiss(ctx, member : discord.Member):
     file.close()
     this_line = None
     num_lines = None
-
-@kiss.error
-async def kiss_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'kiss.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'kiss.txt','rt')
-        for gifline in file:
-            i += 1
-            if i == this_num:
-                this_line = gifline
-                break
-        embed = discord.Embed(
-            title = 'Homie Bot kisses ' + str(author[0]) + ' 💋',
-            colour = discord.Colour.from_rgb(0,0,0)
-        )
-        embed.set_image(url=this_line)
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-        num_lines = None
 
 @bot.command(brief='Slap someone or yourself')
-async def slap(ctx, member : discord.Member):
-    self_message = str(ctx.author)
-    author = self_message.split('#')
+async def slap(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
     i = 0
     file = open(gifsPath + 'slap.txt','rt')
     num_lines = sum(1 for line in file)
@@ -703,7 +542,7 @@ async def slap(ctx, member : discord.Member):
             this_line = gifline
             break
     embed = discord.Embed(
-        title = str(author[0]) + ' slaps ' + str(member.name) + ' 😡',
+        title = str(author.name) + ' slaps ' + str(member.name) + ' 😡',
         colour = discord.Colour.from_rgb(0,0,0)
     )
     embed.set_image(url=this_line)
@@ -711,31 +550,6 @@ async def slap(ctx, member : discord.Member):
     file.close()
     this_line = None
     num_lines = None
-
-@slap.error
-async def slap_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        self_message = str(ctx.author)
-        author = self_message.split('#')
-        i = 0
-        file = open(gifsPath + 'slap.txt','rt')
-        num_lines = sum(1 for line in file)
-        this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(gifsPath + 'slap.txt','rt')
-        for gifline in file:
-            i += 1
-            if i == this_num:
-                this_line = gifline
-                break
-        embed = discord.Embed(
-            title = 'Homie Bot slaps ' + str(author[0]) + ' 😡',
-            colour = discord.Colour.from_rgb(0,0,0)
-        )
-        embed.set_image(url=this_line)
-        await ctx.channel.send(embed=embed)
-        file.close()
-        this_line = None
-        num_lines = None
 
 file = open(Discord_Bot_Dir + 'token.txt','rt')
 bot.run(str(file.read()))

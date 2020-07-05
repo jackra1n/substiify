@@ -272,10 +272,10 @@ async def roast_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'insults.txt','rt')
+        file = open(gifsPath + 'insults.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'insults.txt','rt')
+        file = open(gifsPath + 'insults.txt','rt')
         for insultline in file:
             i += 1
             if i == this_num:
@@ -522,10 +522,10 @@ async def bite_error(ctx, error):
         self_message = str(ctx.author)
         author = self_message.split('#')
         i = 0
-        file = open(Discord_Bot_Dir + 'bite.txt','rt')
+        file = open(gifsPath + 'bite.txt','rt')
         num_lines = sum(1 for line in file)
         this_num = random.randint(1,int(f'{num_lines}'))
-        file = open(Discord_Bot_Dir + 'bite.txt','rt')
+        file = open(gifsPath + 'bite.txt','rt')
         for gifline in file:
             i += 1
             if i == this_num:

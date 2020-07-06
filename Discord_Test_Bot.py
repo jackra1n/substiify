@@ -220,7 +220,7 @@ async def pp(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
     no_use_pp = None
     PP_Size = random.randint(1,18)
-    if member.id == 48895970960959078:
+    if member.id == 488959709609590787:
         member = no_use_pp
     if member.id == jackDiscordId:
         PP_Size = 20

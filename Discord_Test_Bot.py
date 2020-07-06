@@ -290,13 +290,12 @@ async def pickup(ctx, member : discord.Member=None):
 @bot.command(aliases=['duel'], brief='Fight someone on this server!')
 @commands.max_concurrency(1,per=BucketType.default,wait=True)
 async def fight(ctx, member : discord.Member):
-    duel_author = str(ctx.author)
-    duelers_id = str(ctx.author.id)
-    duel_authors_name = duel_author.split('#')
-    challenge_member = str(member.name)
-    challenge_member_id = str(member.id)
-    bot_name = str(bot.user)
-    bot_username = bot_name.split('#')
+    duel_authors_id = ctx.author.id
+    duel_authors_name = ctx.author.name
+    challenge_member_name = member.name
+    challenge_member_id = member.id
+    bot_username = bot.user.name
+    bot_id = bot.user.id
 
     hit_response = [    'cRaZyy',
                         'pOwerful',
@@ -308,7 +307,7 @@ async def fight(ctx, member : discord.Member):
     ]
     
     #fighting yourself? Loser.
-    if str(duelers_id) == str(challenge_member_id):
+    if duel_authors_id == challenge_member_id:
         replys = [  'Dumbass.. You cant challenge yourself! 🤡',
                     'LOL! IDIOT! 🤣',
                     'Homie... Chillax. Stop beefing with yo self 👊',
@@ -319,7 +318,7 @@ async def fight(ctx, member : discord.Member):
         await ctx.channel.send(f'{random.choice(replys)}')
 
     #fighting the bot? KEKW
-    elif str(challenge_member) == str(bot_username[0]):
+    elif challenge_member_id == bot_id:
         replys = [  'Simmer down buddy 🔫',
                     'You dare challenge thy master?! 💪',
                     'OK homie relax.. 💩',
@@ -333,7 +332,7 @@ async def fight(ctx, member : discord.Member):
     #fighting other users
     else:
         embed = discord.Embed(
-            title = '⚔️ ' + duel_authors_name[0] + ' has challenged ' + challenge_member + ' to a fight!',
+            title = '⚔️ ' + duel_authors_name + ' has challenged ' + challenge_member_name + ' to a fight!',
             description=member.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!',
             colour = discord.Colour.red()
         )
@@ -351,24 +350,24 @@ async def fight(ctx, member : discord.Member):
                 msg = await bot.wait_for('message', check=inner_check, timeout=30.0)
             except asyncio.TimeoutError:
                 if (fight_turn % 2) == 0:
-                    await ctx.channel.send('Nice fight idiots.. **' + duel_authors_name[0] + '** wins!')
+                    await ctx.channel.send('Nice fight idiots.. **' + duel_authors_name + '** wins!')
                     break
                 else:
-                    await ctx.channel.send('Nice fight idiots.. **' + challenge_member + '** wins!')
+                    await ctx.channel.send('Nice fight idiots.. **' + challenge_member_name + '** wins!')
                     break
-            if str(msg.content) == 'punch' and str(msg.author.id) == challenge_member_id and (fight_turn % 2) == 0:
+            if str(msg.content) == 'punch' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
                 fight_turn += 1
-                
+
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
                 if msg.author.id == jackDiscordId:
                     punch_damage = 100
                 duelers_health -= punch_damage
-                await ctx.channel.send('**' + challenge_member + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name[0] + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name[0] + '** is left with `' + f'{duelers_health}' + '` health!')
-                               
+                await ctx.channel.send('**' + challenge_member_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name + '** is left with `' + f'{duelers_health}' + '` health!')
+                                
                 if duelers_health <= 0:
                     embed = discord.Embed(
                         title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-                        description = '**' + f'{challenge_member}' + '** wins with just `' + f'{challenge_member_health}' + ' HP` left!',
+                        description = '**' + f'{challenge_member_name}' + '** wins with just `' + f'{challenge_member_health}' + ' HP` left!',
                         colour = discord.Colour.teal()
                     )
                     await ctx.channel.send(embed=embed)
@@ -376,19 +375,20 @@ async def fight(ctx, member : discord.Member):
                 else:
                     await ctx.channel.send(ctx.author.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
                     punch_damage = int(random.randint(1,int(f'{challenge_member_health}'))) 
-            elif str(msg.content) == 'punch' and str(msg.author.id) == duelers_id and (fight_turn % 2) != 0:
+              
+            elif str(msg.content) == 'punch' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
                 fight_turn += 1
 
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
                 if msg.author.id == jackDiscordId:
                     punch_damage = 100
                 challenge_member_health -= punch_damage
-                await ctx.channel.send('**' + duel_authors_name[0] + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + challenge_member + '** is left with `' + f'{challenge_member_health}' + '` health!')
+                await ctx.channel.send('**' + duel_authors_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + challenge_member_name + '** is left with `' + f'{challenge_member_health}' + '` health!')
                            
                 if challenge_member_health == 0:
                     embed = discord.Embed(
                         title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-                        description = '**' + f'{duel_authors_name[0]}' + '** wins with just `' + f'{duelers_health}' + ' HP` left!',
+                        description = '**' + f'{duel_authors_name}' + '** wins with just `' + f'{duelers_health}' + ' HP` left!',
                         colour = discord.Colour.teal()
                     )
                     await ctx.channel.send(embed=embed)
@@ -396,23 +396,22 @@ async def fight(ctx, member : discord.Member):
                 else:
                     await ctx.channel.send(member.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
                     punch_damage = int(random.randint(1,int(f'{duelers_health}')))  
-            elif str(msg.content) == 'defend' and str(msg.author.id) == duelers_id and (fight_turn % 2) != 0:
+
+            elif str(msg.content) == 'defend' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
                 fight_turn += 1
-                await defenseResponse(ctx, duel_authors_name[0], member.mention)
-            elif str(msg.content) == 'defend' and str(msg.author.id) == challenge_member_id and (fight_turn % 2) == 0:
+                await defenseResponse(ctx, duel_authors_name, member.mention)
+            elif str(msg.content) == 'defend' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
                 fight_turn += 1
-                await defenseResponse(ctx, challenge_member, ctx.author.mention)
-            elif str(msg.content) == 'end' and str(msg.author.id) == duelers_id and (fight_turn % 2) != 0:
-                await ctx.channel.send(duel_authors_name[0] + ' has ended the fight. What a wimp.')
+                await defenseResponse(ctx, challenge_member_name, ctx.author.mention)
+            elif str(msg.content) == 'end' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
+                await ctx.channel.send(duel_authors_name + ' has ended the fight. What a wimp.')
                 break
-            elif str(msg.content) == 'end' and str(msg.author.id) == challenge_member_id and (fight_turn % 2) == 0:
-                await ctx.channel.send(challenge_member + ' has ended the fight. What a wimp.')
-                break
+            elif str(msg.content) == 'end' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
+                await ctx.channel.send(challenge_member_name + ' has ended the fight. What a wimp.')
+                break   
 
 async def defenseResponse(ctx, person, mentionedUser):
-    print("im in defenseResponse()")
     defence_points = int(random.randint(1,10))
-    print(mentionedUser)
     await ctx.channel.send('**' + f'{person}' + '** boosted their defense by `' + f'{defence_points}' + '` points!')
     await ctx.channel.send(mentionedUser + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
 

@@ -218,7 +218,10 @@ async def clear_error(ctx, error):
 @bot.command(aliases=['penis','pipa','pene'], brief='Ego problems? No problem I can help you with that.')
 async def pp(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
+    no_use_pp = None
     PP_Size = random.randint(1,18)
+    if member.id == 48895970960959078:
+        member = no_use_pp
     if member.id == jackDiscordId:
         PP_Size = 20
     elif member.id == 464861706665984010:

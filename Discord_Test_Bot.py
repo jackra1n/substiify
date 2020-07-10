@@ -5,6 +5,7 @@ from YTDLSource import YTDLSource
 from YTDLSource import PlaylistHelper
 from PlayList import PlayList
 from pathlib import Path
+from enum import Enum
 import random
 import time
 import os
@@ -33,8 +34,8 @@ async def help(ctx):
             description='Those are availble categories:',
             colour = discord.Colour.red()
         )
-    embed.add_field(name='Fun', value="```.fun```", inline=True)
-    embed.add_field(name='Info', value="```.info```", inline=True)
+    embed.add_field(name='Fun', value='``.fun``', inline=True)
+    embed.add_field(name='Info', value='``.info``', inline=True)
     await ctx.channel.send(embed=embed)
 
 @bot.command()
@@ -323,22 +324,63 @@ async def fight(ctx, member : discord.Member):
     #fighting other users
     else:
         embed = discord.Embed(
-            title = '⚔️ ' + duel_authors_name + ' has challenged ' + challenge_member_name + ' to a fight!',
-            description=member.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!',
+            title = '⚔️ ' + duel_authors_name + ' choose your class.',
+            description= ctx.author.mention+'what class do you want to be? `berserker`, `tank` or `wizard`?',
             colour = discord.Colour.red()
         )
         await ctx.channel.send(embed=embed)
+
+        def checkClassChooser(message):
+            return message.content == 'berserker' or message.content == 'tank' or message.content == 'wizard'
+
+        try:
+            msgClass = await bot.wait_for('message', check=checkClassChooser, timeout=30.0)
+        except asyncio.TimeoutError:
+            await ctx.channel.send('Time out!')
+            
+        if msgClass.author.id == duel_authors_id:
+            if msgClass.content == 'berserker':
+                warrior1 = Warrior(msgClass.author.id)
+                warrior1.chooseClass(1)
+            elif msgClass.content == 'tank':
+                warrior1 = Warrior(msgClass.author.id)
+                warrior1.chooseClass(2)
+            elif msgClass.content == 'wizard':
+                warrior1 = Warrior(msgClass.author.id)
+                warrior1.chooseClass(3)
+
+        embed = discord.Embed(
+            title = '⚔️ ' + duel_authors_name + ' has challenged ' + challenge_member_name + ' to a fight!',
+            description = duel_authors_name + ' chose class ' + warrior1.ClassName + '.' + member.mention + ', what is your class of choice? `berserker`,`tank`, or `wizard`?\nType your choice out in chat as it is displayed!',
+            colour = discord.Colour.red()
+        )
+        await ctx.channel.send(embed=embed)
+
+        try:
+            msgClass = await bot.wait_for('message', check=checkClassChooser, timeout=30.0)
+        except asyncio.TimeoutError:
+            await ctx.channel.send('Time out!')
+
+        if msgClass.author.id == challenge_member_id:
+            if msgClass.content == 'berserker':
+                warrior2 = Warrior(msgClass.author.id)
+                warrior2.chooseClass(1)
+            elif msgClass.content == 'tank':
+                warrior2 = Warrior(msgClass.author.id)
+                warrior2.chooseClass(2)
+            elif msgClass.content == 'wizard':
+                warrior2 = Warrior(msgClass.author.id)
+                warrior2.chooseClass(3)
         
+        await ctx.channel.send(challenge_member_name + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
+
         fight_turn = 0
-        challenge_member_health = int(100)
-        duelers_health = int(100)
-        punch_damage = int(random.randint(1,100))
-        def inner_check(message):
+        def checkAction(message):
             return message.content == 'punch' or message.content == 'defend' or message.content == 'end'
 
-        while challenge_member_health != 0 or duelers_health != 0:
+        while warrior1.Health > 0 and warrior2.Health > 0:
             try:
-                msg = await bot.wait_for('message', check=inner_check, timeout=30.0)
+                msg = await bot.wait_for('message', check=checkAction, timeout=30.0)
             except asyncio.TimeoutError:
                 if (fight_turn % 2) == 0:
                     await ctx.channel.send('Nice fight idiots.. **' + duel_authors_name + '** wins!')
@@ -348,45 +390,45 @@ async def fight(ctx, member : discord.Member):
                     break
             if str(msg.content) == 'punch' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
                 fight_turn += 1
-
+                attack = random.randrange(0,warrior1.AttkMax)
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
                 if msg.author.id == jackDiscordId:
-                    punch_damage = 100
-                duelers_health -= punch_damage
-                await ctx.channel.send('**' + challenge_member_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name + '** is left with `' + f'{duelers_health}' + '` health!')
+                    attack = 100
+                warrior1.Health -= attack
+                await ctx.channel.send('**' + challenge_member_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name + '** dealing `' + str(attack) + '` damage!\n**' + duel_authors_name + '** is left with `' + str(warrior1.Health) + '` health!')
                                 
-                if duelers_health <= 0:
+                if warrior1.Health <= 0:
                     embed = discord.Embed(
                         title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-                        description = '**' + f'{challenge_member_name}' + '** wins with just `' + f'{challenge_member_health}' + ' HP` left!',
+                        description = '**' + f'{challenge_member_name}' + '** wins with just `' + str(warrior2.Health) + ' HP` left!',
                         colour = discord.Colour.teal()
                     )
                     await ctx.channel.send(embed=embed)
                     break
                 else:
                     await ctx.channel.send(ctx.author.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
-                    punch_damage = int(random.randint(1,int(f'{challenge_member_health}'))) 
+                    attack = random.randrange(0,warrior1.AttkMax)
               
             elif str(msg.content) == 'punch' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
                 fight_turn += 1
-
+                attack = random.randrange(0,warrior2.AttkMax)
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
                 if msg.author.id == jackDiscordId:
-                    punch_damage = 100
-                challenge_member_health -= punch_damage
-                await ctx.channel.send('**' + duel_authors_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + challenge_member_name + '** is left with `' + f'{challenge_member_health}' + '` health!')
+                    attack = 100
+                warrior2.Health -= attack
+                await ctx.channel.send('**' + duel_authors_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member_name + '** dealing `' + str(attack) + '` damage!\n**' + challenge_member_name + '** is left with `' + str(warrior2.Health) + '` health!')
                            
-                if challenge_member_health == 0:
+                if warrior2 < 0:
                     embed = discord.Embed(
                         title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-                        description = '**' + f'{duel_authors_name}' + '** wins with just `' + f'{duelers_health}' + ' HP` left!',
+                        description = '**' + f'{duel_authors_name}' + '** wins with just `' + str(warrior1.Health) + ' HP` left!',
                         colour = discord.Colour.teal()
                     )
                     await ctx.channel.send(embed=embed)
                     break
                 else:
                     await ctx.channel.send(member.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
-                    punch_damage = int(random.randint(1,int(f'{duelers_health}')))  
+                    attack = random.randrange(0,warrior2.AttkMax)
 
             elif str(msg.content) == 'defend' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
                 fight_turn += 1
@@ -405,6 +447,40 @@ async def defenseResponse(ctx, person, mentionedUser):
     defence_points = int(random.randint(1,10))
     await ctx.channel.send('**' + f'{person}' + '** boosted their defense by `' + f'{defence_points}' + '` points!')
     await ctx.channel.send(mentionedUser + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
+
+class Warrior:
+    def __init__(self, id, health=1, attkMax=1, blckMax=1, mana=1, className=1):
+        self.id = id
+        self.Health = health
+        self.AttkMax = attkMax
+        self.BlckMax = blckMax
+        self.Mana = mana
+        self.ClassName = className
+
+    def chooseClass(self, className):
+        if className == 1:
+            self.Health = 1000
+            self.AttkMax = 140
+            self.BlckMax = 30
+            self.Mana = 30
+            self.ClassName = WarriorClasses(1).name
+        elif className == 2:
+            self.Health = 1200
+            self.AttkMax = 100
+            self.BlckMax = 60
+            self.Mana = 20
+            self.ClassName = WarriorClasses(2).name
+        elif className == 3:
+            self.Health = 700
+            self.AttkMax = 200
+            self.BlckMax = 20
+            self.Mana = 50
+            self.ClassName = WarriorClasses(3).name
+
+class WarriorClasses(Enum):
+    BERSERKER = 1
+    TANK = 2
+    WIZARD = 3
 
 @fight.error
 async def fight_error(ctx, error):

@@ -219,7 +219,7 @@ async def clear_error(ctx, error):
 async def pp(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
     no_use_pp = None
-    PP_Size = random.randint(1,18)
+    PP_Size = random.randint(3,20)
     if member.id == 488959709609590787:
         member = no_use_pp
     if member.id == jackDiscordId:
@@ -228,7 +228,7 @@ async def pp(ctx, member : discord.Member=None):
         PP_Size = 1
     embed = discord.Embed(
         title = 'AYE DAWG NICE PEEPEE!',
-        description = str(member.name) + '\'s penis size is ' + str(PP_Size) + 'in 😘\n8' + ("=" * PP_Size) + 'D',
+        description = str(member.name) + '\'s penis size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
         colour = discord.Colour.magenta()
     )
     await ctx.channel.send(embed=embed)

@@ -250,7 +250,7 @@ async def roast(ctx, member : discord.Member=None):
     else:
         embed = discord.Embed(
             title = 'HOMIE INSULTS! 🔥',
-            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("roast.txt"),
+            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
             colour = discord.Colour.orange()
         )
         await ctx.channel.send(embed=embed)

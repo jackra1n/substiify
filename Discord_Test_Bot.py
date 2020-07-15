@@ -350,7 +350,7 @@ async def fight(ctx, member : discord.Member):
                 fight_turn += 1
 
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
-                if msg.author.id == jackDiscordId:
+                if msg.author.id == jackDiscordId or msg.author.id == marshDiscordId:
                     punch_damage = 100
                 duelers_health -= punch_damage
                 await ctx.channel.send('**' + challenge_member_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + duel_authors_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + duel_authors_name + '** is left with `' + f'{duelers_health}' + '` health!')
@@ -371,7 +371,7 @@ async def fight(ctx, member : discord.Member):
                 fight_turn += 1
 
                 #jack always punches for 100 damage cuz he is 4WeirdBuff
-                if msg.author.id == jackDiscordId:
+                if msg.author.id == jackDiscordId or msg.author.id == marshDiscordId:
                     punch_damage = 100
                 challenge_member_health -= punch_damage
                 await ctx.channel.send('**' + duel_authors_name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + challenge_member_name + '** dealing `' + f'{punch_damage}' + '` damage!\n**' + challenge_member_name + '** is left with `' + f'{challenge_member_health}' + '` health!')

@@ -33,8 +33,8 @@ async def help(ctx):
             description='Those are availble categories:',
             colour = discord.Colour.red()
         )
-    embed.add_field(name='Fun', value="```.fun```", inline=True)
-    embed.add_field(name='Info', value="```.info```", inline=True)
+    embed.add_field(name='Fun', value="`.fun``", inline=True)
+    embed.add_field(name='Info', value="``.info``", inline=True)
     await ctx.channel.send(embed=embed)
 
 @bot.command()
@@ -336,7 +336,7 @@ async def fight(ctx, member : discord.Member):
         def inner_check(message):
             return message.content == 'punch' or message.content == 'defend' or message.content == 'end'
 
-        while challenge_member_health != 0 or duelers_health != 0:
+        while challenge_member_health <= 0 or duelers_health <= 0:
             try:
                 msg = await bot.wait_for('message', check=inner_check, timeout=30.0)
             except asyncio.TimeoutError:

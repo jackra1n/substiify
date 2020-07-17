@@ -1,9 +1,6 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
-from YTDLSource import YTDLSource
-from YTDLSource import PlaylistHelper
-from PlayList import PlayList
 from pathlib import Path
 import random
 import time
@@ -58,124 +55,6 @@ async def cd(ctx):
     delta = f_date - Tday
     if ctx.author.id == marshDiscordId or ctx.author.id == 704589853974855770 or ctx.author.id == jackDiscordId:
         await ctx.channel.send(delta)
-
-@bot.command(pass_context=True, aliases=["p", "sing"])
-async def play(ctx, *, url):
-    if PlaylistHelper.checkIfYoutubePlayList(url):
-        urls = YTDLSource.get_playlist_info(url)['urls']
-        embed = discord.Embed(
-            title="Queued " + str(len(urls)) + " Songs",
-            description='Playing Song!',
-            colour = discord.Colour.red()
-        )
-        await ctx.channel.send(embed=embed)
-
-        if not ctx.voice_client.is_playing():
-            try:
-                player = await YTDLSource.from_url(urls.pop(0), stream=True)
-                if player is not None:
-                    if ctx.voice_client.is_playing():
-                        ctx.voice_client.stop()
-                    ctx.voice_client.play(player, after=lambda e: check_queue(ctx))
-                    embed = discord.Embed(
-                        title = 'Playing: ' + player.title,
-                        description='Playing Song!',
-                        colour = discord.Colour.red()
-                    )
-                    await ctx.channel.send(embed=embed)
-            except Exception as err:
-                embed = discord.Embed(
-                    title = 'ERROR: {0}'.format(err),
-                    description='Playing Song!',
-                    colour = discord.Colour.dark_blue()
-                )
-                await ctx.channel.send(embed=embed)
-
-        for entry in urls:
-            PlayList.queue(entry)
-    else:
-        player = await YTDLSource.from_url(url, stream=True)
-        if ctx.voice_client.is_playing():
-            PlayList.queue(url)
-        else:
-            try:
-                if player is not None:
-                    if ctx.voice_client.is_playing():
-                        ctx.voice_client.stop()
-                    ctx.voice_client.play(player, after=lambda e: check_queue(ctx))
-                    embed = discord.Embed(
-                        title = 'Playing: ' + player.title,
-                        description='Playing Song!',
-                        colour = discord.Colour.red()
-                    )
-                    await ctx.channel.send(embed=embed)
-            except Exception as err:
-                embed = discord.Embed(
-                    title = 'ERROR: {0}'.format(err),
-                    description='Playing Song!',
-                    colour = discord.Colour.dark_blue()
-                )
-                await ctx.channel.send(embed=embed)
-
-@bot.command(pass_context=True, aliases=["l", "disconnect"])
-async def leave(ctx):
-    server = ctx.message.guild.voice_client
-    await server.disconnect()
-
-
-@bot.command(pass_context=True, aliases=["r", "random"])
-async def shuffle(ctx):
-    PlayList.shuffle = not PlayList.shuffle
-
-
-@bot.command()
-async def skip(ctx):
-    await play_next_song(ctx)
-
-
-@play.error
-async def play_error(ctx, error):
-    await ctx.channel.send('Cant play the song!')
-
-def check_queue(ctx):
-    if not ctx.voice_client.is_playing():
-        asyncio.run(play_next_song(ctx))
-    else:
-        pass
-
-async def play_next_song(ctx):
-    try:
-        player = await PlayList.get_next_song()
-        if player is not None:
-            if ctx.voice_client.is_playing():
-                ctx.voice_client.stop()
-            ctx.voice_client.play(player, after=lambda e: check_queue(ctx))
-            embed = discord.Embed(
-                title = 'Playing: ' + player.title,
-                description='Playing Song!',
-                colour = discord.Colour.red()
-            )
-            await ctx.channel.send(embed=embed)
-    except Exception as err:
-        embed = discord.Embed(
-            title = 'ERROR: {0}'.format(err),
-            description='Playing Song!',
-            colour = discord.Colour.dark_blue()
-        )
-        await ctx.send(embed=embed)
-
-@play.before_invoke
-async def ensure_voice(ctx):
-    if ctx.voice_client is None:
-        if ctx.author.voice:
-            await ctx.author.voice.channel.connect()
-        else:
-            await ctx.channel.send("You are not connected to a voice channel.")
-            raise commands.CommandError("Author not connected to a voice channel.")
-
-@bot.command()
-async def summon(ctx):
-    await ctx.author.voice.channel.connect()
 
 @bot.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
 async def eightball(ctx,*,question):
@@ -422,65 +301,15 @@ async def av(ctx, member : discord.Member=None):
     embed.set_image(url=member.avatar_url)
     await ctx.channel.send(embed=embed)
 
-@bot.command(brief='Bite someone or yourself')
-async def bite(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = str(author.name) + ' bites ' + str(member.name),
-        colour = discord.Colour.from_rgb(0,0,0)
-    )
-    embed.set_image(url=await lineChooser("bite.txt"))
-    await ctx.channel.send(embed=embed)
-    file.close()
+startup_extensions = ["gif","music"]
 
-@bot.command(brief='Cuddle someone or yourself')
-async def cuddle(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = str(author.name) + ' cuddles ' + str(member.name) + ' 🤗',
-        colour = discord.Colour.from_rgb(0,0,0)
-    )
-    embed.set_image(url=await lineChooser("cuddle.txt"))
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-@bot.command(brief='Hug someone or yourself')
-async def hug(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = str(author.name) + ' hugs ' + str(member.name) + ' 🤗',
-        colour = discord.Colour.from_rgb(0,0,0)
-    )
-    embed.set_image(url=await lineChooser("hug.txt"))
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-@bot.command(brief='Kiss someone or yourself')
-async def kiss(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = str(author.name) + ' kisses ' + str(member.name) + ' 💋',
-        colour = discord.Colour.from_rgb(0,0,0)
-    )
-    embed.set_image(url=await lineChooser("kiss.txt"))
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-@bot.command(brief='Slap someone or yourself')
-async def slap(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = str(author.name) + ' slaps ' + str(member.name) + ' 😡',
-        colour = discord.Colour.from_rgb(0,0,0)
-    )
-    embed.set_image(url=await lineChooser("slap.txt"))
-    await ctx.channel.send(embed=embed)
-    file.close()
+if __name__ == "__main__":
+    for extension in startup_extensions:
+        try:
+            bot.load_extension(extension)
+        except Exception as e:
+            exc = '{}: {}'.format(type(e).__name__, e)
+            print('Failed to load extension {}\n{}'.format(extension, exc))
 
 file = open(Discord_Bot_Dir / 'token.txt','rt')
 bot.run(str(file.read()))

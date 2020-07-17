@@ -22,12 +22,12 @@ class Duel(commands.Cog):
         #fighting yourself? Loser.
         if duel_authors_id == challenge_member_id:
             replys = ['Dumbass.. You cant challenge yourself! 🤡','LOL! IDIOT! 🤣','Homie... Chillax. Stop beefing with yo self 👊','You good bro? 😥','REEEEELLLAAAAXXXXXXXXX 😬','Its gonna be okay 😔']
-            await ctx.channel.send(f'{random.choice(replys)}')
+            await ctx.channel.send(random.choice(replys))
 
         #fighting the bot? KEKW
         elif challenge_member_id == bot_id:
             replys = [  'Simmer down buddy 🔫','You dare challenge thy master?! 💪','OK homie relax.. 💩','You aint even worth it dawg 🤏','You a one pump chump anyway 🤡','HA! Good one. 😂','You done yet? Pussy.']
-            await ctx.channel.send(f'{random.choice(replys)}')
+            await ctx.channel.send(random.choice(replys))
 
         #fighting other users
         else:
@@ -114,7 +114,7 @@ class Duel(commands.Cog):
 
         hit_response = ['cRaZyy','pOwerful','DEADLY','dangerous','deathly','l33t','amazing']
 
-        await ctx.channel.send('**' + warrior1.user.name + '** lands a ' + f'{random.choice(hit_response)}' + ' hit on **' + warrior2.user.name + '** dealing `' + str(attackDamage) + '` damage!\n**' + warrior2.user.name + '** did ' + str(counterDamage) + ' counter damage!\n' + warrior2.user.name + '  is left with `' + str(warrior2.Health) + '` health!\n' + warrior1.user.name + ' is left with `' + str(warrior1.Health) + '` health!')
+        await ctx.channel.send('**' + warrior1.user.name + '** lands a ' + random.choice(hit_response) + ' hit on **' + warrior2.user.name + '** dealing `' + str(attackDamage) + '` damage!\n**' + warrior2.user.name + '** did ' + str(counterDamage) + ' counter damage!\n' + warrior2.user.name + '  is left with `' + str(warrior2.Health) + '` health!\n' + warrior1.user.name + ' is left with `' + str(warrior1.Health) + '` health!')
         if warrior2.Health < 0:
             winEmbedMessage = discord.Embed(
                             title = 'STOP! STOP! STOP! THE FIGHT IS OVER!!!',
@@ -130,7 +130,7 @@ class Duel(commands.Cog):
 
     async def defenseResponse(self, ctx, person, mentionedUser):
         defence_points = int(random.randint(1,10))
-        await ctx.channel.send('**' + f'{person}' + '** boosted their defense by `' + f'{defence_points}' + '` points!')
+        await ctx.channel.send('**' + person + '** boosted their defense by `' + str(defence_points) + '` points!')
         await ctx.channel.send(mentionedUser + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
 
     @fight.error

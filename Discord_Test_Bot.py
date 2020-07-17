@@ -123,7 +123,7 @@ async def roast(ctx, member : discord.Member=None):
                 'You done yet? Pussy.',
                 'Fuck off!!'
         ]
-        await ctx.channel.send(f'{random.choice(replys)}')
+        await ctx.channel.send(random.choice(replys))
     else:
         embed = discord.Embed(
             title = 'HOMIE INSULTS! 🔥',
@@ -146,15 +146,8 @@ async def pickup(ctx, member : discord.Member=None):
     file.close()
 
 async def lineChooser(filename):
-    i = 0
-    file = open(linksPath / filename,'rt')
-    num_lines = sum(1 for line in file)
-    this_num = random.randint(1,int(f'{num_lines}'))
-    file = open(linksPath / filename,'rt')
-    for line in file:
-        i += 1
-        if i == this_num:
-            return str(line)
+    lines = open(linksPath / filename).read().splitlines()
+    return random.choice(lines)
 
 @bot.command(brief='Enlarge and view your profile picture or another member')
 async def av(ctx, member : discord.Member=None):

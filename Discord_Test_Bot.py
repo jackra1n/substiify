@@ -38,7 +38,7 @@ async def help(ctx):
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
-            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(marshDiscordId), str(jackDiscordId)),
+            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(jackDiscordId), str(marshDiscordId)),
             colour = discord.Colour.greyple()
         )
     await ctx.channel.send(embed=embed)

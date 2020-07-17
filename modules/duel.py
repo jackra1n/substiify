@@ -58,6 +58,26 @@ class Duel(commands.Cog):
             while warrior1.Health > 0 and warrior2.Health > 0:
                 try:
                     msg = await self.bot.wait_for('message', check=checkAction, timeout=30.0)
+                    if str(msg.content) == 'punch' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
+                        fight_turn += 1
+                        if await self.getActionResult(warrior2, warrior1, ctx):
+                            break
+                    elif str(msg.content) == 'punch' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
+                        fight_turn += 1
+                        if await self.getActionResult(warrior1, warrior2, ctx):
+                            break
+                    elif str(msg.content) == 'defend' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
+                        fight_turn += 1
+                        await self.defenseResponse(ctx, challenge_member_name, ctx.author.mention)
+                    elif str(msg.content) == 'defend' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
+                        fight_turn += 1
+                        await self.defenseResponse(ctx, duel_authors_name, member.mention)
+                    elif str(msg.content) == 'end' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
+                        await ctx.channel.send(challenge_member_name + ' has ended the fight. What a wimp.')
+                        break   
+                    elif str(msg.content) == 'end' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
+                        await ctx.channel.send(duel_authors_name + ' has ended the fight. What a wimp.')
+                        break
                 except asyncio.TimeoutError:
                     if (fight_turn % 2) == 0:
                         await ctx.channel.send('Nice fight idiots.. **' + duel_authors_name + '** wins!')
@@ -65,29 +85,6 @@ class Duel(commands.Cog):
                     else:
                         await ctx.channel.send('Nice fight idiots.. **' + challenge_member_name + '** wins!')
                         break
-                else:
-                    if str(msg.content) == 'punch' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
-                        fight_turn += 1
-                        if await self.getActionResult(warrior2, warrior1, ctx):
-                            break
-                        
-                    elif str(msg.content) == 'punch' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
-                        fight_turn += 1
-                        if await self.getActionResult(warrior1, warrior2, ctx):
-                            break
-
-                    elif str(msg.content) == 'defend' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
-                        fight_turn += 1
-                        await self.defenseResponse(ctx, duel_authors_name, member.mention)
-                    elif str(msg.content) == 'defend' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
-                        fight_turn += 1
-                        await self.defenseResponse(ctx, challenge_member_name, ctx.author.mention)
-                    elif str(msg.content) == 'end' and msg.author.id == duel_authors_id and (fight_turn % 2) != 0:
-                        await ctx.channel.send(duel_authors_name + ' has ended the fight. What a wimp.')
-                        break
-                    elif str(msg.content) == 'end' and msg.author.id == challenge_member_id and (fight_turn % 2) == 0:
-                        await ctx.channel.send(challenge_member_name + ' has ended the fight. What a wimp.')
-                        break   
 
     def checkClassChooser(self, author):
         def inner_check(message):
@@ -106,13 +103,13 @@ class Duel(commands.Cog):
                 warrior.chooseClass(3)
             return warrior
         except asyncio.TimeoutError:
-            ctx.channel.send('Time out!')
+            await ctx.channel.send('Time out!')
 
     async def getActionResult(self, warrior1, warrior2, ctx):
         attackDamage = random.randrange(0,warrior1.AttkMax) + 20
-        warrior2.Health -= attackDamage
-
         counterDamage = random.randrange(0,warrior2.AttkMax)
+
+        warrior2.Health -= attackDamage
         warrior1.Health -= counterDamage
 
         hit_response = ['cRaZyy','pOwerful','DEADLY','dangerous','deathly','l33t','amazing']

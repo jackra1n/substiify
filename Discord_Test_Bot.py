@@ -215,7 +215,7 @@ async def fight(ctx, member : discord.Member):
         def inner_check(message):
             return message.content == 'punch' or message.content == 'defend' or message.content == 'end'
 
-        while challenge_member_health <= 0 or duelers_health <= 0:
+        while challenge_member_health > 0 or duelers_health > 0:
             try:
                 msg = await bot.wait_for('message', check=inner_check, timeout=30.0)
             except asyncio.TimeoutError:

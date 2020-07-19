@@ -91,7 +91,7 @@ class Duel(commands.Cog):
 
     async def createWarrior(self, ctx, user):
         try:
-            msgClass = await self.bot.wait_for('message', check=self.checkClassChooser(user), timeout=30.0)
+            msgClass = await self.bot.wait_for('message', check=self.checkClassChooser(user), timeout=40.0)
             warrior = Warrior(msgClass.author)
             if msgClass.content == 'berserker':
                 warrior.chooseClass(1)
@@ -105,7 +105,7 @@ class Duel(commands.Cog):
 
     async def getActionResult(self, warrior1, warrior2, ctx):
         try:
-            action = await self.bot.wait_for("message", check=self.checkAction(warrior1.user), timeout=30.0)
+            action = await self.bot.wait_for("message", check=self.checkAction(warrior1.user), timeout=40.0)
             buffBonus = 20
             if action.content == "punch": 
                 attack = random.randrange(0,warrior1.AttkMax) + buffBonus
@@ -125,6 +125,7 @@ class Duel(commands.Cog):
             await self.calculateDamage(ctx, warrior2, warrior1, counterDamage)
         except asyncio.TimeoutError:
             await ctx.channel.send('action timed out!')
+            return True
 
     async def calculateDamage(self, ctx, warrior1, warrior2, damage):
         hit_response = ['cRaZyy','pOwerful','DEADLY','dangerous','deathly','l33t','amazing']

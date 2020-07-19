@@ -62,12 +62,11 @@ class Duel(commands.Cog):
                 await self.printWinner(warrior2, ctx)
             elif warrior2.Health < 0:
                 await self.printWinner(warrior1, ctx)
+            else:
+                await ctx.channel.send("Dude, imagine surrendering")
 
     async def checkForWinner(self, warrior1, warrior2, ctx, fight_turn):
-        await self.getActionResult(warrior1, warrior2, ctx)
-        if warrior1.Health < 0:
-            return True
-        elif warrior2.Health < 0:
+        if await self.getActionResult(warrior1, warrior2, ctx) or warrior1.Health < 0 or warrior2.Health < 0:
             return True
         fight_turn += 1
         await ctx.channel.send(warrior2.user.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')

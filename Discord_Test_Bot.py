@@ -49,7 +49,7 @@ async def info(ctx):
 async def duel(ctx):
     embed = discord.Embed(
             title="Duel",
-            description="To start a duel use command ``.fight`` and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
+            description="To start a duel use command '.fight "+bot.user.mention+"' and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
             colour = discord.Colour.greyple()
         )
     embed.add_field(name='Stats', value="```Statistics: Berserker  Tank  Wizard\n"+

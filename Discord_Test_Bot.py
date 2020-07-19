@@ -19,7 +19,9 @@ jackDiscordId = 276462585690193921
 async def on_ready():
     activity = discord.Activity(type=discord.ActivityType.listening, name=".help")
     await bot.change_presence(activity=activity)
-    print(f'Logged on and ready to use!')
+    print("="*20)
+    print("Logged in as "+bot.user.name)
+    print("="*20)
 
 @bot.command()
 async def help(ctx):

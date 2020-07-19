@@ -17,30 +17,47 @@ jackDiscordId = 276462585690193921
 
 @bot.event
 async def on_ready():
-    activity = discord.Activity(type=discord.ActivityType.listening, name=".help")
+    activity = discord.Activity(type=discord.ActivityType.listening, name="nobody")
     await bot.change_presence(activity=activity)
     print("="*20)
     print("Logged in as "+bot.user.name)
     print("="*20)
 
-@bot.command()
+@bot.group()
 async def help(ctx):
-    embed = discord.Embed(
-            title="HomieBot Command List",
-            description='Those are availble categories:',
-            colour = discord.Colour.red()
-        )
-    embed.add_field(name='Fun', value='``.fun``', inline=True)
-    embed.add_field(name='Info', value='``.info``', inline=True)
-    await ctx.channel.send(embed=embed)
+    if ctx.invoked_subcommand is None:
+        embed = discord.Embed(
+                title="HomieBot Command List",
+                description='Those are availble categories:',
+                colour = discord.Colour.red()
+            )
+        # embed.add_field(name='Fun', value='``.help fun``', inline=True)
+        embed.add_field(name='Info', value='``.help info``', inline=True)
+        embed.add_field(name='Duel', value='``.help duel``', inline=True)
+        await ctx.channel.send(embed=embed)
 
-@bot.command()
+@help.command()
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
             description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(marshDiscordId), str(jackDiscordId)),
             colour = discord.Colour.greyple()
         )
+    await ctx.channel.send(embed=embed)
+
+@help.command()
+async def duel(ctx):
+    embed = discord.Embed(
+            title="Duel",
+            description="To start a duel use command ``.fight`` and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
+            colour = discord.Colour.greyple()
+        )
+    embed.add_field(name='Stats', value="```Statistics: Berserker  Tank  Wizard\n"+
+                                        "Health:       1000     1200    700\n"+
+                                        "Max Attack:   140      100     200\n"+
+                                        "Max Defense:  30       60      20\n"+
+                                        "Max Mana:     30       20      50```", inline=False)
+    embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. ``punch``, ``defend`` and ``end``. ``punch`` boosts your attack and ``defend`` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. ``end`` makes you surrender.", inline=False)
     await ctx.channel.send(embed=embed)
 
 @bot.event

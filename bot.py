@@ -68,7 +68,7 @@ async def system_info(ctx):
         cpu_usage = psutil.cpu_percent()
         ram_usage = psutil.virtual_memory().percent
         color_list = list(Color("green").range_to(Color("red"),100))
-        color = int("0x"+str(color_list[int(cpu_usage)])[1:], 16)
+        color = int("0x"+str(color_list[int(cpu_usage)].hex)[1:], 16)
         embed = discord.Embed(
                 title="System usage information",
                 colour = discord.Colour(color)

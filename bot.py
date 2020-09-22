@@ -66,7 +66,8 @@ async def duel(ctx):
 async def system_info(ctx):
     if ctx.message.author.id == jackDiscordId:
         cpu_usage = psutil.cpu_percent()
-        ram_usage = psutil.virtual_memory().percent
+        ramTotal = psutil.virtual_memory().total >> 20
+        ramAvailable = psutil.virtual_memory().available >> 20
         color_list = list(Color("green").range_to(Color("red"),100))
         color = int("0x"+str(color_list[int(cpu_usage)].hex)[1:], 16)
         embed = discord.Embed(
@@ -74,7 +75,7 @@ async def system_info(ctx):
                 colour = discord.Colour(color)
             )
         embed.add_field(name="CPU", value=f"Current CPU usage is: {cpu_usage}%")
-        embed.add_field(name="RAM", value=f"Current RAM usage is: {ram_usage}%")
+        embed.add_field(name="RAM", value=f"Current RAM usage is: {ramTotal-ramAvailable}/{ramTotal}MB")
         await ctx.channel.send(embed=embed)
 
 @bot.event

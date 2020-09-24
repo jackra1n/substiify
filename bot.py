@@ -1,13 +1,15 @@
-import discord
 from discord.ext import commands
+from colour import Color
 from pathlib import Path
+import datetime
+import discord
 import random
+import psutil
+import json
 import time
 import os
-import datetime
-import json
 
-bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix=',')
 bot.remove_command('help')
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
@@ -59,6 +61,22 @@ async def duel(ctx):
                                         "Max Mana:     30       20      50```", inline=False)
     embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. ``punch``, ``defend`` and ``end``. ``punch`` boosts your attack and ``defend`` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. ``end`` makes you surrender.", inline=False)
     await ctx.channel.send(embed=embed)
+
+@bot.command()
+async def system_info(ctx):
+    if ctx.message.author.id == jackDiscordId:
+        cpu_usage = psutil.cpu_percent()
+        ramTotal = psutil.virtual_memory().total >> 20
+        ramAvailable = psutil.virtual_memory().available >> 20
+        color_list = list(Color("green").range_to(Color("red"),100))
+        color = int("0x"+str(color_list[int(cpu_usage)].hex)[1:], 16)
+        embed = discord.Embed(
+                title="System usage information",
+                colour = discord.Colour(color)
+            )
+        embed.add_field(name="CPU", value=f"Current CPU usage is: {cpu_usage}%")
+        embed.add_field(name="RAM", value=f"Current RAM usage is: {ramTotal-ramAvailable}/{ramTotal}MB")
+        await ctx.channel.send(embed=embed)
 
 @bot.event
 async def on_command_error(ctx, error):

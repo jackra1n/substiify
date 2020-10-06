@@ -1,6 +1,7 @@
 from discord.ext import commands
 from colour import Color
 from pathlib import Path
+import aiofiles
 import datetime
 import discord
 import random
@@ -74,8 +75,8 @@ async def system_info(ctx):
                 title="System usage information",
                 colour = discord.Colour(color)
             )
-        embed.add_field(name="CPU", value=f"Current CPU usage is: {cpu_usage}%")
-        embed.add_field(name="RAM", value=f"Current RAM usage is: {ramTotal-ramAvailable}/{ramTotal}MB")
+        embed.add_field(name="CPU", value=f"Current usage is: {cpu_usage}%")
+        embed.add_field(name="RAM", value=f"Current usage is: {ramTotal-ramAvailable}/{ramTotal}MB")
         await ctx.channel.send(embed=embed)
 
 @bot.event
@@ -197,7 +198,7 @@ async def av(ctx, member : discord.Member=None):
     embed.set_image(url=member.avatar_url)
     await ctx.channel.send(embed=embed)
 
-startup_extensions = ["modules.gif","modules.music","modules.duel"]
+startup_extensions = ["modules.gif","modules.music","modules.duel","modules.reactionRoles"]
 
 if __name__ == "__main__":
     for extension in startup_extensions:

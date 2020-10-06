@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 token.txt
+.vscode/
+
+reaction_roles.txt

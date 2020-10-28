@@ -19,7 +19,7 @@ jackDiscordId = 276462585690193921
 
 @bot.event
 async def on_ready():
-    activity = discord.Activity(type=discord.ActivityType.listening, name="nobody")
+    activity = discord.Activity(type=discord.ActivityType.listening, name=",help")
     await bot.change_presence(activity=activity)
     print("="*20)
     print("Logged in as "+bot.user.name)

@@ -197,7 +197,7 @@ async def av(ctx, member : discord.Member=None):
     embed.set_image(url=member.avatar_url)
     await ctx.channel.send(embed=embed)
 
-startup_extensions = ["modules.gif","modules.music","modules.duel"]
+startup_extensions = ["modules.gif","modules.music","modules.duel","modules.daydeal"]
 
 if __name__ == "__main__":
     for extension in startup_extensions:

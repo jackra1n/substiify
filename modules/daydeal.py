@@ -31,6 +31,7 @@ class Daydeal(commands.Cog):
             colour = discord.Colour.from_rgb(35,180,12),
             description = description_str
         )
+        embed.set_thumbnail(url="https://static.daydeal.ch/2.17.10/images/logo-top.png")
         embed.set_author(name='Todays deal: ' + title1)
         embed.set_image(url=product_img)
         await ctx.channel.send(embed=embed)

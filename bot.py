@@ -63,7 +63,7 @@ async def duel(ctx):
     await ctx.channel.send(embed=embed)
 
 @bot.command()
-async def system_info(ctx):
+async def sysinfo(ctx):
     if ctx.message.author.id == jackDiscordId:
         cpu_usage = psutil.cpu_percent()
         ramTotal = psutil.virtual_memory().total >> 20
@@ -74,8 +74,8 @@ async def system_info(ctx):
                 title="System usage information",
                 colour = discord.Colour(color)
             )
-        embed.add_field(name="CPU", value=f"Current CPU usage is: {cpu_usage}%")
-        embed.add_field(name="RAM", value=f"Current RAM usage is: {ramTotal-ramAvailable}/{ramTotal}MB")
+        embed.add_field(name="CPU usage", value=f"{cpu_usage}%")
+        embed.add_field(name="RAM usage", value=f"{ramTotal-ramAvailable}/{ramTotal}MB")
         await ctx.channel.send(embed=embed)
 
 @bot.event

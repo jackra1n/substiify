@@ -9,8 +9,14 @@ from datetime import date, time, datetime
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
 
-async def availableBarCreator():
-    "["+("l"*int(available))+"||"+("l‏‎‎"*(50-int(available)))+"||] ("+str(available)+"%)"
+async def availableBarCreator(available):
+    bar = "["
+    if int(available) == 50:
+        bar += ("l"*int(available))+"]"
+    else:
+        bar += ("l"*int(available))+"||"+("l‏‎‎"*(50-int(available)))+"||]"
+    bar += " ("+str(int(available)*2)+"%)"
+    return bar
 
 class Daydeal(commands.Cog):
     def __init__(self, bot):
@@ -28,11 +34,10 @@ class Daydeal(commands.Cog):
         product_img = soup.find('img', class_='product-img-main-pic')['src']
         newPrice = soup.find('h2', class_='product-pricing__prices-new-price').text
         oldPrice = soup.find('span', class_='js-old-price').text
-        #available = 50/100*int(soup.find('strong', class_='product-progress__availability').text.strip('%'))
-        available = 50
+        available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))/2
+        availableBar = await availableBarCreator(available)
         endsOn = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
         endsIn = endsOn - datetime.now().replace(microsecond=0)
-        
         description_str = ""
         for element in description_details:
             description_str += "• "+element.text+"\n"
@@ -47,7 +52,7 @@ class Daydeal(commands.Cog):
         embed.set_image(url=product_img)
         embed.set_author(name='Todays deal: ' + title1)
         embed.add_field(name="Price", value="Now: "+newPrice+", Old: "+oldPrice, inline=False)
-        embed.add_field(name="Available", value="", inline=False)
+        embed.add_field(name="Available", value=availableBar, inline=False)
         embed.add_field(name="Ends in", value=endsIn, inline=False)
         await ctx.channel.send(embed=embed)
 

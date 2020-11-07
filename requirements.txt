@@ -4,3 +4,4 @@ discord.py
 youtube_dl
 colour
 psutil
+bs4

@@ -1,6 +1,6 @@
 import discord
 import random
-from discord.ext import commands
+from discord.ext import commands, tasks
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
@@ -8,6 +8,10 @@ from datetime import date, time, datetime
 
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
+
+URL = "https://www.daydeal.ch/"
+page = requests.get(URL)
+soup = BeautifulSoup(page.content, 'html.parser')
 
 async def availableBarCreator(available):
     bar = "["
@@ -23,10 +27,24 @@ class Daydeal(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def startTask(self, ctx):
+        await self.checkTime.start(ctx)
+
+    @commands.command()
+    async def stopTask(self, ctx):
+        await self.checkTime.cancel()
+
+    @tasks.loop(seconds=5.0)
+    async def checkTime(self, ctx):
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        goal_time = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        if(current_time == goal_time):
+            await ctx.invoke(self.bot.get_command('deal'))
+        else:
+            await ctx.channel.send("test pogu")
+
+    @commands.command()
     async def deal(self, ctx):
-        URL = "https://www.daydeal.ch/"
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'html.parser')
         product_description = soup.find('section', class_='product-description')
         title1 = product_description.find('h1', class_='product-description__title1').text
         title2 = product_description.find('h2', class_='product-description__title2').text

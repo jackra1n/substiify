@@ -33,7 +33,11 @@ class Daydeal(commands.Cog):
         description_details = product_description.find('ul', class_='product-description__list').findChildren()
         product_img = soup.find('img', class_='product-img-main-pic')['src']
         newPrice = soup.find('h2', class_='product-pricing__prices-new-price').text
-        oldPrice = soup.find('span', class_='js-old-price').text
+        oldPrice = soup.find('span', class_='js-old-price')
+        if oldPrice is not None:
+            oldPrice = oldPrice.text
+        else:
+            oldPrice = ""
         available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))/2
         availableBar = await availableBarCreator(available)
         endsOn = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')

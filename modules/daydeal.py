@@ -25,23 +25,32 @@ async def availableBarCreator(available):
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.endTime = datetime.now()
 
     @commands.command()
-    async def startTask(self, ctx):
-        await self.checkTime.start(ctx)
-
-    @commands.command()
-    async def stopTask(self, ctx):
-        await self.checkTime.cancel()
-
-    @tasks.loop(seconds=5.0)
-    async def checkTime(self, ctx):
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        goal_time = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
-        if(current_time == goal_time):
+    @commands.has_permissions(manage_channels=True)
+    async def setupDaydeal(self, ctx, channel : discord.TextChannel, mentionRole : discord.Role):
+        self.channel = channel
+        self.mentionRole = mentionRole
+        if self.channel and self.mentionRole:
             await ctx.invoke(self.bot.get_command('deal'))
-        else:
-            await ctx.channel.send("test pogu")
+            await ctx.channel.send("Setup successful.")
+            await self.daydeal_task.start(ctx)
+    
+    @setupDaydeal.error
+    async def setupDaydeal_error(self, ctx, error):
+        await ctx.channel.send("Error. Please use command like this: ```,setupDaydeal #channel @role``` Error cause: "+str(error))
+
+    @commands.command()
+    async def stopDaydeal(self, ctx):
+        await self.daydeal_task.cancel()
+
+    @tasks.loop(seconds=30.0)
+    async def daydeal_task(self, ctx):
+        current_time = datetime.now()
+        self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        if(current_time >= self.endTime):
+            await ctx.invoke(self.bot.get_command('deal'))
 
     @commands.command()
     async def deal(self, ctx):
@@ -54,8 +63,7 @@ class Daydeal(commands.Cog):
         oldPrice = soup.find('span', class_='js-old-price').text
         available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))/2
         availableBar = await availableBarCreator(available)
-        endsOn = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
-        endsIn = endsOn - datetime.now().replace(microsecond=0)
+        endsIn = self.endTime - datetime.now().replace(microsecond=0)
         description_str = ""
         for element in description_details:
             description_str += "• "+element.text+"\n"
@@ -72,7 +80,8 @@ class Daydeal(commands.Cog):
         embed.add_field(name="Price", value="Now: "+newPrice+", Old: "+oldPrice, inline=False)
         embed.add_field(name="Available", value=availableBar, inline=False)
         embed.add_field(name="Ends in", value=endsIn, inline=False)
-        await ctx.channel.send(embed=embed)
+        await self.channel.send(embed=embed)
+        await self.channel.send(self.mentionRole.mention)
 
     @deal.error
     async def deal_error(self, ctx, error):

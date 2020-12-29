@@ -36,7 +36,7 @@ class Daydeal(commands.Cog):
             await ctx.invoke(self.bot.get_command('deal'))
             await ctx.channel.send("Setup successful.")
             await self.daydeal_task.start(ctx)
-    
+
     @setupDaydeal.error
     async def setupDaydeal_error(self, ctx, error):
         await ctx.channel.send("Error. Please use command like this: ```,setupDaydeal #channel @role``` Error cause: "+str(error))

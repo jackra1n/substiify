@@ -45,7 +45,7 @@ class Daydeal(commands.Cog):
     async def stopDaydeal(self, ctx):
         await self.daydeal_task.cancel()
 
-    @tasks.loop(seconds=30.0)
+    @tasks.loop(seconds=60.0)
     async def daydeal_task(self, ctx):
         current_time = datetime.now()
         self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')

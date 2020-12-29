@@ -68,7 +68,6 @@ class Daydeal(commands.Cog):
         availableBar = await availableBarCreator(available)
         endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
         endsIn = endTime - datetime.now().replace(microsecond=0)
-        await self.channel.send(str(endTime)+ " " + str(datetime.now()))
         description_str = ""
         for element in description_details:
             description_str += "• "+element.text+"\n"

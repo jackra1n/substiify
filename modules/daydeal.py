@@ -25,7 +25,6 @@ async def availableBarCreator(available):
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.endTime = datetime.now()
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
@@ -48,8 +47,8 @@ class Daydeal(commands.Cog):
     @tasks.loop(seconds=60.0)
     async def daydeal_task(self, ctx):
         current_time = datetime.now()
-        self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
-        if(current_time >= self.endTime):
+        endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        if(current_time >= endTime):
             await ctx.invoke(self.bot.get_command('deal'))
 
     @commands.command()
@@ -63,7 +62,9 @@ class Daydeal(commands.Cog):
         oldPrice = soup.find('span', class_='js-old-price').text
         available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))/2
         availableBar = await availableBarCreator(available)
-        endsIn = self.endTime - datetime.now().replace(microsecond=0)
+        endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        endsIn = endTime - datetime.now().replace(microsecond=0)
+        await self.channel.send(str(endTime)+ " " + str(datetime.now()))
         description_str = ""
         for element in description_details:
             description_str += "• "+element.text+"\n"

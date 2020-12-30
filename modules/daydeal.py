@@ -53,6 +53,8 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     async def deal(self, ctx):
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, 'html.parser')
         product_description = soup.find('section', class_='product-description')
         title1 = product_description.find('h1', class_='product-description__title1').text
         title2 = product_description.find('h2', class_='product-description__title2').text

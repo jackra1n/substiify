@@ -20,11 +20,9 @@ async def availableBarCreator(available):
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.page = requests.get(URL)
-        self.soup = BeautifulSoup(self.page.content, 'html.parser')
         self.channel = None
         self.mention_role = None
-        self.endTime = datetime.strptime(self.soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        self.endTime = None
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
@@ -51,21 +49,21 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     async def deal(self, ctx):
-        self.page = requests.get(URL)
-        self.soup = BeautifulSoup(self.page.content, 'html.parser')
-        self.endTime = datetime.strptime(self.soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
-        product_description = self.soup.find('section', class_='product-description')
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        product_description = soup.find('section', class_='product-description')
         title1 = product_description.find('h1', class_='product-description__title1').text
         title2 = product_description.find('h2', class_='product-description__title2').text
         description_details = product_description.find('ul', class_='product-description__list').findChildren()
-        product_img = self.soup.find('img', class_='product-img-main-pic')['src']
-        new_price = self.soup.find('h2', class_='product-pricing__prices-new-price').text
-        old_price = self.soup.find('span', class_='js-old-price')
+        product_img = soup.find('img', class_='product-img-main-pic')['src']
+        new_price = soup.find('h2', class_='product-pricing__prices-new-price').text
+        old_price = soup.find('span', class_='js-old-price')
         if old_price is not None:
             old_price = old_price.text
         else:
             old_price = ""
-        available = int(self.soup.find('strong', class_='product-progress__availability').text.strip('%')) / 2
+        available = int(soup.find('strong', class_='product-progress__availability').text.strip('%')) / 2
         ends_in = self.endTime - datetime.now().replace(microsecond=0)
         description_str = ""
         for element in description_details:

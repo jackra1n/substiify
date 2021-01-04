@@ -5,3 +5,4 @@ youtube_dl
 colour
 psutil
 bs4
+requests

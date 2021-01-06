@@ -39,6 +39,7 @@ class Daydeal(commands.Cog):
         await ctx.channel.send("Error. Please use command like this: ```,setupDaydeal #channel @role``` Error cause: " + str(error))
 
     @commands.command()
+    @commands.has_permissions(manage_channels=True)
     async def stopDaydeal(self):
         await self.daydeal_task.cancel()
 

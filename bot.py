@@ -29,20 +29,20 @@ async def on_ready():
 async def help(ctx):
     if ctx.invoked_subcommand is None:
         embed = discord.Embed(
-                title="HomieBot Command List",
+                title="Dux-Bot Command List",
                 description='Those are availble categories:',
                 colour = discord.Colour.red()
             )
         # embed.add_field(name='Fun', value='``.help fun``', inline=True)
-        embed.add_field(name='Info', value='``.help info``', inline=True)
-        embed.add_field(name='Duel', value='``.help duel``', inline=True)
+        embed.add_field(name='Info', value='``,help info``', inline=True)
+        embed.add_field(name='Duel', value='``,help duel``', inline=True)
         await ctx.channel.send(embed=embed)
 
 @help.command()
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
-            description="Hello! I'm HomieBot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(jackDiscordId), str(marshDiscordId)),
+            description="Hello! I'm Dux-Bot. My parents are <@{}> and <@{}>. Hope you will enjoy my company.".format(str(jackDiscordId), str(marshDiscordId)),
             colour = discord.Colour.greyple()
         )
     await ctx.channel.send(embed=embed)
@@ -85,7 +85,7 @@ async def pickup(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
     author = bot.user if member is ctx.author else ctx.author
     embed = discord.Embed(
-        title = 'HOMIE PICKUPS! 🌈',
+        title = 'BOT PICKUPS! 🌈',
         description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
         colour = discord.Colour.orange()
     )
@@ -112,7 +112,7 @@ async def roast(ctx, member : discord.Member=None):
         await ctx.channel.send(random.choice(replys))
     else:
         embed = discord.Embed(
-            title = 'HOMIE INSULTS! 🔥',
+            title = 'BOT INSULTS! 🔥',
             description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
             colour = discord.Colour.orange()
         )

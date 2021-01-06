@@ -63,6 +63,63 @@ async def duel(ctx):
     await ctx.channel.send(embed=embed)
 
 @bot.command()
+async def pp(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    no_use_pp = None
+    PP_Size = random.randint(3,20)
+    if member.id == 488959709609590787:
+        member = no_use_pp
+    if member.id == jackDiscordId:
+        PP_Size = 20
+    elif member.id == 464861706665984010:
+        PP_Size = 1
+    embed = discord.Embed(
+        title = 'AYE DAWG NICE PEEPEE!',
+        description = str(member.name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
+        colour = discord.Colour.magenta()
+    )
+    await ctx.channel.send(embed=embed)
+
+@bot.command(brief='Wanna hit on someone? Let me be your wingman!')
+async def pickup(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
+    embed = discord.Embed(
+        title = 'HOMIE PICKUPS! 🌈',
+        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
+        colour = discord.Colour.orange()
+    )
+    await ctx.channel.send(embed=embed)
+    file.close()
+
+async def lineChooser(filename):
+    lines = open(linksPath / filename).read().splitlines()
+    return random.choice(lines)
+
+@bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
+async def roast(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
+    if bot.user.id == member.id:
+        replys = ['Simmer down buddy 🔫',
+                'You dare challenge thy master?! 💪',
+                'OK homie relax.. 💩',
+                'You aint even worth it dawg 🤏',
+                'HA! Good one. 😂',
+                'You done yet? Pussy.',
+                'Fuck off!!'
+        ]
+        await ctx.channel.send(random.choice(replys))
+    else:
+        embed = discord.Embed(
+            title = 'HOMIE INSULTS! 🔥',
+            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
+            colour = discord.Colour.orange()
+        )
+        await ctx.channel.send(embed=embed)
+        file.close()
+
+@bot.command()
 async def sysinfo(ctx):
     if ctx.message.author.id == jackDiscordId:
         cpu_usage = psutil.cpu_percent()
@@ -120,63 +177,6 @@ async def eightball(ctx,*,question):
                 'Outlook not so good.',
                 'Very doubtful.']
     await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
-
-@bot.command()
-async def pp(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    no_use_pp = None
-    PP_Size = random.randint(3,20)
-    if member.id == 488959709609590787:
-        member = no_use_pp
-    if member.id == jackDiscordId:
-        PP_Size = 20
-    elif member.id == 464861706665984010:
-        PP_Size = 1
-    embed = discord.Embed(
-        title = 'AYE DAWG NICE PEEPEE!',
-        description = str(member.name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
-        colour = discord.Colour.magenta()
-    )
-    await ctx.channel.send(embed=embed)
-
-@bot.command(brief='Wanna hit on someone? Let me be your wingman!')
-async def pickup(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = 'HOMIE PICKUPS! 🌈',
-        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
-        colour = discord.Colour.orange()
-    )
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-async def lineChooser(filename):
-    lines = open(linksPath / filename).read().splitlines()
-    return random.choice(lines)
-
-@bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
-async def roast(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    if bot.user.id == member.id:
-        replys = ['Simmer down buddy 🔫',
-                'You dare challenge thy master?! 💪',
-                'OK homie relax.. 💩',
-                'You aint even worth it dawg 🤏',
-                'HA! Good one. 😂',
-                'You done yet? Pussy.',
-                'Fuck off!!'
-        ]
-        await ctx.channel.send(random.choice(replys))
-    else:
-        embed = discord.Embed(
-            title = 'HOMIE INSULTS! 🔥',
-            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
-            colour = discord.Colour.orange()
-        )
-        await ctx.channel.send(embed=embed)
-        file.close()
 
 @bot.command(brief='Enlarge and view your profile picture or another member')
 async def av(ctx, member : discord.Member=None):

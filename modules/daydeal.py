@@ -49,6 +49,7 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     async def deal(self, ctx):
+        # Web Scraping
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, 'html.parser')
         self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
@@ -69,20 +70,19 @@ class Daydeal(commands.Cog):
         for element in description_details:
             description_str += "• " + element.text + "\n"
 
-        embed = discord.Embed(
-            title=title2,
-            description=description_str,
-            url=URL,
-            colour=discord.Colour.from_rgb(35, 180, 12)
-        )
+        # Create embed message
+        embed = discord.Embed(title=title2, description=description_str, url=URL, colour=0x23b40c)
         embed.set_thumbnail(url="https://static.daydeal.ch/2.17.10/images/logo-top.png")
         embed.set_image(url=product_img)
         embed.set_author(name='Today\'s deal: ' + title1)
         embed.add_field(name="Price", value="Now: " + new_price + ", Old: " + old_price, inline=False)
         embed.add_field(name="Available", value=str(await availableBarCreator(available)), inline=False)
         embed.add_field(name="Ends in", value=str(ends_in), inline=False)
+        if self.channel is None:
+            self.channel = ctx.channel
         await self.channel.send(embed=embed)
-        await self.channel.send(self.mention_role.mention)
+        if self.mention_role is not None:
+            await self.channel.send(self.mention_role.mention)
 
     @deal.error
     async def deal_error(self, ctx, error):

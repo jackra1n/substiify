@@ -83,13 +83,19 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         pass
 
-@bot.command(brief='In Progress 😊')
-async def cd(ctx):
-    Tday = datetime.date.today()
-    f_date = datetime.date(2020, 8, 10)
-    delta = f_date - Tday
-    if ctx.author.id == marshDiscordId or ctx.author.id == 704589853974855770 or ctx.author.id == jackDiscordId:
-        await ctx.channel.send(delta)
+@bot.command(brief='Clears messages within the current channel.')
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx,amount):
+    amount = int(amount)
+    if amount <= 100:
+        await ctx.channel.purge(limit=amount + 1)
+    else:
+        await ctx.channel.send('Cannot delete more than 100 messages at a time!')
+
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.channel.send('Please put an amount to clear.')
 
 @bot.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
 async def eightball(ctx,*,question):
@@ -115,21 +121,7 @@ async def eightball(ctx,*,question):
                 'Very doubtful.']
     await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
 
-@bot.command(brief='Clears messages within the current channel.')
-@commands.has_permissions(manage_messages=True)
-async def clear(ctx,amount):
-    amount = int(amount)
-    if amount <= 100:
-        await ctx.channel.purge(limit=amount + 1)
-    else:
-        await ctx.channel.send('Cannot delete more than 100 messages at a time!')
-
-@clear.error
-async def clear_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.channel.send('Please put an amount to clear.')
-
-@bot.command(aliases=['penis','pipa','pene'], brief='Ego problems? No problem I can help you with that.')
+@bot.command()
 async def pp(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
     no_use_pp = None
@@ -142,10 +134,26 @@ async def pp(ctx, member : discord.Member=None):
         PP_Size = 1
     embed = discord.Embed(
         title = 'AYE DAWG NICE PEEPEE!',
-        description = str(member.name) + '\'s penis size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
+        description = str(member.name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
         colour = discord.Colour.magenta()
     )
     await ctx.channel.send(embed=embed)
+
+@bot.command(brief='Wanna hit on someone? Let me be your wingman!')
+async def pickup(ctx, member : discord.Member=None):
+    member = ctx.author if member is None else member
+    author = bot.user if member is ctx.author else ctx.author
+    embed = discord.Embed(
+        title = 'HOMIE PICKUPS! 🌈',
+        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
+        colour = discord.Colour.orange()
+    )
+    await ctx.channel.send(embed=embed)
+    file.close()
+
+async def lineChooser(filename):
+    lines = open(linksPath / filename).read().splitlines()
+    return random.choice(lines)
 
 @bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
 async def roast(ctx, member : discord.Member=None):
@@ -169,22 +177,6 @@ async def roast(ctx, member : discord.Member=None):
         )
         await ctx.channel.send(embed=embed)
         file.close()
-
-@bot.command(brief='Wanna hit on someone? Let me be your wingman!')
-async def pickup(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = 'HOMIE PICKUPS! 🌈',
-        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
-        colour = discord.Colour.orange()
-    )
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-async def lineChooser(filename):
-    lines = open(linksPath / filename).read().splitlines()
-    return random.choice(lines)
 
 @bot.command(brief='Enlarge and view your profile picture or another member')
 async def av(ctx, member : discord.Member=None):

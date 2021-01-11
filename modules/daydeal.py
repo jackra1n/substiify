@@ -40,8 +40,9 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
-    async def stopDaydeal(self):
+    async def stopDaydeal(self, ctx):
         await self.daydeal_task.cancel()
+        await ctx.channel.send("Daydeal stopped.")
 
     @tasks.loop(seconds=180.0)
     async def daydeal_task(self, ctx):

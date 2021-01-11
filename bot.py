@@ -189,7 +189,7 @@ async def av(ctx, member : discord.Member=None):
     embed.set_image(url=member.avatar_url)
     await ctx.channel.send(embed=embed)
 
-startup_extensions = ["modules.gif","modules.music","modules.duel","modules.daydeal"]
+startup_extensions = ["modules.gif", "modules.music", "modules.duel", "modules.daydeal", "modules.epicGames"]
 
 if __name__ == "__main__":
     for extension in startup_extensions:
@@ -199,5 +199,5 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-file = open(Discord_Bot_Dir / 'token.txt','rt')
+file = open(Discord_Bot_Dir / 'token.txt', 'rt')
 bot.run(str(file.read()))

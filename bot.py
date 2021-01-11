@@ -1,13 +1,8 @@
-from discord.ext import commands
-from colour import Color
-from pathlib import Path
-import datetime
-import discord
 import random
-import psutil
-import json
-import time
-import os
+from pathlib import Path
+
+import discord
+from discord.ext import commands
 
 bot = commands.Bot(command_prefix=',')
 bot.remove_command('help')
@@ -119,40 +114,10 @@ async def roast(ctx, member : discord.Member=None):
         await ctx.channel.send(embed=embed)
         file.close()
 
-@bot.command()
-async def sysinfo(ctx):
-    if ctx.message.author.id == jackDiscordId:
-        cpu_usage = psutil.cpu_percent()
-        ramTotal = psutil.virtual_memory().total >> 20
-        ramAvailable = psutil.virtual_memory().available >> 20
-        color_list = list(Color("green").range_to(Color("red"),100))
-        color = int("0x"+str(color_list[int(cpu_usage)].hex)[1:], 16)
-        embed = discord.Embed(
-                title="System usage information",
-                colour = discord.Colour(color)
-            )
-        embed.add_field(name="CPU usage", value=f"{cpu_usage}%")
-        embed.add_field(name="RAM usage", value=f"{ramTotal-ramAvailable}/{ramTotal}MB")
-        await ctx.channel.send(embed=embed)
-
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         pass
-
-@bot.command(brief='Clears messages within the current channel.')
-@commands.has_permissions(manage_messages=True)
-async def clear(ctx,amount):
-    amount = int(amount)
-    if amount <= 100:
-        await ctx.channel.purge(limit=amount + 1)
-    else:
-        await ctx.channel.send('Cannot delete more than 100 messages at a time!')
-
-@clear.error
-async def clear_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.channel.send('Please put an amount to clear.')
 
 @bot.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
 async def eightball(ctx,*,question):
@@ -178,18 +143,7 @@ async def eightball(ctx,*,question):
                 'Very doubtful.']
     await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
 
-@bot.command(brief='Enlarge and view your profile picture or another member')
-async def av(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    embed = discord.Embed(
-        title = str(member.name),
-        description = 'Avatar',
-        colour = discord.Colour.light_grey()
-    )
-    embed.set_image(url=member.avatar_url)
-    await ctx.channel.send(embed=embed)
-
-startup_extensions = ["modules.gif", "modules.music", "modules.duel", "modules.daydeal", "modules.epicGames"]
+startup_extensions = ["modules.gif", "modules.music", "modules.duel", "modules.daydeal", "modules.epicGames", "modules.util", "modules.giveaway"]
 
 if __name__ == "__main__":
     for extension in startup_extensions:

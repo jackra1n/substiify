@@ -58,6 +58,10 @@ async def duel(ctx):
     await ctx.channel.send(embed=embed)
 
 @bot.command()
+async def jack(ctx):
+    await ctx.channel.send('"Fucking Jack!"')
+
+@bot.command()
 async def pp(ctx, member : discord.Member=None):
     member = ctx.author if member is None else member
     no_use_pp = None

@@ -4,7 +4,8 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix=',')
+prefix = "<<"
+bot = commands.Bot(command_prefix=prefix)
 bot.remove_command('help')
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
@@ -14,7 +15,7 @@ jackDiscordId = 276462585690193921
 
 @bot.event
 async def on_ready():
-    activity = discord.Activity(type=discord.ActivityType.listening, name=",help")
+    activity = discord.Activity(type=discord.ActivityType.listening, name=f"{prefix}help")
     await bot.change_presence(activity=activity)
     print("="*20)
     print("Logged in as "+bot.user.name)
@@ -28,9 +29,9 @@ async def help(ctx):
                 description='Those are availble categories:',
                 colour = discord.Colour.red()
             )
-        # embed.add_field(name='Fun', value='``.help fun``', inline=True)
-        embed.add_field(name='Info', value='``,help info``', inline=True)
-        embed.add_field(name='Duel', value='``,help duel``', inline=True)
+        # embed.add_field(name='Fun', value=f'``{prefix}help fun``', inline=True)
+        embed.add_field(name='Info', value=f'``{prefix}help info``', inline=True)
+        embed.add_field(name='Duel', value=f'``{prefix}help duel``', inline=True)
         await ctx.channel.send(embed=embed)
 
 @help.command()
@@ -46,7 +47,7 @@ async def info(ctx):
 async def duel(ctx):
     embed = discord.Embed(
             title="Duel",
-            description="To start a duel use command '.fight "+bot.user.mention+"' and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
+            description=f"To start a duel use command '{prefix}fight "+bot.user.mention+"' and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
             colour = discord.Colour.greyple()
         )
     embed.add_field(name='Stats', value="```Statistics: Berserker  Tank  Wizard\n"+

@@ -31,6 +31,7 @@ async def help(ctx):
             )
         # embed.add_field(name='Fun', value=f'``{prefix}help fun``', inline=True)
         embed.add_field(name='Info', value=f'``{prefix}help info``', inline=True)
+        embed.add_field(name='Gifs', value=f'``{prefix}help gifs``', inline=True)
         embed.add_field(name='Duel', value=f'``{prefix}help duel``', inline=True)
         await ctx.channel.send(embed=embed)
 
@@ -56,6 +57,15 @@ async def duel(ctx):
                                         "Max Defense:  30       60      20\n"+
                                         "Max Mana:     30       20      50```", inline=False)
     embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. ``punch``, ``defend`` and ``end``. ``punch`` boosts your attack and ``defend`` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. ``end`` makes you surrender.", inline=False)
+    await ctx.channel.send(embed=embed)
+
+@help.command()
+async def gifs(ctx):
+    embed = discord.Embed(
+            title="Gifs",
+            description=f"Use any of the available gif command and tag a person in order to send a GIF of that action",
+            colour = discord.Colour.greyple()
+        )
     await ctx.channel.send(embed=embed)
 
 @bot.command()

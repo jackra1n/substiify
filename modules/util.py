@@ -15,6 +15,7 @@ class Util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(6, 5)
     @commands.command(brief='Enlarge and view your profile picture or another member')
     async def av(self, ctx, member: discord.Member = None):
         member = ctx.author if member is None else member
@@ -41,7 +42,7 @@ class Util(commands.Cog):
             await ctx.channel.send('Please put an amount to clear.')
 
     @commands.command()
-    async def sysinfo(ctx):
+    async def sysinfo(self, ctx):
         if ctx.message.author.id == jackDiscordId:
             cpu_usage = psutil.cpu_percent()
             ram_total = psutil.virtual_memory().total >> 20

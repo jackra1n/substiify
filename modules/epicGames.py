@@ -14,6 +14,7 @@ class EpicGames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(3, 30)
     @commands.command()
     async def epic(self, ctx):
         jsonEpicStore = requests.get(epicStoreFreeGamesURL).json()["data"]["Catalog"]["searchStore"]["elements"]

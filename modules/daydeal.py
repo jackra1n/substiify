@@ -49,6 +49,7 @@ class Daydeal(commands.Cog):
         if datetime.now() >= self.endTime:
             await ctx.invoke(self.bot.get_command('deal'))
 
+    @commands.cooldown(4, 10)
     @commands.command()
     async def deal(self, ctx):
         # Web Scraping

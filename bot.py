@@ -32,6 +32,7 @@ async def help(ctx):
         embed.add_field(name='Info', value=f'``{prefix}help info``')
         embed.add_field(name='Gifs', value=f'``{prefix}help gifs``')
         embed.add_field(name='Fun', value=f'``{prefix}help fun``')
+        embed.add_field(name='Daydeal', value=f'``{prefix}help daydeal``')
         embed.add_field(name='Duel', value=f'``{prefix}help duel``')
         await ctx.channel.send(embed=embed)
 
@@ -65,6 +66,18 @@ async def fun(ctx):
     embed.add_field(name="`pickup`",value="Wanna hit on someone? Let me be your wingman! Most of them are inappropriate so please use it on people you know well!", inline=False)
     embed.add_field(name="`roast`",value="Insult someone until they cry", inline=False)
     embed.add_field(name="`8ball`",value="AKA 8ball, Ask the bot a question that you dont want the answer to.", inline=False)
+    await ctx.channel.send(embed=embed)
+
+@help.command()
+async def daydeal(ctx):
+    embed = discord.Embed(
+            title="Daydeal",
+            description=f"Super duper cool https://daydeal.ch integration in discord",
+            colour = discord.Colour.green()
+        )
+    embed.add_field(name="`deal`",value="Sends current daydeal", inline=False)
+    embed.add_field(name="`setupDaydeal`",value=f"Setups the daydeal to send it whenever a new one is available. us it like '{prefix}setupDaydeal [channel] [roleToPing]'. You need 'manage_channels' permission to use this command.", inline=False)
+    embed.add_field(name="`stopDaydeal`",value="Stops automatic sending od daydeals", inline=False)
     await ctx.channel.send(embed=embed)
 
 @help.command()

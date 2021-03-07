@@ -6,17 +6,6 @@ from datetime import datetime
 
 URL = "https://www.daydeal.ch/"
 
-
-async def availableBarCreator(available):
-    bar = "["
-    if int(available) == 50:
-        bar += ("l" * int(available)) + "]"
-    else:
-        bar += ("l" * int(available)) + "||" + ("l" * (50 - int(available))) + "||]"
-    bar += " (" + str(int(available) * 2) + "%)"
-    return bar
-
-
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -24,34 +13,16 @@ class Daydeal(commands.Cog):
         self.mention_role = None
         self.endTime = None
 
-    @commands.command()
-    @commands.has_permissions(manage_channels=True)
-    async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role):
-        self.channel = channel
-        self.mention_role = mention_role
-        if self.channel and self.mention_role:
-            await ctx.invoke(self.bot.get_command('deal'))
-            await ctx.channel.send("Setup successful.")
-            await self.daydeal_task.start(ctx)
+    async def availableBarCreator(self, available):
+        bar = "["
+        if int(available) == 50:
+            bar += ("l" * int(available)) + "]"
+        else:
+            bar += ("l" * int(available)) + "||" + ("l" * (50 - int(available))) + "||]"
+        bar += " (" + str(int(available) * 2) + "%)"
+        return bar
 
-    @setupDaydeal.error
-    async def setupDaydeal_error(self, ctx, error):
-        await ctx.channel.send("Error. Please use command like this: ```,setupDaydeal #channel @role``` Error cause: " + str(error))
-
-    @commands.command()
-    @commands.has_permissions(manage_channels=True)
-    async def stopDaydeal(self, ctx):
-        await self.daydeal_task.cancel()
-        await ctx.channel.send("Daydeal stopped.")
-
-    @tasks.loop(seconds=180.0)
-    async def daydeal_task(self, ctx):
-        if datetime.now() >= self.endTime:
-            await ctx.invoke(self.bot.get_command('deal'))
-
-    @commands.cooldown(4, 10)
-    @commands.command()
-    async def deal(self, ctx):
+    async def createDaydealEmbed(self):
         # Web Scraping
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -79,13 +50,41 @@ class Daydeal(commands.Cog):
         embed.set_image(url=product_img)
         embed.set_author(name='Today\'s deal: ' + title1)
         embed.add_field(name="Price", value="Now: " + new_price + ", Old: " + old_price, inline=False)
-        embed.add_field(name="Available", value=str(await availableBarCreator(available)), inline=False)
+        embed.add_field(name="Available", value=str(await self.availableBarCreator(available)), inline=False)
         embed.add_field(name="Ends in", value=str(ends_in), inline=False)
+        return embed
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role):
+        self.channel = channel
+        self.mention_role = mention_role
         if self.channel is None:
             self.channel = ctx.channel
-        await self.channel.send(embed=embed)
-        if self.mention_role is not None:
-            await self.channel.send(self.mention_role.mention)
+        if self.channel and self.mention_role:
+            await self.channel.send(content=self.mention_role.mention,embed=await self.createDaydealEmbed())
+            await ctx.channel.send("Setup successful.")
+            await self.daydeal_task.start(ctx)
+
+    @setupDaydeal.error
+    async def setupDaydeal_error(self, ctx, error):
+        await ctx.channel.send("Error. Please use command like this: ```,setupDaydeal #channel @role``` Error cause: " + str(error))
+
+    @tasks.loop(seconds=180.0)
+    async def daydeal_task(self, ctx):
+        if datetime.now() >= self.endTime:
+            await self.channel.send(content=self.mention_role.mention,embed=await self.createDaydealEmbed())
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def stopDaydeal(self, ctx):
+        await self.daydeal_task.cancel()
+        await ctx.channel.send("Daydeal stopped.")
+
+    @commands.cooldown(4, 10)
+    @commands.command()
+    async def deal(self, ctx):
+        await ctx.channel.send(embed=await self.createDaydealEmbed())
 
     @deal.error
     async def deal_error(self, ctx, error):

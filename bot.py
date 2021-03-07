@@ -34,6 +34,7 @@ async def help(ctx):
         embed.add_field(name='Fun', value=f'``{prefix}help fun``')
         embed.add_field(name='Daydeal', value=f'``{prefix}help daydeal``')
         embed.add_field(name='Duel', value=f'``{prefix}help duel``')
+        embed.add_field(name='Owner', value=f'``{prefix}help owner``')
         await ctx.channel.send(embed=embed)
 
 @help.command()
@@ -93,6 +94,17 @@ async def duel(ctx):
                                         "Max Defense:  30       60      20\n"+
                                         "Max Mana:     30       20      50```", inline=False)
     embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. ``punch``, ``defend`` and ``end``. ``punch`` boosts your attack and ``defend`` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. ``end`` makes you surrender.", inline=False)
+    await ctx.channel.send(embed=embed)
+
+@help.command()
+async def owner(ctx):
+    embed = discord.Embed(
+            title="Owner",
+            description=f"Some commands for the bot owner.",
+            colour = discord.Colour.greyple()
+        )
+    embed.add_field(name="`sysinfo`",value="Shows host RAM and CPU usage", inline=False)
+    embed.add_field(name="`run_command`",value="Run console commands remotely", inline=False)
     await ctx.channel.send(embed=embed)
 
 @bot.command()

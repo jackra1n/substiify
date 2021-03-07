@@ -2,6 +2,7 @@ from pathlib import Path
 
 import discord
 import psutil
+import subprocess
 from colour import Color
 from discord.ext import commands
 
@@ -55,6 +56,20 @@ class Util(commands.Cog):
             )
             embed.add_field(name="CPU usage", value=f"{cpu_usage}%")
             embed.add_field(name="RAM usage", value=f"{ram_total - ram_available}/{ram_total}MB")
+            await ctx.channel.send(embed=embed)
+
+    @commands.command()
+    async def run_command(self, ctx, *command):
+        if ctx.message.author.id == jackDiscordId:
+            try:
+                output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
+            except subprocess.CalledProcessError:
+                print(output)
+            embed = discord.Embed(
+                    title="Command output",
+                    description=f"{output}",
+                    colour = discord.Colour(0x1FE4FF)
+                )
             await ctx.channel.send(embed=embed)
 
 

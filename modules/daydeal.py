@@ -1,6 +1,8 @@
+from sqlite3.dbapi2 import Cursor
 import discord
 from discord.ext import commands, tasks
 import requests
+import sqlite3
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -63,6 +65,13 @@ class Daydeal(commands.Cog):
             self.channel = ctx.channel
         if self.channel and self.mention_role:
             await self.channel.send(content=self.mention_role.mention,embed=await self.createDaydealEmbed())
+            db = sqlite3.connect('main.sqlite')
+            cursor = db.cursor()
+            cursor.execute(f"SELECT channel_id FROM daydeal WHERE guild_id = {ctx.guild.id}")
+            result = cursor.fetchone()
+            if result is None:
+                sql = ("INSERT INTO daydeal(guild_id, channel_id, role_id,)")
+
             await ctx.channel.send("Setup successful.")
             await self.daydeal_task.start(ctx)
 

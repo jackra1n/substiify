@@ -1,5 +1,7 @@
 import random
+import sqlite3
 from pathlib import Path
+from sqlite3.dbapi2 import Cursor
 
 import discord
 from discord.ext import commands
@@ -15,6 +17,16 @@ jackDiscordId = 276462585690193921
 
 @bot.event
 async def on_ready():
+    db = sqlite3.connect('main.sqlite')
+    cursor = db.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS daydeal(
+            guild_id TEXT,
+            channel_id TEXT,
+            role_id TEXT,
+            enabled INTEGER
+        )
+    ''')
     activity = discord.Activity(type=discord.ActivityType.listening, name=f"{prefix}help")
     await bot.change_presence(activity=activity)
     print("="*20)

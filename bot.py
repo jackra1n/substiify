@@ -23,8 +23,7 @@ async def on_ready():
         CREATE TABLE IF NOT EXISTS daydeal(
             guild_id TEXT,
             channel_id TEXT,
-            role_id TEXT,
-            enabled INTEGER
+            role_id TEXT
         )
     ''')
     activity = discord.Activity(type=discord.ActivityType.listening, name=f"{prefix}help")

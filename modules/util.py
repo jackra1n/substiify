@@ -61,6 +61,7 @@ class Util(commands.Cog):
     @commands.command()
     async def run_command(self, ctx, *command):
         if ctx.message.author.id == jackDiscordId:
+            output = ""
             try:
                 output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
             except subprocess.CalledProcessError:

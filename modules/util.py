@@ -64,14 +64,15 @@ class Util(commands.Cog):
             output = ""
             try:
                 output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
+                embed = discord.Embed(
+                        title="Command output",
+                        description=f"{output}",
+                        colour = discord.Colour(0x1FE4FF)
+                    )
+                await ctx.channel.send(embed=embed)
             except subprocess.CalledProcessError:
                 print(output)
-            embed = discord.Embed(
-                    title="Command output",
-                    description=f"{output}",
-                    colour = discord.Colour(0x1FE4FF)
-                )
-            await ctx.channel.send(embed=embed)
+                await ctx.channel.send(output)
 
 
 def setup(bot):

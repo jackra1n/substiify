@@ -1,3 +1,4 @@
+import sqlite3
 from pathlib import Path
 import discord
 from discord.ext import commands
@@ -12,6 +13,16 @@ marshDiscordId=224618877626089483
 
 @bot.event
 async def on_ready():
+    db = sqlite3.connect('main.sqlite')
+    cursor = db.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS daydeal(
+            daydeal_id INTEGER PRIMARY KEY,
+            guild_id TEXT,
+            channel_id TEXT,
+            role_id TEXT
+        )
+    ''')
     activity = discord.Activity(type=discord.ActivityType.listening, name=f"{prefix}help")
     await bot.change_presence(activity=activity)
     await load_extensions()

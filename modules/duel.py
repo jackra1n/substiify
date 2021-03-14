@@ -5,8 +5,6 @@ from enum import Enum
 import asyncio
 import random
 
-jackDiscordId = 276462585690193921
-
 
 class Duel(commands.Cog):
     def __init__(self, bot):
@@ -39,7 +37,8 @@ class Duel(commands.Cog):
         else:
             embed = discord.Embed(
                 title='⚔️ ' + duel_authors_name + ' choose your class.',
-                description=ctx.author.mention + 'what class do you want to be? `berserker`, `tank` or `wizard`?',
+                description=ctx.author.mention +
+                    'what class do you want to be? `berserker`, `tank` or `wizard`?',
                 colour=discord.Colour.red()
             )
             await ctx.channel.send(embed=embed)
@@ -48,7 +47,8 @@ class Duel(commands.Cog):
 
             embed = discord.Embed(
                 title='⚔️ ' + duel_authors_name + ' has challenged ' + challenge_member_name + ' to a fight!',
-                description=duel_authors_name + ' chose class ' + warrior1.ClassName + '. ' + member.mention + ', what is your class of choice? `berserker`,`tank`, or `wizard`?\nType your choice out in chat as it is displayed!',
+                description=duel_authors_name + ' chose class ' + warrior1.ClassName + '. ' + member.mention +
+                    ', what is your class of choice? `berserker`,`tank`, or `wizard`?\nType your choice out in chat as it is displayed!',
                 colour=discord.Colour.red()
             )
             await ctx.channel.send(embed=embed)
@@ -81,29 +81,28 @@ class Duel(commands.Cog):
     async def printWinner(self, winner, ctx):
         winEmbedMessage = discord.Embed(
             title='STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-            description='**' + winner.user.name + '** wins with just `' + str(winner.Health) + ' HP` left!',
+            description='**' + winner.user.name +
+                '** wins with just `' + str(winner.Health) + ' HP` left!',
             colour=discord.Colour.teal()
         )
         await ctx.channel.send(embed=winEmbedMessage)
 
     def checkClassChooser(self, author):
         def inner_check(message):
-            return (
-                               message.content == 'berserker' or message.content == 'tank' or message.content == 'wizard') and message.author == author
+            return (message.content == 'berserker' or message.content == 'tank' or message.content == 'wizard') and message.author == author
 
         return inner_check
 
     def checkAction(self, author):
         def inner_check(message):
             return (message.content == 'punch' or message.content == 'defend' or message.content == 'end' or (
-                        message.content == "detroit smash!" and author.id == jackDiscordId)) and message.author == author
-
+                        message.content == "detroit smash!" and author.id == self.bot.owner_id)) and message.author == author
         return inner_check
 
     async def createWarrior(self, ctx, user):
         try:
-            msgClass = await self.bot.wait_for('message', check=self.checkClassChooser(user), timeout=40.0)
-            warrior = Warrior(msgClass.author)
+            msgClass=await self.bot.wait_for('message', check=self.checkClassChooser(user), timeout=40.0)
+            warrior=Warrior(msgClass.author)
             if msgClass.content == 'berserker':
                 warrior.chooseClass(1)
             elif msgClass.content == 'tank':
@@ -116,21 +115,21 @@ class Duel(commands.Cog):
 
     async def getActionResult(self, warrior1, warrior2, ctx):
         try:
-            action = await self.bot.wait_for("message", check=self.checkAction(warrior1.user), timeout=40.0)
-            buff_bonus = 20
+            action=await self.bot.wait_for("message", check=self.checkAction(warrior1.user), timeout=40.0)
+            buff_bonus=20
             if action.content == "punch":
-                attack = random.randrange(0, warrior1.AttkMax) + buff_bonus
-                defense = random.randrange(0, warrior1.BlckMax)
+                attack=random.randrange(0, warrior1.AttkMax) + buff_bonus
+                defense=random.randrange(0, warrior1.BlckMax)
             elif action.content == "defend":
-                attack = random.randrange(0, warrior1.AttkMax)
-                defense = random.randrange(0, warrior1.BlckMax) + buff_bonus
+                attack=random.randrange(0, warrior1.AttkMax)
+                defense=random.randrange(0, warrior1.BlckMax) + buff_bonus
             elif action.content == "end":
                 return True
-            elif action.content == "detroit smash!" and action.author.id == jackDiscordId:
-                attack = random.randrange(0, warrior1.AttkMax) + 2000
-                defense = random.randrange(0, warrior1.BlckMax)
-            attack_damage = attack - random.randrange(warrior2.BlckMax)
-            counter_damage = random.randrange(0, warrior2.AttkMax) - defense
+            elif action.content == "detroit smash!" and action.author.id == self.bot.owner_id:
+                attack=random.randrange(0, warrior1.AttkMax) + 2000
+                defense=random.randrange(0, warrior1.BlckMax)
+            attack_damage=attack - random.randrange(warrior2.BlckMax)
+            counter_damage=random.randrange(0, warrior2.AttkMax) - defense
 
             await self.calculateDamage(ctx, warrior1, warrior2, attack_damage)
             await self.calculateDamage(ctx, warrior2, warrior1, counter_damage)
@@ -157,38 +156,38 @@ class Duel(commands.Cog):
 
 class Warrior:
     def __init__(self, user, health=1, attkMax=1, blckMax=1, mana=1, className=1):
-        self.user = user
-        self.Health = health
-        self.AttkMax = attkMax
-        self.BlckMax = blckMax
-        self.Mana = mana
-        self.ClassName = className
+        self.user=user
+        self.Health=health
+        self.AttkMax=attkMax
+        self.BlckMax=blckMax
+        self.Mana=mana
+        self.ClassName=className
 
     def chooseClass(self, className):
         if className == 1:
-            self.Health = 1000
-            self.AttkMax = 140
-            self.BlckMax = 30
-            self.Mana = 30
-            self.ClassName = WarriorClasses(1).name
+            self.Health=1000
+            self.AttkMax=140
+            self.BlckMax=30
+            self.Mana=30
+            self.ClassName=WarriorClasses(1).name
         elif className == 2:
-            self.Health = 1200
-            self.AttkMax = 100
-            self.BlckMax = 60
-            self.Mana = 20
-            self.ClassName = WarriorClasses(2).name
+            self.Health=1200
+            self.AttkMax=100
+            self.BlckMax=60
+            self.Mana=20
+            self.ClassName=WarriorClasses(2).name
         elif className == 3:
-            self.Health = 700
-            self.AttkMax = 200
-            self.BlckMax = 20
-            self.Mana = 50
-            self.ClassName = WarriorClasses(3).name
+            self.Health=700
+            self.AttkMax=200
+            self.BlckMax=20
+            self.Mana=50
+            self.ClassName=WarriorClasses(3).name
 
 
 class WarriorClasses(Enum):
-    BERSERKER = 1
-    TANK = 2
-    WIZARD = 3
+    BERSERKER=1
+    TANK=2
+    WIZARD=3
 
 
 def setup(bot):

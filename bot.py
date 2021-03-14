@@ -21,6 +21,7 @@ async def on_ready():
     cursor = db.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS daydeal(
+            daydeal_id INTEGER PRIMARY KEY,
             guild_id TEXT,
             channel_id TEXT,
             role_id TEXT

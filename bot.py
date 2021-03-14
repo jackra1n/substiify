@@ -17,7 +17,7 @@ async def on_ready():
     await load_extensions()
     print(f'[bot.py] {bot.user} has connected')
 
-startup_extensions = ['gif','music','duel','daydeal','epicGames','util','giveaway']
+startup_extensions = ['gif','music','duel','daydeal','epicGames','util','giveaway','fun']
 
 async def load_extensions():
     for extension in startup_extensions:

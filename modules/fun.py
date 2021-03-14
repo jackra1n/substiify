@@ -4,18 +4,23 @@ from discord.ext import commands
 from pathlib import Path
 
 Discord_Bot_Dir = Path("./")
+linksPath = Path(Discord_Bot_Dir / "links/")
+
+async def lineChooser(filename):
+    lines = open(linksPath / filename).read().splitlines()
+    return random.choice(lines)
 
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bot.command()
+    @commands.command()
     async def jack(ctx):
         await ctx.channel.send('"Fucking Jack!"')
 
     @commands.cooldown(6, 5)
     @commands.command()
-    async def pp(ctx, member : discord.Member=None):
+    async def pp(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
         PP_Size = random.randint(3,20)
         if member.id == self.bot.owner_id:
@@ -29,24 +34,19 @@ class Fun(commands.Cog):
 
     @commands.cooldown(6, 5)
     @commands.command(brief='Wanna hit on someone? Let me be your wingman!')
-    async def pickup(ctx, member : discord.Member=None):
+    async def pickup(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
-        author = bot.user if member is ctx.author else ctx.author
+        author = self.bot.user if member is ctx.author else ctx.author
         embed = discord.Embed(
             title = 'BOT PICKUPS! 🌈',
             description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
             colour = discord.Colour.orange()
         )
         await ctx.channel.send(embed=embed)
-        file.close()
-
-    async def lineChooser(filename):
-        lines = open(linksPath / filename).read().splitlines()
-        return random.choice(lines)
 
     @commands.cooldown(6, 5)
     @commands.command(aliases=['insult','burn'], brief='Insult someone until they cry')
-    async def roast(ctx, member : discord.Member=None):
+    async def roast(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
         author = bot.user if member is ctx.author else ctx.author
         if bot.user.id == member.id:
@@ -66,11 +66,10 @@ class Fun(commands.Cog):
                 colour = discord.Colour.orange()
             )
             await ctx.channel.send(embed=embed)
-            file.close()
 
     @commands.cooldown(6, 5)
     @commands.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
-    async def eightball(ctx,*,question):
+    async def eightball(self, ctx,*,question):
         responses = ['It is certain.',
                     'It is decidedly so.',
                     'Without a doubt.',

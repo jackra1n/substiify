@@ -8,7 +8,6 @@ from discord.ext import commands
 
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir / "links/")
-jackDiscordId = 276462585690193921
 giveaway_channel = None
 
 
@@ -44,7 +43,7 @@ class Util(commands.Cog):
 
     @commands.command()
     async def sysinfo(self, ctx):
-        if ctx.message.author.id == jackDiscordId:
+        if ctx.message.author.id == self.bot.owner_id:
             cpu_usage = psutil.cpu_percent()
             ram_total = psutil.virtual_memory().total >> 20
             ram_available = psutil.virtual_memory().available >> 20
@@ -60,7 +59,7 @@ class Util(commands.Cog):
 
     @commands.command()
     async def run_command(self, ctx, *command):
-        if ctx.message.author.id == jackDiscordId:
+        if ctx.message.author.id == self.bot.owner_id:
             output = ""
             try:
                 output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')

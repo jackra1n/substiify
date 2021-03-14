@@ -1,25 +1,31 @@
-import random
 from pathlib import Path
-
 import discord
 from discord.ext import commands
 
 prefix = "<<"
-bot = commands.Bot(command_prefix=prefix)
+bot = commands.Bot(command_prefix=prefix, owner_id=276462585690193921)
 bot.remove_command('help')
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
 
-marshDiscordId = 224618877626089483
-jackDiscordId = 276462585690193921
+marshDiscordId=224618877626089483
 
 @bot.event
 async def on_ready():
     activity = discord.Activity(type=discord.ActivityType.listening, name=f"{prefix}help")
     await bot.change_presence(activity=activity)
-    print("="*20)
-    print("Logged in as "+bot.user.name)
-    print("="*20)
+    await load_extensions()
+    print(f'[bot.py] {bot.user} has connected')
+
+startup_extensions = ['gif','music','duel','daydeal','epicGames','util','giveaway']
+
+async def load_extensions():
+    for extension in startup_extensions:
+        try:
+            bot.load_extension(f'modules.{extension}')
+        except Exception as e:
+            exc = f'{type(e).__name__}: {e}'
+            print(f'Failed to load extension {extension}\n{exc}')
 
 @bot.group()
 async def help(ctx):
@@ -41,7 +47,7 @@ async def help(ctx):
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
-            description=f"Hello! I'm Dux-Bot. My parents are <@{str(jackDiscordId)}> and <@{str(marshDiscordId)}>. Hope you will enjoy my company.",
+            description=f"Hello! I'm Dux-Bot. My parents are <@{str(bot.owner_id)}> and <@{str(marshDiscordId)}>. Hope you will enjoy my company.",
             colour = discord.Colour.greyple()
         )
     await ctx.channel.send(embed=embed)
@@ -106,105 +112,6 @@ async def owner(ctx):
     embed.add_field(name="`sysinfo`",value="Shows host RAM and CPU usage", inline=False)
     embed.add_field(name="`run_command`",value="Run console commands remotely", inline=False)
     await ctx.channel.send(embed=embed)
-
-@bot.command()
-async def jack(ctx):
-    await ctx.channel.send('"Fucking Jack!"')
-
-@commands.cooldown(6, 5)
-@bot.command()
-async def pp(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    PP_Size = random.randint(3,20)
-    if member.id == jackDiscordId:
-        PP_Size = 20
-    embed = discord.Embed(
-        title = 'AYE DAWG NICE PEEPEE!',
-        description = str(member.name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
-        colour = discord.Colour.magenta()
-    )
-    await ctx.channel.send(embed=embed)
-
-@commands.cooldown(6, 5)
-@bot.command(brief='Wanna hit on someone? Let me be your wingman!')
-async def pickup(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    embed = discord.Embed(
-        title = 'BOT PICKUPS! 🌈',
-        description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
-        colour = discord.Colour.orange()
-    )
-    await ctx.channel.send(embed=embed)
-    file.close()
-
-async def lineChooser(filename):
-    lines = open(linksPath / filename).read().splitlines()
-    return random.choice(lines)
-
-@commands.cooldown(6, 5)
-@bot.command(aliases=['insult','burn'], brief='Insult someone until they cry')
-async def roast(ctx, member : discord.Member=None):
-    member = ctx.author if member is None else member
-    author = bot.user if member is ctx.author else ctx.author
-    if bot.user.id == member.id:
-        replys = ['Simmer down buddy 🔫',
-                'You dare challenge thy master?! 💪',
-                'OK homie relax.. 💩',
-                'You aint even worth it dawg 🤏',
-                'HA! Good one. 😂',
-                'You done yet? Pussy.',
-                'Fuck off!!'
-        ]
-        await ctx.channel.send(random.choice(replys))
-    else:
-        embed = discord.Embed(
-            title = 'BOT INSULTS! 🔥',
-            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
-            colour = discord.Colour.orange()
-        )
-        await ctx.channel.send(embed=embed)
-        file.close()
-
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        pass
-
-@commands.cooldown(6, 5)
-@bot.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
-async def eightball(ctx,*,question):
-    responses = ['It is certain.',
-                'It is decidedly so.',
-                'Without a doubt.',
-                'Yes - definitely.',
-                'You may rely on it.',
-                'As I see it, yes.',
-                'Most likely.',
-                'Outlook good.',
-                'Yes.',
-                'Signs point to yes.',
-                'Reply hazy, try again.',
-                'Ask again later.',
-                'Better not tell you now.',
-                'Cannot predict now.',
-                'Concentrate and ask again.',
-                "Don't count on it.",
-                'My reply is no.',
-                'My sources say no.',
-                'Outlook not so good.',
-                'Very doubtful.']
-    await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
-
-startup_extensions = ["modules.gif", "modules.music", "modules.duel", "modules.daydeal", "modules.epicGames", "modules.util", "modules.giveaway"]
-
-if __name__ == "__main__":
-    for extension in startup_extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            exc = '{}: {}'.format(type(e).__name__, e)
-            print('Failed to load extension {}\n{}'.format(extension, exc))
 
 file = open(Discord_Bot_Dir / 'token.txt', 'rt')
 bot.run(str(file.read()))

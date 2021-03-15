@@ -2,6 +2,9 @@ import discord
 import random
 from discord.ext import commands
 from pathlib import Path
+from PIL import Image
+import requests
+from discord import File
 
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir / "links/")
@@ -92,6 +95,42 @@ class Fun(commands.Cog):
                     'Very doubtful.']
         await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
 
+    @commands.command()
+    async def secretDraw(self, ctx, offsetX, offsetY):
+        channel_to_spam = 819966095070330950
+        imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
+        if imageToDraw is not None:
+            width, height = imageToDraw.size
+            pix_val = list(imageToDraw.getdata())
+
+            fileTxt = open('pixelart.txt','a')
+            im = Image.new('RGB', (1000,1000))
+
+            i = 0
+            for x in range(width):
+                for y in range(height):
+                    im.putpixel((y+int(offsetX),x+int(offsetY)), pix_val[i])
+                    fileTxt.write(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                    i += 1
+
+            im.save("test2.png")
+        await ctx.channel.send(file=File(fileTxt.name))
+        await ctx.channel.send(file=File(Image.open('test2.png').filename))
+        fileTxt.close()
+
+    @commands.command()
+    async def spamDraw(self, ctx, offsetX, offsetY):
+        server = self.bot.get_guild(747752542741725244)
+        channelToSpam = server.get_channel(819966095070330950)
+        imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
+        if imageToDraw is not None:
+            width, height = imageToDraw.size
+            pix_val = list(imageToDraw.getdata())
+            i = 0
+            for x in range(width):
+                for y in range(height):
+                    await ctx.channel.send(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                    i += 1
 
 def setup(bot):
     bot.add_cog(Fun(bot))

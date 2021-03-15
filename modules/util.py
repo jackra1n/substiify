@@ -1,8 +1,8 @@
 from pathlib import Path
-
 import discord
 import psutil
 import subprocess
+import time
 from colour import Color
 from discord.ext import commands
 
@@ -40,6 +40,18 @@ class Util(commands.Cog):
     async def clear_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.channel.send('Please put an amount to clear.')
+
+    @commands.command(aliases=['dink'])
+    async def ping(self, ctx):
+        title = 'Pong!'
+        if 'dink' in ctx.message.content.lower():
+            title = 'Donk!'
+        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:')
+        start = time.perf_counter()
+        ping = await ctx.channel.send(embed=embed)
+        end = time.perf_counter()
+        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start) * 1000)}` ms')
+        await ping.edit(embed=embed)
 
     @commands.command()
     async def sysinfo(self, ctx):

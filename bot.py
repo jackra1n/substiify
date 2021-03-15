@@ -13,7 +13,7 @@ marshDiscordId=224618877626089483
 
 @bot.event
 async def on_ready():
-    db = sqlite3.connect('main.sqlite')
+    db = sqlite3.connect('data/main.sqlite')
     cursor = db.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS daydeal(

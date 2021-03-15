@@ -130,3 +130,5 @@ dmypy.json
 
 token.txt
 .vscode/settings.json
+
+data/main.sqlite

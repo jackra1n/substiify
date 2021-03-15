@@ -129,7 +129,7 @@ class Fun(commands.Cog):
             i = 0
             for x in range(width):
                 for y in range(height):
-                    await ctx.channel.send(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                    await channelToSpam.send(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
                     i += 1
 
 def setup(bot):

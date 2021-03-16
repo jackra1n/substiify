@@ -9,8 +9,6 @@ bot.remove_command('help')
 Discord_Bot_Dir = Path("./")
 linksPath = Path(Discord_Bot_Dir/"links/")
 
-marshDiscordId=224618877626089483
-
 @bot.event
 async def on_ready():
     db = sqlite3.connect('data/main.sqlite')
@@ -58,7 +56,7 @@ async def help(ctx):
 async def info(ctx):
     embed = discord.Embed(
             title="Information",
-            description=f"Hello! I'm Dux-Bot. My parents are <@{str(bot.owner_id)}> and <@{str(marshDiscordId)}>. Hope you will enjoy my company.",
+            description=f"Hello! I'm Dux-Bot. My parents are <@{str(bot.owner_id)}> and <@{str(224618877626089483)}>. Hope you will enjoy my company.",
             colour = discord.Colour.greyple()
         )
     await ctx.channel.send(embed=embed)

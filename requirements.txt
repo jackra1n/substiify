@@ -6,3 +6,4 @@ colour
 psutil
 bs4
 requests
+Pillow

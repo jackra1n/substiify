@@ -100,9 +100,9 @@ class Daydeal(commands.Cog):
             cursor = db.cursor()
             daydealEmbed = await self.createDaydealEmbed()
             for row in cursor.execute(f"SELECT * FROM daydeal"):
-                server = self.bot.get_guild(int(row[0]))
-                channel = self.bot.get_channel(int(row[1]))
-                role = server.get_role(int(row[2]))
+                server = self.bot.get_guild(int(row[1]))
+                channel = self.bot.get_channel(int(row[2]))
+                role = server.get_role(int(row[3]))
                 await channel.send(content=role.mention,embed=daydealEmbed)
 
     @commands.command()

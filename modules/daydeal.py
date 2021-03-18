@@ -44,7 +44,7 @@ class Daydeal(commands.Cog):
             old_price = old_price.text
         else:
             old_price = ""
-        available = int(soup.find('strong', class_='product-progress__availability').text.strip('%')) / 2
+        available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))
         ends_in = self.endTime - datetime.now().replace(microsecond=0)
         description_str = ""
         for element in description_details:

@@ -25,8 +25,8 @@ class Daydeal(commands.Cog):
         return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
 
     async def availableBarCreator(self, available):
-        percent = int(round(available, -1))
-        return '<:green_square:820409531573993513>'*percent + '<:grey_square:820409550938046514>'*(10-percent) + f' `{available}%`'
+        toDraw = int(round(available, -1)/10)
+        return '<:green_square:820409531573993513>'*toDraw + '<:grey_square:820409550938046514>'*(10-toDraw) + f' `{available}%`'
 
     async def createDaydealEmbed(self):
         # Web Scraping

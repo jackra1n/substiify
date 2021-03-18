@@ -55,7 +55,7 @@ class Daydeal(commands.Cog):
         embed.set_thumbnail(url="https://static.daydeal.ch/2.17.10/images/logo-top.png")
         embed.set_image(url=product_img)
         embed.set_author(name='Today\'s deal: ' + title1)
-        embed.add_field(name="Price", value=f'~~{old_price}~~ ⟶ {new_price}', inline=False)
+        embed.add_field(name="Price", value=f'~~`{old_price}`~~ ⟶ `{new_price}`', inline=False)
         embed.add_field(name="Available", value=str(await self.availableBarCreator(available)), inline=False)
         embed.add_field(name="Ends in", value=str(ends_in), inline=False)
         return embed

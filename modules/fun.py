@@ -93,7 +93,14 @@ class Fun(commands.Cog):
                     'My sources say no.',
                     'Outlook not so good.',
                     'Very doubtful.']
-        await ctx.channel.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
+        embed = discord.Embed(
+            title=random.choice(responses),
+            description=f'Question: {question}',
+            colour = discord.Colour.orange()
+        )
+        embed.set_footer(text=f'Question by {ctx.author}', icon_url=ctx.author.avatar_url)
+        await ctx.channel.send(embed=embed)
+
 
     @commands.command()
     async def secretDraw(self, ctx, offsetX, offsetY):

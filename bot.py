@@ -81,7 +81,7 @@ async def fun(ctx):
     embed.add_field(name="`pp`",value="Tells how long is your pp :)", inline=False)
     embed.add_field(name="`pickup`",value="Wanna hit on someone? Let me be your wingman! Most of them are inappropriate so please use it on people you know well!", inline=False)
     embed.add_field(name="`roast`",value="Insult someone until they cry", inline=False)
-    embed.add_field(name="`8ball`",value="AKA 8ball, Ask the bot a question that you dont want the answer to.", inline=False)
+    embed.add_field(name="`8ball`",value="Ask the bot a question that you dont want the answer to.", inline=False)
     await ctx.channel.send(embed=embed)
 
 @help.command()

@@ -25,13 +25,8 @@ class Daydeal(commands.Cog):
         return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
 
     async def availableBarCreator(self, available):
-        bar = "["
-        if int(available) == 50:
-            bar += ("l" * int(available)) + "]"
-        else:
-            bar += ("l" * int(available)) + "||" + ("l" * (50 - int(available))) + "||]"
-        bar += " (" + str(int(available) * 2) + "%)"
-        return bar
+        percent = int(round(available, -1))
+        return '<:green_square:820409531573993513>'*percent + '<:grey_square:820409550938046514>'*(10-percent) + f' `{available}%`'
 
     async def createDaydealEmbed(self):
         # Web Scraping
@@ -60,7 +55,7 @@ class Daydeal(commands.Cog):
         embed.set_thumbnail(url="https://static.daydeal.ch/2.17.10/images/logo-top.png")
         embed.set_image(url=product_img)
         embed.set_author(name='Today\'s deal: ' + title1)
-        embed.add_field(name="Price", value="Now: " + new_price + ", Old: " + old_price, inline=False)
+        embed.add_field(name="Price", value=f'~~{old_price}~~ ⟶ {new_price}', inline=False)
         embed.add_field(name="Available", value=str(await self.availableBarCreator(available)), inline=False)
         embed.add_field(name="Ends in", value=str(ends_in), inline=False)
         return embed

@@ -18,7 +18,7 @@ class Fun(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def jack(ctx):
+    async def jack(self, ctx):
         await ctx.channel.send('"Fucking Jack!"')
 
     @commands.cooldown(6, 5)

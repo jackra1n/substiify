@@ -2,6 +2,7 @@ import sqlite3
 from pathlib import Path
 import discord
 from discord.ext import commands
+import subprocess
 
 prefix = "<<"
 bot = commands.Bot(command_prefix=prefix, owner_id=276462585690193921)
@@ -35,6 +36,18 @@ async def load_extensions():
         except Exception as e:
             exc = f'{type(e).__name__}: {e}'
             print(f'Failed to load extension {extension}\n{exc}')
+
+@bot.command()
+async def reload(ctx):
+    if ctx.author.id == bot.owner_id:
+        subprocess.run(["git","pull","--no-edit"])
+        try:
+            for cog in startup_extensions:
+                bot.reload_extension(cog)
+        except Exception as e:
+            exc = f'{type(e).__name__}: {e}'
+            await ctx.channel.send(f'Failed to reload extensions\n{exc}')
+        await ctx.channel.send('Realoded all cogs')
 
 @bot.group()
 async def help(ctx):

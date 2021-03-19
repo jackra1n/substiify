@@ -118,7 +118,7 @@ class Fun(commands.Cog):
                 for x in range(width):
                     for y in range(height):
                         im.putpixel((y+int(offsetX),x+int(offsetY)), pix_val[i])
-                        fileTxt.write(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
                         i += 1
 
                 im.save("test2.png")
@@ -138,7 +138,7 @@ class Fun(commands.Cog):
                 i = 0
                 for x in range(width):
                     for y in range(height):
-                        await channelToSpam.send(f"dev.place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
                         i += 1
 
 def setup(bot):

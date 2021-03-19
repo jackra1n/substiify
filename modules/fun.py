@@ -51,8 +51,8 @@ class Fun(commands.Cog):
     @commands.command(aliases=['insult','burn'], brief='Insult someone until they cry')
     async def roast(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
-        author = bot.user if member is ctx.author else ctx.author
-        if bot.user.id == member.id:
+        author = self.bot.user if member is ctx.author else ctx.author
+        if self.bot.user.id == member.id:
             replys = ['Simmer down buddy 🔫',
                     'You dare challenge thy master?! 💪',
                     'OK homie relax.. 💩',
@@ -104,7 +104,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def secretDraw(self, ctx, offsetX, offsetY):
-        if ctx.message.author == self.bot.owner:
+        if ctx.message.author.id == self.bot.owner_id:
             channel_to_spam = 819966095070330950
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
             if imageToDraw is not None:
@@ -128,7 +128,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def spamDraw(self, ctx, offsetX, offsetY):
-        if ctx.message.author == self.bot.owner:
+        if ctx.message.author.id == self.bot.owner_id:
             server = self.bot.get_guild(747752542741725244)
             channelToSpam = server.get_channel(819966095070330950)
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)

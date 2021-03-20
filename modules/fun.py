@@ -111,14 +111,21 @@ class Fun(commands.Cog):
                 width, height = imageToDraw.size
                 pix_val = list(imageToDraw.getdata())
 
-                fileTxt = open('pixelart.txt','a')
+                fileTxt = open('pixelart.txt','w')
                 im = Image.new('RGB', (1000,1000))
 
                 i = 0
                 for x in range(width):
                     for y in range(height):
-                        im.putpixel((y+int(offsetX),x+int(offsetY)), pix_val[i])
-                        fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        if imageToDraw.mode in ('RGB'):
+                            im.putpixel((y+int(offsetX),x+int(offsetY)), pix_val[i])
+                            fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        elif imageToDraw.mode in ('L'):
+                            im.putpixel((y+int(offsetX),x+int(offsetY)), (pix_val[i], pix_val[i], pix_val[i]))
+                            fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + f'#{pix_val[i]:02x}{pix_val[i]:02x}{pix_val[i]:02x}'+"\n")
+                        else:
+                            await channelToSpam.send(f'image has wrong color mode. cancelling')
+                            break
                         i += 1
 
                 im.save("test2.png")
@@ -138,7 +145,13 @@ class Fun(commands.Cog):
                 i = 0
                 for x in range(width):
                     for y in range(height):
-                        await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        if imageToDraw.mode in ('RGB'):
+                            await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                        elif imageToDraw.mode in ('L'):
+                            await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + f'#{pix_val[i]:02x}{pix_val[i]:02x}{pix_val[i]:02x}')
+                        else:
+                            await channelToSpam.send(f'image has wrong color mode. cancelling')
+                            break
                         i += 1
 
 def setup(bot):

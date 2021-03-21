@@ -4,7 +4,7 @@ from discord.ext import commands
 from pathlib import Path
 
 Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "links/")
+linksPath = Path(Discord_Bot_Dir / "resources/")
 
 
 async def lineChooser(filename):
@@ -16,7 +16,7 @@ async def embedSender(self, ctx, member, text, file):
     member = ctx.author if member is None else member
     author = self.bot.user if member is ctx.author else ctx.author
     embed = discord.Embed(
-        title=author.name + text + member.name,
+        title=author.display_name + text + member.display_name,
         colour=discord.Colour.from_rgb(0, 0, 0)
     )
     embed.set_image(url=await lineChooser(file))

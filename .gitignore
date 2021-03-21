@@ -132,3 +132,4 @@ token.txt
 .vscode/settings.json
 
 data/main.sqlite
+data/settings.json

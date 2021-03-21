@@ -7,7 +7,7 @@ import requests
 from discord import File
 
 Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "links/")
+linksPath = Path(Discord_Bot_Dir / "resources/")
 
 async def lineChooser(filename):
     lines = open(linksPath / filename).read().splitlines()
@@ -30,7 +30,7 @@ class Fun(commands.Cog):
             PP_Size = 20
         embed = discord.Embed(
             title = 'AYE DAWG NICE PEEPEE!',
-            description = str(member.name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
+            description = str(member.display_name) + '\'s pp size is ' + str(PP_Size) + 'cm 😘\n8' + ("=" * PP_Size) + 'D',
             colour = discord.Colour.magenta()
         )
         await ctx.channel.send(embed=embed)
@@ -42,7 +42,7 @@ class Fun(commands.Cog):
         author = self.bot.user if member is ctx.author else ctx.author
         embed = discord.Embed(
             title = 'BOT PICKUPS! 🌈',
-            description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("pickup.txt"),
+            description = str(author.display_name) + ' says: ay ' + str(member.display_name) + ', ' + await lineChooser("pickup.txt"),
             colour = discord.Colour.orange()
         )
         await ctx.channel.send(embed=embed)
@@ -65,7 +65,7 @@ class Fun(commands.Cog):
         else:
             embed = discord.Embed(
                 title = 'BOT INSULTS! 🔥',
-                description = str(author.name) + ' says: ay ' + str(member.name) + ', ' + await lineChooser("insults.txt"),
+                description = str(author.display_name) + ' says: ay ' + str(member.display_name) + ', ' + await lineChooser("insults.txt"),
                 colour = discord.Colour.orange()
             )
             await ctx.channel.send(embed=embed)

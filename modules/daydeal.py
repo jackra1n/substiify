@@ -1,12 +1,9 @@
-from sqlite3.dbapi2 import Cursor
-import discord
-from discord import guild, role
 from discord.ext import commands, tasks
-from discord.ext.commands.core import command
+from datetime import datetime
+from bs4 import BeautifulSoup
+import discord
 import requests
 import sqlite3
-from bs4 import BeautifulSoup
-from datetime import datetime
 
 URL = "https://www.daydeal.ch/"
 

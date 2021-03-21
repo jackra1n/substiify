@@ -10,12 +10,12 @@ class Duel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['duel'], brief='Fight someone on this server!')
+    @commands.command(brief='Fight someone on this server!')
     @commands.max_concurrency(1, per=BucketType.default, wait=True)
     async def fight(self, ctx, member: discord.Member):
         duel_authors_id = ctx.author.id
-        duel_authors_name = ctx.author.name
-        challenge_member_name = member.name
+        duel_authors_name = ctx.author.display_name
+        challenge_member_name = member.display_name
         challenge_member_id = member.id
         bot_id = self.bot.user.id
 
@@ -81,7 +81,7 @@ class Duel(commands.Cog):
     async def printWinner(self, winner, ctx):
         winEmbedMessage = discord.Embed(
             title='STOP! STOP! STOP! THE FIGHT IS OVER!!!',
-            description='**' + winner.user.name +
+            description='**' + winner.user.display_name +
                 '** wins with just `' + str(winner.Health) + ' HP` left!',
             colour=discord.Colour.teal()
         )
@@ -140,13 +140,13 @@ class Duel(commands.Cog):
     async def calculateDamage(self, ctx, warrior1, warrior2, damage):
         hit_response = ['cRaZyy', 'pOwerful', 'DEADLY', 'dangerous', 'deathly', 'l33t', 'amazing']
         if damage <= 0:
-            await ctx.channel.send("**" + warrior2.user.name + "** blocked the attack!")
+            await ctx.channel.send("**" + warrior2.user.display_name + "** blocked the attack!")
         else:
-            await ctx.channel.send('**' + warrior1.user.name + '** lands a ' + random.choice(
-                hit_response) + ' hit on **' + warrior2.user.name + '** dealing `' + str(damage) + '` damage!')
+            await ctx.channel.send('**' + warrior1.user.display_name + '** lands a ' + random.choice(
+                hit_response) + ' hit on **' + warrior2.user.display_name + '** dealing `' + str(damage) + '` damage!')
             warrior2.Health -= damage
             await ctx.channel.send(
-                '**' + warrior2.user.name + '**  is left with `' + str(warrior2.Health) + '` health!')
+                '**' + warrior2.user.display_name + '**  is left with `' + str(warrior2.Health) + '` health!')
 
     @fight.error
     async def fight_error(self, ctx, error):

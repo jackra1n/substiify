@@ -12,7 +12,7 @@ bot = commands.Bot(command_prefix=settings['prefix'], owner_id=27646258569019392
 bot.remove_command('help')
 bot.load_extension("modules.mainbot")
 
-if settings['token'] is None:
+if not settings['token']:
     print('No token in ./data/settings.json! Please add it and try again.')
     exit()
 

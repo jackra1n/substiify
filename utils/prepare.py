@@ -15,9 +15,9 @@ def createFiles():
     # Create 'logs' folder if it doesn't exist
     Path('logs').mkdir(parents=True, exist_ok=True)
 
-    if not Path('../data/settings.json'):
-        log('Creating settings.json', keyword)
-        with open('../data/settings.json', 'a') as f:
+    if not Path('./data/settings.json').is_file():
+        log('Creating settings.json\n', keyword)
+        with open('./data/settings.json', 'a') as f:
             json.dump(default_settings, f, indent=2)
 
     log('All files setup', keyword)

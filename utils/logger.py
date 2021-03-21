@@ -16,11 +16,11 @@ def log(text, keyword=None):
     time = datetime.now(timezone('Europe/Zurich')).strftime('%H:%M:%S')
     try:
         with open(f'logs/{date}.log', 'a') as f:
-            f.write(f'[{time}] -- {text}')
+            f.write(f'[{time}] -- {text}\n')
     except UnicodeEncodeError:
         with open(f'logs/{date}.log', 'a') as f:
             text = text.encode('UTF-8')
             print('!!!-----UnicodeEncodeError while logging-----!!!')
-            f.write(f'{existing_log}\n\n#############UnicodeEncodeError#############\n\n[{time}] -- {text}')
+            f.write(f'{existing_log}\n\n#############UnicodeEncodeError#############\n\n[{time}] -- {text}\n')
             
     print(f'Logged: {text}')

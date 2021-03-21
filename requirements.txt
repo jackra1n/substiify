@@ -7,3 +7,4 @@ psutil
 bs4
 requests
 Pillow
+pytz

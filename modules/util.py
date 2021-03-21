@@ -84,6 +84,7 @@ class Util(commands.Cog):
     @commands.command()
     async def reload(self, ctx):
         if ctx.author.id == self.bot.owner_id:
+            self.bot.get_cog('Daydeal').daydeal_task.stop()
             subprocess.run(["git","pull","--no-edit"])
             try:
                 for cog in startup_extensions:

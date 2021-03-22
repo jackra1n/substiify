@@ -1,6 +1,7 @@
+from discord.ext import commands
+import subprocess
 import sqlite3
 import discord
-from discord.ext import commands
 import json
 
 class MainBot(commands.Cog):
@@ -46,6 +47,20 @@ class MainBot(commands.Cog):
         await self.load_db()
         await self.load_extensions()
         print(f'[bot.py] {self.bot.user} has connected')
+
+    @commands.command()
+    async def reload(self, ctx):
+        if ctx.author.id == self.bot.owner_id:
+            self.bot.get_cog('Daydeal').daydeal_task.stop()
+            subprocess.run(["git","pull","--no-edit"])
+            try:
+                for cog in startup_extensions:
+                    self.bot.reload_extension(f'modules.{cog}')
+            except Exception as e:
+                exc = f'{type(e).__name__}: {e}'
+                await ctx.channel.send(f'Failed to reload extensions\n{exc}')
+            await ctx.channel.send('Realoded all cogs')
+
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

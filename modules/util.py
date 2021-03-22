@@ -82,20 +82,6 @@ class Util(commands.Cog):
                 await ctx.channel.send(output)
 
     @commands.command()
-    async def reload(self, ctx):
-        if ctx.author.id == self.bot.owner_id:
-            self.bot.get_cog('Daydeal').daydeal_task.stop()
-            subprocess.run(["git","pull","--no-edit"])
-            try:
-                for cog in startup_extensions:
-                    self.bot.reload_extension(f'modules.{cog}')
-            except Exception as e:
-                exc = f'{type(e).__name__}: {e}'
-                await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-            await ctx.channel.send('Realoded all cogs')
-
-    
-    @commands.command()
     async def info(self, ctx):
         bot_time = time_up(time.time() - self.script_start) #uptime of the bot
         cpu_usage = psutil.cpu_percent()

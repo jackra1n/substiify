@@ -1,3 +1,4 @@
+from utils.store import store
 from discord.ext import commands
 from datetime import datetime
 from pytz import timezone
@@ -5,18 +6,16 @@ from pathlib import Path
 import subprocess
 import platform
 import discord
+import asyncio
 import psutil
 import time
 import json
-
-Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "resources/")
 
 class Util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.script_start = time.time()
-        with open("./data/settings.json", "r") as settings:
+        with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
 
     @commands.cooldown(6, 5)
@@ -86,6 +85,8 @@ class Util(commands.Cog):
         bot_time = time_up(time.time() - self.script_start) #uptime of the bot
         cpu_usage = psutil.cpu_percent()
         ram_usage = psutil.virtual_memory().percent
+        with open(store.settings_path, "r") as settings:
+            self.settings = json.load(settings)
 
         content = f'**Made by:** <@{self.bot.owner_id}>\n\n' \
             f'**Instance uptime:** `{bot_time}`\n' \
@@ -102,6 +103,20 @@ class Util(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.set_footer(text=f"Requested by by {ctx.author.display_name}")
         await ctx.channel.send(embed=embed)
+
+    @commands.command()
+    async def setversion(self, ctx, version):
+        with open(store.settings_path, "r") as settings:
+            settings_json = json.load(settings)
+        settings_json['version'] = version
+        with open(store.settings_path, "w") as settings:
+            json.dump(settings_json, settings, indent=2)
+        if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
+        embed = discord.Embed(description=f'Version has been set to {version}')
+        msg = await ctx.send(embed=embed)
+        await asyncio.sleep(10)
+        await msg.delete()
 
 def setup(bot):
     bot.add_cog(Util(bot))

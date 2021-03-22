@@ -1,3 +1,4 @@
+from utils.store import store
 from pathlib import Path
 from datetime import datetime
 from pytz import timezone
@@ -15,10 +16,10 @@ def log(text, keyword=None):
     date = datetime.now(timezone('Europe/Zurich')).strftime('%Y-%m-%d')
     time = datetime.now(timezone('Europe/Zurich')).strftime('%H:%M:%S')
     try:
-        with open(f'logs/{date}.log', 'a') as f:
+        with open(f'{store.logs_path}/{date}.log', 'a') as f:
             f.write(f'[{time}] -- {text}\n')
     except UnicodeEncodeError:
-        with open(f'logs/{date}.log', 'a') as f:
+        with open(f'{store.logs_path}/{date}.log', 'a') as f:
             text = text.encode('UTF-8')
             print('!!!-----UnicodeEncodeError while logging-----!!!')
             f.write(f'{existing_log}\n\n#############UnicodeEncodeError#############\n\n[{time}] -- {text}\n')

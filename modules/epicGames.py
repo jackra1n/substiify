@@ -4,8 +4,6 @@ import discord
 import requests
 from discord.ext import commands
 
-Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "resources/")
 epicStoreFreeGamesAPI = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=GB&allowCountries=GB,US"
 epicGamesLogo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/50px-Epic_Games_logo.svg.png"
 epicStoreFreeGamesURL = "https://www.epicgames.com/store/en-US/free-games"

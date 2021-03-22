@@ -1,4 +1,5 @@
 from discord.ext import commands, tasks
+from utils.store import store
 from datetime import datetime
 from bs4 import BeautifulSoup
 import discord
@@ -13,7 +14,6 @@ class Daydeal(commands.Cog):
         self.channel = None
         self.mention_role = None
         self.endTime = self.getDealEndTime()
-        self.db_path = './data/main.sqlite'
         self.daydeal_task.start()
 
     def getDealEndTime(self):
@@ -65,7 +65,7 @@ class Daydeal(commands.Cog):
         if self.channel is None:
             self.channel = ctx.channel
         if self.channel and self.mention_role:
-            db = sqlite3.connect(self.db_path)
+            db = sqlite3.connect(store.db_path)
             cursor = db.cursor()
             cursor.execute(f"SELECT channel_id FROM daydeal WHERE guild_id = {ctx.guild.id}")
             result = cursor.fetchone()
@@ -88,7 +88,7 @@ class Daydeal(commands.Cog):
     @tasks.loop(seconds=60.0)
     async def daydeal_task(self):
         if datetime.now() >= self.endTime:
-            db = sqlite3.connect(self.db_path)
+            db = sqlite3.connect(store.db_path)
             cursor = db.cursor()
             daydealEmbed = await self.createDaydealEmbed()
             for row in cursor.execute(f"SELECT * FROM daydeal"):
@@ -100,7 +100,7 @@ class Daydeal(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def stopDaydeal(self, ctx):
-        db = sqlite3.connect(self.db_path)
+        db = sqlite3.connect(store.db_path)
         cursor = db.cursor()
         cursor.execute(f"DELETE FROM daydeal WHERE guild_id = {ctx.guild.id}")
         db.commit()

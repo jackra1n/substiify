@@ -1,3 +1,4 @@
+from utils.store import store
 from discord.ext import commands
 import subprocess
 import sqlite3
@@ -7,7 +8,7 @@ import json
 class MainBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("./data/settings.json", "r") as settings:
+        with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
         self.startup_extensions = [
             'gif',
@@ -30,7 +31,7 @@ class MainBot(commands.Cog):
                 print(f'Failed to load extension {extension}\n{exc}')
 
     async def load_db(self):
-        db = sqlite3.connect('data/main.sqlite')
+        db = sqlite3.connect(store.db_path)
         cursor = db.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS daydeal(

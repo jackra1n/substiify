@@ -1,4 +1,5 @@
 import discord
+from utils.store import store
 import random
 from discord.ext import commands
 from pathlib import Path
@@ -6,11 +7,8 @@ from PIL import Image
 import requests
 from discord import File
 
-Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "resources/")
-
 async def lineChooser(filename):
-    lines = open(linksPath / filename).read().splitlines()
+    lines = open(f'{store.resources_path}/{filename}').read().splitlines()
     return random.choice(lines)
 
 class Fun(commands.Cog):

@@ -1,17 +1,15 @@
 import discord
 import time
 import json
+from utils.store import store
 from pathlib import Path
 from discord.ext import commands
-
-Discord_Bot_Dir = Path("./")
-linksPath = Path(Discord_Bot_Dir / "resources/")
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.script_start = time.time()
-        with open("./data/settings.json", "r") as settings:
+        with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
         self.prefix = self.settings['prefix']
 

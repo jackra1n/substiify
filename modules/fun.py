@@ -103,7 +103,6 @@ class Fun(commands.Cog):
     @commands.command()
     async def secretDraw(self, ctx, offsetX, offsetY):
         if ctx.message.author.id == self.bot.owner_id:
-            channel_to_spam = 819966095070330950
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
             if imageToDraw is not None:
                 width, height = imageToDraw.size
@@ -151,6 +150,16 @@ class Fun(commands.Cog):
                             await channelToSpam.send(f'image has wrong color mode. cancelling')
                             break
                         i += 1
+
+    @commands.command()
+    async def serversInfo(self, ctx):
+        if ctx.message.author.id == self.bot.owner_id:
+            serverList = []
+            userList = []
+            for guild in self.bot.guilds:
+                serverList.append(f'{guild.name}::{guild.id}')
+                userList.append(f'{guild.name} has {guild.member_count}')
+            await ctx.send(f'{serverList}\n{userList}')
 
 def setup(bot):
     bot.add_cog(Fun(bot))

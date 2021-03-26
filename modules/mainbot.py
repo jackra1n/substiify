@@ -35,10 +35,10 @@ class MainBot(commands.Cog):
         cursor = db.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS daydeal(
-                daydeal_id INTEGER PRIMARY KEY,
-                guild_id TEXT,
-                channel_id TEXT,
-                role_id TEXT
+                id INTEGER PRIMARY KEY,
+                guild_id INTEGER,
+                channel_id INTEGER,
+                role_id INTEGER
             )
         ''')
 

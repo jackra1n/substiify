@@ -2,6 +2,9 @@ from discord.ext import commands, tasks
 from utils.store import store
 from datetime import datetime
 from bs4 import BeautifulSoup
+from utils import db
+from sqlalchemy.sql import select
+import asyncio
 import discord
 import requests
 import sqlite3
@@ -11,8 +14,6 @@ URL = "https://www.daydeal.ch/"
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.channel = None
-        self.mention_role = None
         self.endTime = self.getDealEndTime()
         self.daydeal_task.start()
 
@@ -59,54 +60,47 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
-    async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role):
-        self.channel = channel
-        self.mention_role = mention_role
-        if self.channel is None:
-            self.channel = ctx.channel
-        if self.channel and self.mention_role:
-            db = sqlite3.connect(store.db_path)
-            cursor = db.cursor()
-            cursor.execute(f"SELECT channel_id FROM daydeal WHERE guild_id = {ctx.guild.id}")
-            result = cursor.fetchone()
-            if result is None:
-                sql = ("INSERT INTO daydeal(guild_id, channel_id, role_id) VALUES (?, ?, ?)")
-                val = (str(ctx.guild.id), str(channel.id), str(mention_role.id))
-                cursor.execute(sql, val)
-                db.commit()
-                cursor.close()
-                db.close()
-                await self.channel.send(content=self.mention_role.mention,embed=await self.createDaydealEmbed())
-                await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c))
+    async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role = None ):
+        channel_id = ctx.channel.id if channel is None else channel.id
+        mention_role_id = mention_role.id if mention_role is not None else None
+        result = db.session.query(db.Daydeal).filter_by(guild_id=ctx.guild.id).first()
+        if result is None:
+            # Adds new db.Daydeal object to session
+            db.session.add(db.Daydeal(ctx.guild.id, channel_id, mention_role_id))
+            db.session.commit()     
+            channel_to_send = ctx.guild.get_channel(channel_id)
+            if mention_role is not None:
+                content = mention_role.mention
             else:
-                await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c))
-
-    @setupDaydeal.error
-    async def setupDaydeal_error(self, ctx, error):
-        await ctx.channel.send(str(error))
+                content = ''
+            await channel_to_send.send(content=content, embed=await self.createDaydealEmbed())
+            msg = await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c))
+            await asyncio.sleep(5)
+            await msg.delete()
+        else:
+            await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c))
 
     @tasks.loop(seconds=60.0)
     async def daydeal_task(self):
         if datetime.now() >= self.endTime:
-            db = sqlite3.connect(store.db_path)
-            cursor = db.cursor()
             daydealEmbed = await self.createDaydealEmbed()
-            for row in cursor.execute(f"SELECT * FROM daydeal"):
-                server = self.bot.get_guild(int(row[1]))
-                channel = self.bot.get_channel(int(row[2]))
-                role = server.get_role(int(row[3]))
-                await channel.send(content=role.mention,embed=daydealEmbed)
+            for setup in db.session.query(db.Daydeal).all():
+                server = self.bot.get_guild(setup.guild_id)
+                channel = self.bot.get_channel(setup.channel_id)
+                if setup.role_id is not None:
+                    role = server.get_role(setup.role_id).mention
+                else:
+                    role = ''
+                await channel.send(content=role,embed=daydealEmbed)
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def stopDaydeal(self, ctx):
-        db = sqlite3.connect(store.db_path)
-        cursor = db.cursor()
-        cursor.execute(f"DELETE FROM daydeal WHERE guild_id = {ctx.guild.id}")
-        db.commit()
-        cursor.close()
-        db.close()
-        await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c))
+        db.session.query(db.Daydeal).filter_by(guild_id=ctx.guild.id).delete()
+        db.session.commit()
+        msg = await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c))
+        await asyncio.sleep(5)
+        await msg.delete()
 
     @commands.cooldown(4, 10)
     @commands.command()

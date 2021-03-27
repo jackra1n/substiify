@@ -63,7 +63,7 @@ class Help(commands.Cog):
                 colour = discord.Colour.green()
             )
         embed.add_field(name="`deal`",value="Sends current daydeal", inline=False)
-        embed.add_field(name="`setupDaydeal`",value=f"Setups the daydeal to send it whenever a new one is available. us it like `{self.prefix}setupDaydeal [channel] [roleToPing]`. You need 'manage_channels' permission to use this command.", inline=False)
+        embed.add_field(name="`setupDaydeal`",value=f"Setups the daydeal to send it whenever a new one is available. Use it like `{self.prefix}setupDaydeal [channel] [roleToPing]`. Channel and role are optional. Requires'manage_channels' permission to use this command.", inline=False)
         embed.add_field(name="`stopDaydeal`",value="Stops automatic sending od daydeals", inline=False)
         await ctx.channel.send(embed=embed)
 

@@ -59,7 +59,7 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
-    async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role = None ):
+    async def setupDaydeal(self, ctx, channel: discord.TextChannel = None, mention_role: discord.Role = None ):
         channel_id = ctx.channel.id if channel is None else channel.id
         mention_role_id = mention_role.id if mention_role is not None else None
         result = db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).first()

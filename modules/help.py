@@ -8,7 +8,6 @@ from discord.ext import commands
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.script_start = time.time()
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
         self.prefix = self.settings['prefix']

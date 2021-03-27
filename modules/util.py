@@ -8,7 +8,6 @@ import platform
 import discord
 import asyncio
 import psutil
-import time
 import json
 
 class Util(commands.Cog):
@@ -81,7 +80,7 @@ class Util(commands.Cog):
 
     @commands.command()
     async def info(self, ctx):
-        bot_time = time_up(time.time() - store.script_start) #uptime of the bot
+        bot_time = time_up((datetime.now() - store.script_start).total_seconds()) #uptime of the bot
         cpu_usage = psutil.cpu_percent()
         ram_usage = psutil.virtual_memory().percent
         with open(store.settings_path, "r") as settings:

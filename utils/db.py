@@ -46,7 +46,7 @@ def create_database():
         metadata = MetaData(engine)
         Table(Daydeal.__tablename__, metadata,
             Column('id', Integer, primary_key=True, nullable=False), 
-            Column('guild_id', Integer),
+            Column('server_id', Integer),
             Column('channel_id', Integer), 
             Column('role_id', Integer)
             )

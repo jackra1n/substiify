@@ -62,7 +62,7 @@ class Daydeal(commands.Cog):
     async def setupDaydeal(self, ctx, channel: discord.TextChannel, mention_role: discord.Role = None ):
         channel_id = ctx.channel.id if channel is None else channel.id
         mention_role_id = mention_role.id if mention_role is not None else None
-        result = db.session.query(db.Daydeal).filter_by(guild_id=ctx.guild.id).first()
+        result = db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).first()
         if result is None:
             # Adds new db.Daydeal object to session
             db.session.add(db.Daydeal(ctx.guild.id, channel_id, mention_role_id))
@@ -84,7 +84,7 @@ class Daydeal(commands.Cog):
         if datetime.now() >= self.endTime:
             daydealEmbed = await self.createDaydealEmbed()
             for setup in db.session.query(db.Daydeal).all():
-                server = self.bot.get_guild(setup.guild_id)
+                server = self.bot.get_guild(setup.server_id)
                 channel = self.bot.get_channel(setup.channel_id)
                 if setup.role_id is not None:
                     role = server.get_role(setup.role_id).mention
@@ -95,7 +95,7 @@ class Daydeal(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def stopDaydeal(self, ctx):
-        db.session.query(db.Daydeal).filter_by(guild_id=ctx.guild.id).delete()
+        db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).delete()
         db.session.commit()
         msg = await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c))
         await asyncio.sleep(5)

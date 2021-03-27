@@ -1,9 +1,11 @@
 from discord.ext import commands
 from utils.prepare import createFiles
 from utils.store import store
+from utils.db import create_database
 import json
 
 createFiles()
+create_database()
 
 with open(store.settings_path, "r") as settings:
     settings = json.load(settings)

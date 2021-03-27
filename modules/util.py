@@ -18,7 +18,7 @@ class Util(commands.Cog):
             self.settings = json.load(settings)
 
     @commands.cooldown(6, 5)
-    @commands.command(brief='Enlarge and view your profile picture or another member')
+    @commands.command(aliases=['avatar'],brief='Enlarge and view your profile picture or another member')
     async def av(self, ctx, member: discord.Member = None):
         member = ctx.author if member is None else member
         embed = discord.Embed(

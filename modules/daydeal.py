@@ -7,7 +7,6 @@ from sqlalchemy.sql import select
 import asyncio
 import discord
 import requests
-import sqlite3
 
 URL = "https://www.daydeal.ch/"
 

@@ -1,7 +1,7 @@
 from utils.store import store
 from discord.ext import commands
+from utils import db
 import subprocess
-import sqlite3
 import discord
 import json
 
@@ -30,24 +30,17 @@ class MainBot(commands.Cog):
                 exc = f'{type(e).__name__}: {e}'
                 print(f'Failed to load extension {extension}\n{exc}')
 
-    async def load_db(self):
-        db = sqlite3.connect(store.db_path)
-        cursor = db.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS daydeal(
-                id INTEGER PRIMARY KEY,
-                guild_id INTEGER,
-                channel_id INTEGER,
-                role_id INTEGER
-            )
-        ''')
-
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.settings['prefix']}help"))
-        await self.load_db()
         await self.load_extensions()
         print(f'[bot.py] {self.bot.user} has connected')
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.content.startswith('<<'):
+            db.session.add(db.command_history(message))
+            db.session.commit()
 
     @commands.command()
     async def reload(self, ctx):
@@ -61,7 +54,6 @@ class MainBot(commands.Cog):
                 exc = f'{type(e).__name__}: {e}'
                 await ctx.channel.send(f'Failed to reload extensions\n{exc}')
             await ctx.channel.send('Realoded all cogs')
-
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

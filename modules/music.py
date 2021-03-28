@@ -8,7 +8,6 @@ import discord
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.urls = None
 
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
@@ -33,15 +32,12 @@ class Music(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
 
     async def play_next_song(self, ctx):
-        try:
-            player = await PlayList.get_next_song()
-            if player is not None:
-                if ctx.voice_client.is_playing():
-                    ctx.voice_client.stop()
-                ctx.voice_client.play(player, after=lambda e: self.check_queue(ctx))
-                await ctx.channel.send(embed=self.create_play_embed(player.title), delete_after=10)
-        except Exception as err:
-            await ctx.channel.send(embed=self.create_error_embed(err))
+        player = await PlayList.get_next_song()
+        if player is not None:
+            if ctx.voice_client.is_playing():
+                ctx.voice_client.stop()
+            ctx.voice_client.play(player, after=lambda e: self.check_queue(ctx))
+            await ctx.channel.send(embed=self.create_play_embed(player.title), delete_after=10)
 
     def check_queue(self, ctx):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
@@ -54,7 +50,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def leave(self, ctx):
-        self.urls = None
         server = ctx.message.guild.voice_client
         await server.disconnect()
 

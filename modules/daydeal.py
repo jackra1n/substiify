@@ -73,11 +73,9 @@ class Daydeal(commands.Cog):
             else:
                 content = ''
             await channel_to_send.send(content=content, embed=await self.createDaydealEmbed())
-            msg = await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c))
-            await asyncio.sleep(5)
-            await msg.delete()
+            await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c), delete_after=5)
         else:
-            await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c))
+            await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c), delete_after=5)
 
     @tasks.loop(seconds=60.0)
     async def daydeal_task(self):
@@ -97,9 +95,7 @@ class Daydeal(commands.Cog):
     async def stopDaydeal(self, ctx):
         db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).delete()
         db.session.commit()
-        msg = await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c))
-        await asyncio.sleep(5)
-        await msg.delete()
+        await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c), delete_after=5)
 
     @commands.cooldown(4, 10)
     @commands.command()

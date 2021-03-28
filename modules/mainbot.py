@@ -12,7 +12,7 @@ class MainBot(commands.Cog):
             self.settings = json.load(settings)
         self.startup_extensions = [
             'gif',
-            # 'music',
+            'music',
             'duel',
             'daydeal',
             'epicGames',

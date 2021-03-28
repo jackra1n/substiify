@@ -86,11 +86,11 @@ class Util(commands.Cog):
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
 
-        content = f'**Made by:** <@{self.bot.owner_id}>\n\n' \
-            f'**Instance uptime:** `{bot_time}`\n' \
+        content = f'**Instance uptime:** `{bot_time}`\n' \
             f'**Version:** `{self.settings["version"]}`\n' \
             f'**Python:** `{platform.python_version()}` | **discord.py:** `{discord.__version__}`\n\n' \
             f'**CPU:** `{cpu_usage}%` | **RAM:** `{ram_usage}%`\n\n' \
+            f'**Made by:** <@{self.bot.owner_id}>\n' \
             f'**Source:** No link yet' 
 
         embed = discord.Embed(
@@ -112,9 +112,7 @@ class Util(commands.Cog):
         if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
         embed = discord.Embed(description=f'Version has been set to {version}')
-        msg = await ctx.send(embed=embed)
-        await asyncio.sleep(10)
-        await msg.delete()
+        await ctx.send(embed=embed, delete_after=10)
 
 def setup(bot):
     bot.add_cog(Util(bot))

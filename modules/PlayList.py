@@ -1,4 +1,4 @@
-from YTDLSource import YTDLSource
+from modules.YTDLSource import YTDLSource
 import random
 
 class PlayList:
@@ -8,7 +8,6 @@ class PlayList:
     @classmethod
     def queue(cls, youtubeSource:str):
         cls.youtube_sources.append(youtubeSource)
-        print("queued: " + youtubeSource)
 
     @classmethod
     async def get_next_song(cls):

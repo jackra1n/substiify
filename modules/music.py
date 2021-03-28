@@ -69,7 +69,7 @@ class Music(commands.Cog):
                         if ctx.voice_client.is_playing():
                             ctx.voice_client.stop()
                         ctx.voice_client.play(player, after=lambda e: self.check_queue(ctx))
-                        await ctx.channel.send(embed=self.create_play_embed(player.title))
+                        await ctx.channel.send(embed=self.create_play_embed(player.title), delete_after=10)
                 except Exception as err:
                     await ctx.channel.send(embed=elf.create_error_embed(err))
 
@@ -102,7 +102,7 @@ class Music(commands.Cog):
                 if ctx.voice_client.is_playing():
                     ctx.voice_client.stop()
                 ctx.voice_client.play(player, after=lambda e: self.check_queue(ctx))
-                await ctx.channel.send(embed=self.create_play_embed(player.title))
+                await ctx.channel.send(embed=self.create_play_embed(player.title), delete_after=10)
         except Exception as err:
             await ctx.channel.send(embed=self.create_error_embed(err))
 

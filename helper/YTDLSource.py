@@ -1,53 +1,58 @@
 from discord import PCMVolumeTransformer, FFmpegPCMAudio
+from functools import partial
 import youtube_dl
 import asyncio
 
-class PlaylistHelper:
-    @classmethod
-    def checkIfYoutubePlayList(cls, url: str):
-        if "list=" in url:
-            return True
-        else:
-            return False
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'noplaylist': False,
+    'flat-playlist': True
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+ffmpeg_options = {
+    'options': '-vn'
+}
 
 class YTDLSource(PCMVolumeTransformer):
-    ytdl_format_options = {
-        'format': 'bestaudio/best',
-        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-        'restrictfilenames': True,
-        'nocheckcertificate': True,
-        'ignoreerrors': False,
-        'logtostderr': False,
-        'quiet': True,
-        'no_warnings': True,
-        'default_search': 'auto',
-        'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
-        'noplaylist': False,
-        'flat-playlist': True
-    }
-    ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-    ffmpeg_options = {
-        'options': '-vn'
-    }
-
-    def __init__(self, source, *, data, volume=0.5):
+    def __init__(self, source, *, data, requester, volume=0.5):
         super().__init__(source, volume)
 
         self.data = data
         self.title = data.get('title')
         self.url = data.get('url')
+        self.requester = requester
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
+    async def from_url(cls, ctx, url, *, loop, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: cls.ytdl.extract_info(url, download=not stream))
+        to_run = partial(ytdl.extract_info, url=url, download=not stream)
+        data = await loop.run_in_executor(None, to_run)
 
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries'][0]
 
-        filename = data['url'] if stream else cls.ytdl.prepare_filename(data)
-        return cls(FFmpegPCMAudio(filename, **cls.ffmpeg_options), data=data)
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
+
+    @classmethod
+    async def regather_stream(cls, data, *, loop):
+        loop = loop or asyncio.get_event_loop()
+
+        to_run = partial(ytdl.extract_info, url=data['webpage_url'], download=False)
+        data = await loop.run_in_executor(None, to_run)
+        return cls(discord.FFmpegPCMAudio(data['url']), data=data)
 
     @classmethod
     def get_playlist_info(self, url: str):
@@ -57,7 +62,7 @@ class YTDLSource(PCMVolumeTransformer):
         #if song_utils.is_radio(self.target):
         #    self.ydl_opts['playlistend'] = self.musiq.base.settings.max_playlist_items
 
-        with youtube_dl.YoutubeDL(self.ytdl_format_options) as ydl:
+        with youtube_dl.YoutubeDL(ytdl_format_options) as ydl:
             self.info_dict = ydl.extract_info(url=url, download=False, process=False)
 
         if self.info_dict['_type'] != 'playlist' or 'entries' not in self.info_dict:

@@ -82,7 +82,7 @@ class Music(commands.Cog):
     @commands.command()
     async def shuffle(self, ctx):
         PlayList.shuffle = not PlayList.shuffle
-        tittle = f'Playlist unshuffled!'
+        title = f'Playlist unshuffled!'
         if PlayList.shuffle:
             title = f'Playlist shuffled!'
         await ctx.channel.send(embed=discord.Embed(title=title, colour=discord.Colour.dark_blue()))

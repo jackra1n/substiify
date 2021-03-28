@@ -16,7 +16,7 @@ class Help(commands.Cog):
     async def help(self,ctx):
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
-                    title="Dux-Bot Command List",
+                    title=f'{self.bot.user.display_name} Command List',
                     colour = discord.Colour.red()
                 )
             categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner']

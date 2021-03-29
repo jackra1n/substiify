@@ -1,6 +1,7 @@
 from helper.YTDLSource import YTDLSource
 from helper.MusicPlayer import MusicPlayer
 from discord.ext import commands
+from urllib.parse import urlparse
 import asyncio
 import discord
 
@@ -29,7 +30,20 @@ class Music(commands.Cog):
         return player
 
     def checkIfYoutubePlaylist(self, url):
-        return 'youtube.com/playlist' in url
+        return 'list=' in url
+
+    async def parseUrl(self, url):
+        if url.startswith('<'):
+            url = url[1:-1]
+        if checkIfYoutubePlaylist(url):
+            parsed = urlparse.urlparse(url)
+            newUrl = f'https://youtube.com/playlist?list={urlparse.urlparse(parsed.query)["list"]}'
+            for entry in YTDLSource.get_playlist_info(newUrl)['urls']:
+                source = await YTDLSource.from_url(ctx, entry, loop=self.bot.loop, stream=True)
+                await player.queue.put(source)
+        else:
+            source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
+            await player.queue.put(source)
 
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
@@ -37,12 +51,7 @@ class Music(commands.Cog):
         if not vc:
             await ctx.invoke(self.connect_)
         player = self.get_player(ctx)
-        if self.checkIfYoutubePlaylist(url):
-            for entry in YTDLSource.get_playlist_info(url)['urls']:
-                source = await YTDLSource.from_url(ctx, entry, loop=self.bot.loop, stream=True)
-                await player.queue.put(source)
-        source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
-        await player.queue.put(source)
+        await self.parseUrl(url)
 
     @commands.command()
     async def pause(self, ctx):

@@ -48,10 +48,10 @@ class Util(commands.Cog):
         if 'dink' in ctx.message.content.lower():
             title = 'Donk!'
         embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:')
-        start = time.perf_counter()
+        start = datetime.now()
         ping = await ctx.send(embed=embed)
-        end = time.perf_counter()
-        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start) * 1000)}` ms')
+        end = datetime.now()
+        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start).microseconds / 1000)}` ms')
         await ping.edit(embed=embed)
 
     @commands.command()

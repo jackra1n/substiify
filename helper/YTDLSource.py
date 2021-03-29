@@ -33,6 +33,13 @@ class YTDLSource(PCMVolumeTransformer):
         self.url = data.get('url')
         self.requester = requester
 
+
+    def __getitem__(self, item: str):
+        """Allows us to access attributes similar to a dict.
+        This is only useful when you are NOT downloading.
+        """
+        return self.__getattribute__(item)
+
     @classmethod
     async def from_url(cls, ctx, url, *, loop, stream=False):
         try:

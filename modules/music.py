@@ -3,6 +3,7 @@ from helper.MusicPlayer import MusicPlayer
 from discord.ext import commands
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+import itertools
 import asyncio
 import discord
 

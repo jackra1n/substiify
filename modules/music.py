@@ -2,6 +2,7 @@ from helper.YTDLSource import YTDLSource
 from helper.MusicPlayer import MusicPlayer
 from discord.ext import commands
 from urllib.parse import urlparse
+from urllib.parse import parse_qs
 import asyncio
 import discord
 
@@ -36,8 +37,8 @@ class Music(commands.Cog):
         if url.startswith('<'):
             url = url[1:-1]
         if self.checkIfYoutubePlaylist(url):
-            parsed = urlparse(url)
-            newUrl = f'https://youtube.com/playlist?list={urlparse(parsed.query)["list"]}'
+            parsed = urlparse.urlparse(url)
+            newUrl = f'https://youtube.com/playlist?list={parse_qs(parsed.query)["list"][0]}'
             for entry in YTDLSource.get_playlist_info(newUrl)['urls']:
                 source = await YTDLSource.from_url(ctx, entry, loop=self.bot.loop, stream=True)
                 await player.queue.put(source)

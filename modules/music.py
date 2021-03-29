@@ -33,7 +33,7 @@ class Music(commands.Cog):
     def checkIfYoutubePlaylist(self, url):
         return 'list=' in url
 
-    async def parseUrl(self, url):
+    async def parseUrl(self, ctx, url):
         if url.startswith('<'):
             url = url[1:-1]
         if self.checkIfYoutubePlaylist(url):
@@ -52,7 +52,7 @@ class Music(commands.Cog):
         if not vc:
             await ctx.invoke(self.connect_)
         player = self.get_player(ctx)
-        await self.parseUrl(url)
+        await self.parseUrl(ctx, url)
 
     @commands.command()
     async def pause(self, ctx):

@@ -113,8 +113,7 @@ class Music(commands.Cog):
 
     @commands.command(name='stop')
     async def stop_(self, ctx):
-        """Stop the currently playing song and destroy the player.
-        """
+        """Stop the currently playing song and destroy the player."""
         vc = ctx.voice_client
         if not vc or not vc.is_connected():
             return await ctx.send('I am not currently playing anything!', delete_after=20)

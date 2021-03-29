@@ -35,16 +35,18 @@ class YTDLSource(PCMVolumeTransformer):
 
     @classmethod
     async def from_url(cls, ctx, url, *, loop, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        to_run = partial(ytdl.extract_info, url=url, download=not stream)
-        data = await loop.run_in_executor(None, to_run)
+        try:
+            loop = loop or asyncio.get_event_loop()
+            to_run = partial(ytdl.extract_info, url=url, download=not stream)
+            data = await loop.run_in_executor(None, to_run)
+            if 'entries' in data:
+                # take first item from a playlist
+                data = data['entries'][0]
 
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
+            filename = data['url'] if stream else ytdl.prepare_filename(data)
+            return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
+        except Exception as e:
+            print(f'***Exception while getting video info***:\n {e}\n')
 
     @classmethod
     async def regather_stream(cls, data, *, loop):

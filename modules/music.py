@@ -35,7 +35,7 @@ class Music(commands.Cog):
     async def parseUrl(self, url):
         if url.startswith('<'):
             url = url[1:-1]
-        if checkIfYoutubePlaylist(url):
+        if self.checkIfYoutubePlaylist(url):
             parsed = urlparse.urlparse(url)
             newUrl = f'https://youtube.com/playlist?list={urlparse.urlparse(parsed.query)["list"]}'
             for entry in YTDLSource.get_playlist_info(newUrl)['urls']:

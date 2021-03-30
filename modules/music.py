@@ -3,6 +3,7 @@ from helper.MusicPlayer import MusicPlayer
 from discord.ext import commands
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+from random import shuffle
 import logging
 import itertools
 import asyncio
@@ -48,33 +49,36 @@ class Music(commands.Cog):
             source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
             await player.queue.put(source)
 
-    def isInBotVC(self, ctx):
+    async def isInBotVC(self, ctx):
         members = ctx.voice_client.channel.voice_states.keys()
         if ctx.author.id in members:
             return True
-        else:
-            return False
+        await ctx.send(f'You are not in the VC!')
+        return False
 
-    def isInAnyVC(self, ctx):
+    async def isInAnyVC(self, ctx):
         if ctx.author.voice:
             return True
+        await ctx.send('You are not in a VC!')
         return False
 
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
-        if self.isInAnyVC(ctx):
-            vc = ctx.voice_client
-            if not vc:
+        vc = ctx.voice_client
+        if not vc:
+            if await self.isInAnyVC(ctx):
                 await ctx.invoke(self.connect_)
-            player = self.get_player(ctx)
-            await self.parseUrl(ctx, player, url)
+                player = self.get_player(ctx)
+                await self.parseUrl(ctx, player, url)
         else:
-            await ctx.send('You are not in a VC!')
+            if await self.isInBotVC(ctx):
+                player = self.get_player(ctx)
+                await self.parseUrl(ctx, player, url)
 
     @commands.command()
     async def pause(self, ctx):
         """Pause the currently playing song."""
-        if self.isInBotVC(ctx):
+        if await self.isInBotVC(ctx):
             vc = ctx.voice_client
             if not vc or not vc.is_playing():
                 return await ctx.send('I am not currently playing anything!', delete_after=20)
@@ -82,13 +86,11 @@ class Music(commands.Cog):
                 return
             vc.pause()
             await ctx.send(f'**`{ctx.author}`**: Paused the song!')
-        else:
-            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='resume')
     async def resume_(self, ctx):
         """Resume the currently paused song."""
-        if self.isInBotVC(ctx):
+        if await self.isInBotVC(ctx):
             vc = ctx.voice_client
             if not vc or not vc.is_connected():
                 return await ctx.send('I am not currently playing anything!', delete_after=20)
@@ -96,13 +98,11 @@ class Music(commands.Cog):
                 return
             vc.resume()
             await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
-        else:
-            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='skip')
     async def skip_(self, ctx):
         """Skip the song."""
-        if self.isInBotVC(ctx):
+        if await self.isInBotVC(ctx):
             vc = ctx.voice_client
             if not vc or not vc.is_connected():
                 return await ctx.send('I am not currently playing anything!', delete_after=20)
@@ -110,10 +110,8 @@ class Music(commands.Cog):
                 pass
             elif not vc.is_playing():
                 return
-                vc.stop()
-                await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
-        else:
-            await ctx.send(f'You are not in the VC!')
+            vc.stop()
+            await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
 
     @commands.command(name='queue', aliases=['q', 'playlist'])
     async def queue_info(self, ctx):
@@ -150,13 +148,20 @@ class Music(commands.Cog):
     @commands.command(name='stop')
     async def stop_(self, ctx):
         """Stop the currently playing song and destroy the player."""
-        if self.isInBotVC(ctx):
+        if await self.isInBotVC(ctx):
             vc = ctx.voice_client
             if not vc or not vc.is_connected():
                 return await ctx.send('I am not currently playing anything!', delete_after=20)
             await self.cleanup(ctx.guild)
-        else:
-            await ctx.send(f'You are not in the VC!')
+
+    @commands.command(name='shuffle')
+    async def _shuffle(self, ctx: commands.Context):
+        if await self.isInBotVC(ctx):
+            if self.get_player(ctx).queue.qsize() == 0:
+                return await ctx.send('Empty queue.')
+
+            shuffle(self.get_player(ctx).queue._queue)
+            await ctx.message.add_reaction('✅')
 
     @commands.command(name='connect', aliases=['join'])
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):

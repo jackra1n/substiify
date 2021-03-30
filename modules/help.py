@@ -20,9 +20,9 @@ class Help(commands.Cog):
                     title=f'{self.bot.user.display_name} Command List',
                     colour = discord.Colour.red()
                 )
-            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner']
+            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner', 'music']
             embed.add_field(name='Available categories:', value=await self.help_string(categories))
-            await ctx.channel.send(embed=embed)
+            await ctx.send(embed=embed)
 
     async def help_string(self, categories):
         mainString = ''
@@ -40,7 +40,7 @@ class Help(commands.Cog):
                 colour = discord.Colour.greyple()
             )
         embed.add_field(name="**Possible categories:** ",value="`slap`, `hug`, `cuddle`, `kiss`, `bite`")
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def fun(self,ctx):
@@ -53,7 +53,7 @@ class Help(commands.Cog):
         embed.add_field(name="`pickup`",value="Wanna hit on someone? Let me be your wingman! Most of them are inappropriate so please use it on people you know well!", inline=False)
         embed.add_field(name="`roast`",value="Insult someone until they cry", inline=False)
         embed.add_field(name="`8ball`",value="Ask the bot a question that you dont want the answer to.", inline=False)
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def daydeal(self,ctx):
@@ -65,7 +65,7 @@ class Help(commands.Cog):
         embed.add_field(name="`deal`",value="Sends current daydeal", inline=False)
         embed.add_field(name="`setupDaydeal`",value=f"Setups the daydeal to send it whenever a new one is available. Use it like `{self.prefix}setupDaydeal [channel] [roleToPing]`. Channel and role are optional. Requires'manage_channels' permission to use this command.", inline=False)
         embed.add_field(name="`stopDaydeal`",value="Stops automatic sending od daydeals", inline=False)
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def duel(self,ctx):
@@ -80,7 +80,7 @@ class Help(commands.Cog):
                                             "Max Defense:  30       60      20\n"+
                                             "Max Mana:     30       20      50```", inline=False)
         embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. `punch`, `defend` and `end`. `punch` boosts your attack and `defend` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. `end` makes you surrender.", inline=False)
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def owner(self,ctx):
@@ -90,7 +90,24 @@ class Help(commands.Cog):
                 colour = discord.Colour.greyple()
             )
         embed.add_field(name="`run_command`",value="Run console commands remotely", inline=False)
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def music(self,ctx):
+        embed = discord.Embed(
+                title="Music",
+                description=f"Music module commands.",
+                colour = discord.Colour.greyple()
+            )
+        embed.add_field(name="`play`", value='Play music or add to queue')
+        embed.add_field(name="`skip`", value='Skip currently played song')
+        embed.add_field(name="`pause`", value='Pause the song song')
+        embed.add_field(name="`resume`", value='Resume playing (when paused)')
+        embed.add_field(name="`stop`", value='Stop playing music and leave (deletes queue)')
+        embed.add_field(name="`shuffle`", value='Shuffles palylist')
+        embed.add_field(name="`queue`, `q`", value='Shows current song queue')
+        embed.add_field(name="`now`, `currentsong`", value='Shows currently played song')
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Help(bot))

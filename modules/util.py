@@ -105,15 +105,16 @@ class Util(commands.Cog):
 
     @commands.command()
     async def setversion(self, ctx, version):
-        with open(store.settings_path, "r") as settings:
-            settings_json = json.load(settings)
-        settings_json['version'] = version
-        with open(store.settings_path, "w") as settings:
-            json.dump(settings_json, settings, indent=2)
-        if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.message.delete()
-        embed = discord.Embed(description=f'Version has been set to {version}')
-        await ctx.send(embed=embed, delete_after=10)
+        if ctx.message.author.id == self.bot.owner_id:
+            with open(store.settings_path, "r") as settings:
+                settings_json = json.load(settings)
+            settings_json['version'] = version
+            with open(store.settings_path, "w") as settings:
+                json.dump(settings_json, settings, indent=2)
+            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+                await ctx.message.delete()
+            embed = discord.Embed(description=f'Version has been set to {version}')
+            await ctx.send(embed=embed, delete_after=10)
 
 def setup(bot):
     bot.add_cog(Util(bot))

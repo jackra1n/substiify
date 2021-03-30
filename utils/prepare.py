@@ -19,7 +19,7 @@ def prepareFiles():
     # Prepare logging 
     date = datetime.now(timezone('Europe/Zurich')).strftime('%Y-%m-%d')
     coloredlogs.install()
-    logger = logging.getLogger('discord')
+    logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     handler = logging.FileHandler(filename=f'{store.logs_path}/{date}.log', encoding='utf-8', mode='a')
     handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s'))

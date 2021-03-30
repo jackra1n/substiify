@@ -62,7 +62,7 @@ class YTDLSource(PCMVolumeTransformer):
 
         to_run = partial(ytdl.extract_info, url=data['webpage_url'], download=False)
         data = await loop.run_in_executor(None, to_run)
-        return cls(discord.FFmpegPCMAudio(data['url']), data=data)
+        return cls(FFmpegPCMAudio(data['url']), data=data)
 
     @classmethod
     def get_playlist_info(self, url: str):

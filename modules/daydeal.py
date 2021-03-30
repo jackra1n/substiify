@@ -4,6 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from utils import db
 from sqlalchemy.sql import select
+import logging
 import asyncio
 import discord
 import requests

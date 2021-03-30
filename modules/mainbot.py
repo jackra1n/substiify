@@ -2,6 +2,7 @@ from utils.store import store
 from discord.ext import commands
 from utils import db
 import subprocess
+import logging
 import discord
 import json
 
@@ -28,13 +29,13 @@ class MainBot(commands.Cog):
                 self.bot.load_extension('modules.'+extension)
             except Exception as e:
                 exc = f'{type(e).__name__}: {e}'
-                print(f'Failed to load extension {extension}\n{exc}')
+                loggin.warning(f'Failed to load extension {extension}\n{exc}')
 
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.settings['prefix']}help"))
         await self.load_extensions()
-        print(f'[bot.py] {self.bot.user} has connected')
+        logging.info(f'[bot.py] {self.bot.user} has connected')
 
     @commands.Cog.listener()
     async def on_message(self, message):

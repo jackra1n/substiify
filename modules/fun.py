@@ -5,6 +5,7 @@ from discord.ext import commands
 from pathlib import Path
 from PIL import Image
 import requests
+import logging
 from discord import File
 
 async def lineChooser(filename):

@@ -3,6 +3,7 @@ from helper.MusicPlayer import MusicPlayer
 from discord.ext import commands
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+import logging
 import itertools
 import asyncio
 import discord
@@ -47,48 +48,72 @@ class Music(commands.Cog):
             source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
             await player.queue.put(source)
 
+    def isInBotVC(self, ctx):
+        members = ctx.voice_client.channel.voice_states.keys()
+        if ctx.author.id in members:
+            return True
+        else:
+            return False
+
+    def isInAnyVC(self, ctx):
+        if ctx.author.voice:
+            return True
+        return False
+
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
-        vc = ctx.voice_client
-        if not vc:
-            await ctx.invoke(self.connect_)
-        player = self.get_player(ctx)
-        await self.parseUrl(ctx, player, url)
+        if self.isInAnyVC(ctx):
+            vc = ctx.voice_client
+            if not vc:
+                await ctx.invoke(self.connect_)
+            player = self.get_player(ctx)
+            await self.parseUrl(ctx, player, url)
+        else:
+            await ctx.send('You are not in a VC!')
 
     @commands.command()
     async def pause(self, ctx):
         """Pause the currently playing song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_playing():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
-        elif vc.is_paused():
-            return
-        vc.pause()
-        await ctx.send(f'**`{ctx.author}`**: Paused the song!')
+        if self.isInBotVC(ctx):
+            vc = ctx.voice_client
+            if not vc or not vc.is_playing():
+                return await ctx.send('I am not currently playing anything!', delete_after=20)
+            elif vc.is_paused():
+                return
+            vc.pause()
+            await ctx.send(f'**`{ctx.author}`**: Paused the song!')
+        else:
+            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='resume')
     async def resume_(self, ctx):
         """Resume the currently paused song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
-        elif not vc.is_paused():
-            return
-        vc.resume()
-        await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
+        if self.isInBotVC(ctx):
+            vc = ctx.voice_client
+            if not vc or not vc.is_connected():
+                return await ctx.send('I am not currently playing anything!', delete_after=20)
+            elif not vc.is_paused():
+                return
+            vc.resume()
+            await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
+        else:
+            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='skip')
     async def skip_(self, ctx):
         """Skip the song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
-        if vc.is_paused():
-            pass
-        elif not vc.is_playing():
-            return
-        vc.stop()
-        await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
+        if self.isInBotVC(ctx):
+            vc = ctx.voice_client
+            if not vc or not vc.is_connected():
+                return await ctx.send('I am not currently playing anything!', delete_after=20)
+            if vc.is_paused():
+                pass
+            elif not vc.is_playing():
+                return
+                vc.stop()
+                await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
+        else:
+            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='queue', aliases=['q', 'playlist'])
     async def queue_info(self, ctx):
@@ -101,7 +126,7 @@ class Music(commands.Cog):
             return await ctx.send('There are currently no more queued songs.')
         # Grab up to 5 entries from the queue...
         upcoming = list(itertools.islice(player.queue._queue, 0, 5))
-        fmt = '\n'.join(f'**`{_["title"]}`**' for _ in upcoming)
+        fmt = '\n'.join(f'**`{song["title"]}`**' for song in upcoming)
         embed = discord.Embed(title=f'Upcoming - Next {len(upcoming)}', description=fmt)
         await ctx.send(embed=embed)
 
@@ -125,10 +150,13 @@ class Music(commands.Cog):
     @commands.command(name='stop')
     async def stop_(self, ctx):
         """Stop the currently playing song and destroy the player."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
-            return await ctx.send('I am not currently playing anything!', delete_after=20)
-        await self.cleanup(ctx.guild)
+        if self.isInBotVC(ctx):
+            vc = ctx.voice_client
+            if not vc or not vc.is_connected():
+                return await ctx.send('I am not currently playing anything!', delete_after=20)
+            await self.cleanup(ctx.guild)
+        else:
+            await ctx.send(f'You are not in the VC!')
 
     @commands.command(name='connect', aliases=['join'])
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):

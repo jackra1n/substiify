@@ -1,6 +1,7 @@
 import discord
 import time
 import json
+import logging
 from utils.store import store
 from pathlib import Path
 from discord.ext import commands

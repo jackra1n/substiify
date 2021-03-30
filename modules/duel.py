@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from enum import Enum
+import logging
 import asyncio
 import random
 
@@ -65,9 +66,9 @@ class Duel(commands.Cog):
                 if await self.checkForWinner(warrior1, warrior2, ctx, fight_turn):
                     break
             if warrior1.Health < 0:
-                await self.printWinner(warrior2, ctx)
+                await self.sendWinnerEmbed(warrior2, ctx)
             elif warrior2.Health < 0:
-                await self.printWinner(warrior1, ctx)
+                await self.sendWinnerEmbed(warrior1, ctx)
             else:
                 await ctx.channel.send("Dude, imagine surrendering")
 
@@ -78,7 +79,7 @@ class Duel(commands.Cog):
         await ctx.channel.send(
             warrior2.user.mention + ', what would like to do? `punch`,`defend`, or `end`?\nType your choice out in chat as it is displayed!')
 
-    async def printWinner(self, winner, ctx):
+    async def sendWinnerEmbed(self, winner, ctx):
         winEmbedMessage = discord.Embed(
             title='STOP! STOP! STOP! THE FIGHT IS OVER!!!',
             description='**' + winner.user.display_name +

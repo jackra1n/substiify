@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import logging
 
 engine = create_engine('sqlite:///./data/main.sqlite')
 session = sessionmaker(bind=engine)()

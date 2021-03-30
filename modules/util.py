@@ -7,6 +7,7 @@ import subprocess
 import platform
 import discord
 import asyncio
+import logging
 import psutil
 import json
 
@@ -75,7 +76,7 @@ class Util(commands.Cog):
                     )
                 await ctx.channel.send(embed=embed)
             except subprocess.CalledProcessError:
-                print(output)
+                logging.error(output)
                 await ctx.channel.send(output)
 
     @commands.command()

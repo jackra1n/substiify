@@ -1,6 +1,7 @@
 from discord import PCMVolumeTransformer, FFmpegPCMAudio
 from functools import partial
 import youtube_dl
+import logging
 import asyncio
 
 ytdl_format_options = {
@@ -53,7 +54,7 @@ class YTDLSource(PCMVolumeTransformer):
             filename = data['url'] if stream else ytdl.prepare_filename(data)
             return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
         except Exception as e:
-            print(f'***Exception while getting video info***:\n {e}\n')
+            logging.critical(f'***Exception while getting video info***:\n {e}\n')
 
     @classmethod
     async def regather_stream(cls, data, *, loop):

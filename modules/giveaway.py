@@ -2,6 +2,7 @@ from asyncio import TimeoutError, sleep
 from random import choice
 
 import discord
+import logging
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import command, has_permissions

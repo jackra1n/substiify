@@ -1,5 +1,6 @@
 from utils.store import store
 from discord.ext import commands
+from discord import Activity, ActivityType
 from utils import db
 import subprocess
 import logging
@@ -18,7 +19,7 @@ class MainBot(commands.Cog):
             'daydeal',
             'epicGames',
             'util',
-            'giveaway',
+            # 'giveaway',
             'fun',
             'help'
         ]
@@ -33,7 +34,10 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{self.settings['prefix']}help"))
+        servers = len(self.bot.guilds)
+        activityName = f"{self.settings['prefix']}help | {servers} servers"
+        activity = Activity(type=ActivityType.listening, name=activityName)
+        await self.bot.change_presence(activity=activity)
         await self.load_extensions()
         logging.info(f'[bot.py] {self.bot.user} has connected')
 

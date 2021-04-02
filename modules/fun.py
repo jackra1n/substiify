@@ -122,7 +122,7 @@ class Fun(commands.Cog):
                             im.putpixel((y+int(offsetX),x+int(offsetY)), (pix_val[i], pix_val[i], pix_val[i]))
                             fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + f'#{pix_val[i]:02x}{pix_val[i]:02x}{pix_val[i]:02x}'+"\n")
                         else:
-                            await channelToSpam.send(f'image has wrong color mode. cancelling')
+                            await ctx.send(f'image has wrong color mode. cancelling')
                             break
                         i += 1
 

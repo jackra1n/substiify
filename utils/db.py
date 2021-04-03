@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import logging
+import discord
 
 engine = create_engine('sqlite:///./data/main.sqlite')
 session = sessionmaker(bind=engine)()
@@ -37,9 +38,13 @@ class command_history(Base):
         self.command = message.content
         self.date = datetime.now()
         self.user_id = message.author.id
-        self.server_id = message.guild.id
-        self.channel_id = message.channel.id
         self.message_id = message.id
+        self.server_id = None
+        self.channel_id = None
+        if isinstance(message.channel, discord.channel.TextChannel):
+            self.server_id = message.guild.id
+            self.channel_id = message.channel.id
+        
 
 # Creates database tables if the don't exist
 def create_database():

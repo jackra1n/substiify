@@ -30,7 +30,7 @@ class MainBot(commands.Cog):
                 self.bot.load_extension('modules.'+extension)
             except Exception as e:
                 exc = f'{type(e).__name__}: {e}'
-                loggin.warning(f'Failed to load extension {extension}\n{exc}')
+                logging.warning(f'Failed to load extension {extension}\n{exc}')
 
     @commands.Cog.listener()
     async def on_ready(self):

@@ -7,6 +7,7 @@ from PIL import Image
 import requests
 import logging
 from discord import File
+import os
 
 async def lineChooser(filename):
     lines = open(f'{store.resources_path}/{filename}').read().splitlines()
@@ -102,55 +103,85 @@ class Fun(commands.Cog):
 
 
     @commands.command()
-    async def secretDraw(self, ctx, offsetX, offsetY):
+    async def secretDraw(self, ctx, offsetX: int, offsetY: int, resizeX: int = None, resizeY: int = None):
         if ctx.message.author.id == self.bot.owner_id:
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
             if imageToDraw is not None:
+                if resizeX and resizeY:
+                    imageToDraw = imageToDraw.resize((resizeX,resizeY))
                 width, height = imageToDraw.size
-                pix_val = list(imageToDraw.getdata())
+                pix = list(imageToDraw.getdata())
 
                 fileTxt = open('pixelart.txt','w')
                 im = Image.new('RGB', (1000,1000))
-
-                i = 0
                 for x in range(width):
+                    badImage = False
                     for y in range(height):
+                        index = x+y*width
                         if imageToDraw.mode in ('RGB'):
-                            im.putpixel((y+int(offsetX),x+int(offsetY)), pix_val[i])
-                            fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                            im.putpixel((x+offsetX, y+offsetY), pix[index])
+                            hexColor = '#%02x%02x%02x' % pix[index]
+                            fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                        elif imageToDraw.mode in ('RGBA'):
+                            if pix[index] != (0,0,0,0):
+                                im.putpixel((x+offsetX, y+offsetY), pix[x+y*width])
+                            hexColor = '#%02x%02x%02x%02x' % pix[index]
+                            if hexColor != '#00000000':
+                                fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
                         elif imageToDraw.mode in ('L'):
-                            im.putpixel((y+int(offsetX),x+int(offsetY)), (pix_val[i], pix_val[i], pix_val[i]))
-                            fileTxt.write(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + f'#{pix_val[i]:02x}{pix_val[i]:02x}{pix_val[i]:02x}'+"\n")
+                            im.putpixel((x+offsetX, y+offsetY), (pix[index], pix[index], pix[index]))
+                            hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
+                            fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
                         else:
                             await ctx.send(f'image has wrong color mode. cancelling')
+                            badImage = True
                             break
-                        i += 1
+                    if badImage:
+                        break
 
                 im.save("test2.png")
-            await ctx.channel.send(file=File(fileTxt.name))
-            await ctx.channel.send(file=File(Image.open('test2.png').filename))
-            fileTxt.close()
+                if not badImage:
+                    if os.stat('test2.png').st_size <= 8000000:
+                        await ctx.send(file=File(Image.open('test2.png').filename))
+                        if os.stat(fileTxt.name).st_size <= 8000000:
+                             await ctx.send(file=File(fileTxt.name))
+                    else:
+                        await ctx.send('file too big')
+                fileTxt.close()
+            else:
+                await ctx.send('No image to draw')
 
     @commands.command()
-    async def spamDraw(self, ctx, offsetX, offsetY):
+    async def spamDraw(self, ctx, offsetX: int, offsetY: int, resizeX: int = None, resizeY: int = None):
         if ctx.message.author.id == self.bot.owner_id:
             server = self.bot.get_guild(747752542741725244)
             channelToSpam = server.get_channel(819966095070330950)
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
             if imageToDraw is not None:
+                if resizeX and resizeY:
+                    imageToDraw = imageToDraw.resize((resizeX,resizeY))
                 width, height = imageToDraw.size
-                pix_val = list(imageToDraw.getdata())
-                i = 0
+                pix = list(imageToDraw.getdata())
                 for x in range(width):
+                    badImage = False
                     for y in range(height):
+                        index = x+y*width
                         if imageToDraw.mode in ('RGB'):
-                            await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + '#%02x%02x%02x' % pix_val[i]+"\n")
+                            hexColor = '#%02x%02x%02x' % pix[index]
+                            await channelToSpam.send(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                        elif imageToDraw.mode in ('RGBA'):
+                            hexColor = '#%02x%02x%02x%02x' % pix[index]
+                            if hexColor != '#00000000':
+                                await channelToSpam.send(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
                         elif imageToDraw.mode in ('L'):
-                            await channelToSpam.send(f".place setpixel {y+int(offsetX)} {x+int(offsetY)} " + f'#{pix_val[i]:02x}{pix_val[i]:02x}{pix_val[i]:02x}')
+                            hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
+                            await channelToSpam.send(f'.place setpixel {x+offsetX} {y+offsetY} {hexColor}')
                         else:
                             await channelToSpam.send(f'image has wrong color mode. cancelling')
+                            badImage = True
                             break
-                        i += 1
+                    if badImage:
+                        break
 
     @commands.command()
     async def serversInfo(self, ctx):

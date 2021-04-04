@@ -97,7 +97,7 @@ class Duel(commands.Cog):
     def checkAction(self, author):
         def inner_check(message):
             return (message.content == 'punch' or message.content == 'defend' or message.content == 'end' or (
-                        message.content == "detroit smash!" and author.id == self.bot.owner_id)) and message.author == author
+                        message.content == "detroit smash!" and self.bot.is_owner(author))) and message.author == author
         return inner_check
 
     async def createWarrior(self, ctx, user):
@@ -126,7 +126,7 @@ class Duel(commands.Cog):
                 defense=random.randrange(0, warrior1.BlckMax) + buff_bonus
             elif action.content == "end":
                 return True
-            elif action.content == "detroit smash!" and action.author.id == self.bot.owner_id:
+            elif action.content == "detroit smash!" and await self.bot.is_owner(action.author):
                 attack=random.randrange(0, warrior1.AttkMax) + 2000
                 defense=random.randrange(0, warrior1.BlckMax)
             attack_damage=attack - random.randrange(warrior2.BlckMax)

@@ -49,7 +49,7 @@ class MainBot(commands.Cog):
 
     @commands.command()
     async def reload(self, ctx):
-        if ctx.author.id == self.bot.owner_id:
+        if await self.bot.is_owner(ctx.author):
             self.bot.get_cog('Daydeal').daydeal_task.stop()
             subprocess.run(["git","pull","--no-edit"])
             try:

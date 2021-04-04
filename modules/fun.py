@@ -1,12 +1,14 @@
-import discord
-from utils.store import store
-import random
+from websocket import create_connection
 from discord.ext import commands
+from utils.store import store
 from pathlib import Path
+from discord import File
 from PIL import Image
 import requests
 import logging
-from discord import File
+import discord
+import random
+import asyncio
 import os
 
 async def lineChooser(filename):
@@ -16,6 +18,7 @@ async def lineChooser(filename):
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.place_canvas = None
 
     @commands.command()
     async def jack(self, ctx):
@@ -26,7 +29,7 @@ class Fun(commands.Cog):
     async def pp(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
         PP_Size = random.randint(3,20)
-        if member.id == self.bot.owner_id:
+        if await self.bot.is_owner(member):
             PP_Size = 20
         embed = discord.Embed(
             title = 'AYE DAWG NICE PEEPEE!',
@@ -104,32 +107,43 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def secretDraw(self, ctx, offsetX: int, offsetY: int, resizeX: int = None, resizeY: int = None):
-        if ctx.message.author.id == self.bot.owner_id:
+        if await self.bot.is_owner(ctx.author):
             imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
             if imageToDraw is not None:
                 if resizeX and resizeY:
                     imageToDraw = imageToDraw.resize((resizeX,resizeY))
                 width, height = imageToDraw.size
                 pix = list(imageToDraw.getdata())
-
                 fileTxt = open('pixelart.txt','w')
-                im = Image.new('RGB', (1000,1000))
+                if self.place_canvas is None:
+                    try:
+                        await ctx.invoke(self.get_canvas_ws)
+                    except Exception as e:
+                        print(e)
                 for x in range(width):
                     badImage = False
                     for y in range(height):
                         index = x+y*width
                         if imageToDraw.mode in ('RGB'):
-                            im.putpixel((x+offsetX, y+offsetY), pix[index])
-                            hexColor = '#%02x%02x%02x' % pix[index]
-                            fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
-                        elif imageToDraw.mode in ('RGBA'):
-                            if pix[index] != (0,0,0,0):
-                                im.putpixel((x+offsetX, y+offsetY), pix[x+y*width])
-                            hexColor = '#%02x%02x%02x%02x' % pix[index]
-                            if hexColor != '#00000000':
+                            if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index]:
+                                hexColor = '#%02x%02x%02x' % pix[index]
+                                self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
                                 fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                            else:
+                                print('Pixel skipped')
+
+                        elif imageToDraw.mode in ('RGBA'):
+                            if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index][:-1]:
+                                if pix[index] != (0,0,0,0):
+                                    self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
+                                    hexColor = '#%02x%02x%02x%02x' % pix[index]
+                                    if hexColor != '#00000000':
+                                        fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                            else:
+                                print('Pixel skipped')
+
                         elif imageToDraw.mode in ('L'):
-                            im.putpixel((x+offsetX, y+offsetY), (pix[index], pix[index], pix[index]))
+                            self.place_canvas.putpixel((x+offsetX, y+offsetY), (pix[index], pix[index], pix[index]))
                             hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
                             fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
                         else:
@@ -139,10 +153,10 @@ class Fun(commands.Cog):
                     if badImage:
                         break
 
-                im.save("test2.png")
+                self.place_canvas.save("place.png")
                 if not badImage:
-                    if os.stat('test2.png').st_size <= 8000000:
-                        await ctx.send(file=File(Image.open('test2.png').filename))
+                    if os.stat('place.png').st_size <= 8000000:
+                        await ctx.send(file=File(Image.open('place.png').filename))
                         if os.stat(fileTxt.name).st_size <= 8000000:
                              await ctx.send(file=File(fileTxt.name))
                     else:
@@ -152,40 +166,90 @@ class Fun(commands.Cog):
                 await ctx.send('No image to draw')
 
     @commands.command()
-    async def spamDraw(self, ctx, offsetX: int, offsetY: int, resizeX: int = None, resizeY: int = None):
-        if ctx.message.author.id == self.bot.owner_id:
+    async def spamDraw2(self, ctx, offsetX: int, offsetY: int, resizeX:int=None, resizeY:int=None):
+        if await self.bot.is_owner(ctx.author):
+            await self.draw_loop(ctx, ctx.channel, offsetX, offsetY, resizeX, resizeY)
+
+    @commands.command()
+    async def spamDraw(self, ctx, offsetX: int, offsetY: int, resizeX:int=None, resizeY:int=None):
+        if await self.bot.is_owner(ctx.author):
             server = self.bot.get_guild(747752542741725244)
             channelToSpam = server.get_channel(819966095070330950)
-            imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
-            if imageToDraw is not None:
-                if resizeX and resizeY:
-                    imageToDraw = imageToDraw.resize((resizeX,resizeY))
-                width, height = imageToDraw.size
-                pix = list(imageToDraw.getdata())
-                for x in range(width):
-                    badImage = False
-                    for y in range(height):
-                        index = x+y*width
-                        if imageToDraw.mode in ('RGB'):
-                            hexColor = '#%02x%02x%02x' % pix[index]
-                            await channelToSpam.send(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
-                        elif imageToDraw.mode in ('RGBA'):
-                            hexColor = '#%02x%02x%02x%02x' % pix[index]
-                            if hexColor != '#00000000':
-                                await channelToSpam.send(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
-                        elif imageToDraw.mode in ('L'):
-                            hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
-                            await channelToSpam.send(f'.place setpixel {x+offsetX} {y+offsetY} {hexColor}')
-                        else:
-                            await channelToSpam.send(f'image has wrong color mode. cancelling')
-                            badImage = True
-                            break
-                    if badImage:
-                        break
+            await self.draw_loop(ctx, channelToSpam, offsetX, offsetY, resizeX, resizeY)
+            
+    async def draw_loop(self, ctx, channel, offX, offY, resX, resY):
+        image = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
+        if image is not None:
+            if resX and resY:
+                image = image.resize((resX,resY))
+            await ctx.invoke(self.get_canvas_ws)
+            width, height = image.size
+            pix = list(image.getdata())
+            for x in range(width):
+                for y in range(height):
+                    await self.place(ctx, image, channel, x+offX, y+offY, pix[x+y*width])
+
+    async def place(self, ctx, image, channel, x, y, clr):
+        canvas_clr = self.place_canvas.getpixel((x,y))
+        if clr != canvas_clr and clr != (0,0,0,0):
+            hex_color = ''
+            if image.mode in ('RGB'):
+                hex_color = '#%02x%02x%02x' % clr
+            elif image.mode in ('RGBA'):
+                hex_color = '#%02x%02x%02x' % clr[:-1]
+            elif image.mode in ('L'):
+                hex_color = f'#{clr:02x}{clr:02x}{clr:02x}'
+            else:
+                await ctx.send(f'image has wrong color mode. skipping')
+                return
+            if hex_color:
+                await channel.send(f".place setpixel {x} {y} {hex_color}")
+
+    @commands.command()
+    async def get_canvas_ws(self, ctx):
+        if await self.bot.is_owner(ctx.author) and self.place_canvas is None:
+            try:
+                ws = create_connection("ws://52.142.4.222:9000/place")
+                ws.send('\x01')
+                byteArray = bytearray(ws.recv())
+                ws.close()
+                del byteArray[0]
+                self.place_canvas = Image.new('RGB', (1000,1000))
+
+                width, height = 1000, 1000
+                index = 0
+                for i in range(width):
+                    for j in range (height):
+                        r = byteArray[index]
+                        index += 1
+                        g = byteArray[index]
+                        index += 1
+                        b = byteArray[index]
+                        index += 1
+                        color = (r, g, b)
+                        self.place_canvas.putpixel((j,i), color)
+                self.place_canvas.save('place.png')
+                await ctx.send('Got the newest canvas', delete_after=60)
+            except Exception as e:
+                await ctx.send(f'Problem while getting canvas: {e}\nTrying again...')
+                await ctx.invoke(self.get_canvas_ws)
+
+    @commands.command()
+    async def get_canvas(self, ctx):
+        if await self.bot.is_owner(ctx.author):
+            server = self.bot.get_guild(747752542741725244)
+            channel = server.get_channel(768600365602963496)
+            rushs_helper = server.get_member(774276700557148170)
+            await channel.send('.place view', delete_after=1)
+            await asyncio.sleep(3)
+            for message in rushs_helper.history(limit=30):
+                if message.attachments[0].filename == 'place.png':
+                    self.place_canvas = Image.open(requests.get(message.attachments[0].url, stream=True).raw)
+            await ctx.send('Got the newest canvas', delete_after=20)
 
     @commands.command()
     async def serversInfo(self, ctx):
-        if ctx.message.author.id == self.bot.owner_id:
+        if await self.bot.is_owner(ctx.author):
             serverList = []
             userList = []
             for guild in self.bot.guilds:

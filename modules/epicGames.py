@@ -31,10 +31,9 @@ class EpicGames(commands.Cog):
         originalPrice = currentGame["price"]["totalPrice"]["fmtPrice"]["originalPrice"]
         gameCover = currentGame["keyImages"][1]["url"].replace(" ","%20")
 
-        embed = discord.Embed(title=currentGame["title"],description=f"[Grab your free game here]({epicStoreFreeGamesURL})",colour=0x000000)
+        embed = discord.Embed(title=currentGame["title"], url=epicStoreFreeGamesURL, colour=0x000000)
         embed.set_thumbnail(url=f"{epicGamesLogo}")
-        embed.add_field(name="Start date", value=startTime, inline=False)
-        embed.add_field(name="End date", value=endTime, inline=False)
+        embed.add_field(name="Available", value=f'{startTime} to {endTime}', inline=False)
         embed.add_field(name="Price", value="~~" + originalPrice + "~~ ⟶ Free", inline=False)
         embed.set_image(url=f"{gameCover}")
 

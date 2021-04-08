@@ -128,7 +128,7 @@ class Fun(commands.Cog):
                             if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index]:
                                 hexColor = '#%02x%02x%02x' % pix[index]
                                 self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
-                                fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                                fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
                             else:
                                 print('Pixel skipped')
 
@@ -136,16 +136,15 @@ class Fun(commands.Cog):
                             if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index][:-1]:
                                 if pix[index] != (0,0,0,0):
                                     self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
-                                    hexColor = '#%02x%02x%02x%02x' % pix[index]
-                                    if hexColor != '#00000000':
-                                        fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                                    hexColor = '#%02x%02x%02x' % pix[index][:-1]
+                                    fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
                             else:
                                 print('Pixel skipped')
 
                         elif imageToDraw.mode in ('L'):
                             self.place_canvas.putpixel((x+offsetX, y+offsetY), (pix[index], pix[index], pix[index]))
                             hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
-                            fileTxt.write(f".place setpixel {x+offsetX} {y+offsetY} {hexColor}\n")
+                            fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
                         else:
                             await ctx.send(f'image has wrong color mode. cancelling')
                             badImage = True

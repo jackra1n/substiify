@@ -256,5 +256,11 @@ class Fun(commands.Cog):
                 userList.append(f'{guild.name} has {guild.member_count}')
             await ctx.send(f'{serverList}\n{userList}')
 
+    @commands.Cog.listener()
+    async def on_message(self, ctx):
+        gameText = 'The game is on cooldown for another'
+        if ctx.author.id == 778731540359675904 and gameText in ctx.message.content:
+            self.bot.get_owner().send(ctx.message.content)
+
 def setup(bot):
     bot.add_cog(Fun(bot))

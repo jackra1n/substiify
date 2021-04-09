@@ -59,7 +59,7 @@ class Music(commands.Cog):
             for entry in urls:
                 source = await YTDLSource.from_url(ctx, entry, loop=self.bot.loop, stream=True)
                 await player.queue.put(source)
-            ctx.send(f'Queued **{len(urls)}** songs')
+            await ctx.send(f'Queued **{len(urls)}** songs')
         else:
             source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
             if ctx.voice_client.is_playing():

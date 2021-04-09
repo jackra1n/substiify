@@ -259,8 +259,8 @@ class Fun(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         gameText = 'The game is on cooldown for another'
-        if ctx.author.id == 778731540359675904 and gameText in ctx.message.content:
-            self.bot.get_owner().send(ctx.message.content)
+        if ctx.author.id == 778731540359675904 and gameText in ctx.content:
+            self.bot.get_owner().send(ctx.content)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

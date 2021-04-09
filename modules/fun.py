@@ -257,10 +257,21 @@ class Fun(commands.Cog):
             await ctx.send(f'{serverList}\n{userList}')
 
     @commands.Cog.listener()
-    async def on_message(self, ctx):
-        gameText = 'The game is on cooldown for another'
-        if ctx.author.id == 778731540359675904 and gameText in ctx.content:
-            self.bot.get_user(self.bot.owner_id).send(ctx.content)
+    async def on_message(self, message):
+        gameText = 'has the thing'
+        if gameText in message.content and message.author.id == 778731540359675904:
+            user = message.content.split('seconds.',1)[1].split('has',1)[0]
+            await self.bot.fetch_user(self.bot.owner_id).send(user)
+
+    @commands.command()
+    async def t(self, ctx):
+        gameText = 'has the thing'
+        if gameText in ctx.message.content and owner:
+            eth_server = eth_server or self.bot.get_guild(747752542741725244)
+            owner = owner or await self.bot.fetch_user(self.bot.owner_id)
+            user_list = user_list or await eth_server.fetch_members()
+            user = ctx.message.content.split('seconds.',1)[1].split('has',1)[0]
+            await owner.send(user)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

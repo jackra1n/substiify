@@ -257,10 +257,45 @@ class Fun(commands.Cog):
             await ctx.send(f'{serverList}\n{userList}')
 
     @commands.Cog.listener()
-    async def on_message(self, ctx):
-        gameText = 'The game is on cooldown for another'
-        if ctx.author.id == 778731540359675904 and gameText in ctx.content:
-            self.bot.get_user(self.bot.owner_id).send(ctx.content)
+    async def on_message(self, message):
+        gameText = 'has the thing'
+        if gameText in message.content and message.author.id == 778731540359675904:
+            eth_server = self.bot.get_guild(747752542741725244)
+            owner = await self.bot.fetch_user(self.bot.owner_id)
+            user_list = await eth_server.fetch_members().flatten()
+            holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
+            matches = []
+            same_length = lambda x: len(str(x)) == len(str(holder))
+            for user in filter(same_length, user_list):
+                for i in range(len(str(user))):
+                    if holder[i] == "_":
+                        continue
+                    if holder[i] != str(user)[i]:
+                        break
+                    else:
+                        matches.append(str(user))
+            await owner.send(matches)
+
+    @commands.command()
+    async def t(self, ctx):
+        if self.bot.is_owner(ctx.author):
+            gameText = 'has the thing'
+            if gameText in ctx.message.content:
+                eth_server = self.bot.get_guild(747752542741725244)
+                owner = await self.bot.fetch_user(self.bot.owner_id)
+                user_list = await ctx.guild.fetch_members().flatten()
+                holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
+                matches = []
+                same_length = lambda x: len(str(x)) == len(str(holder))
+                for user in filter(same_length, user_list):
+                    for i in range(len(str(user))):
+                        if holder[i] == "_":
+                            continue
+                        if holder[i] != str(user)[i]:
+                            break
+                        else:
+                            matches.append(str(user))
+                await owner.send(matches)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

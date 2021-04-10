@@ -277,7 +277,7 @@ class Fun(commands.Cog):
                     else:
                         matches.append(user)
             last_10_days = (datetime.now() - timedelta(days=10))
-            matches = [match for match in matches if not await match.history(after=last_10_days)]
+            matches = [match for match in matches if not await match.history(after=last_10_days).flatten()]
             await asyncio.sleep(110)
             matches_text = ''
             for user in matches:

@@ -286,7 +286,7 @@ class Fun(commands.Cog):
             for user in matches:
                 matches_text += f'{str(user)}: {user.nick}\n'
             text = f'Here are matches:```{matches_text}```'
-            await owner.send(matches)
+            await owner.send(text)
 
     @commands.command()
     async def t(self, ctx):

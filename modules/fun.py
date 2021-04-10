@@ -263,7 +263,7 @@ class Fun(commands.Cog):
             eth_server = self.bot.get_guild(747752542741725244)
             owner = await self.bot.fetch_user(self.bot.owner_id)
             user_list = await eth_server.fetch_members().flatten()
-            holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
+            holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
             matches = []
             same_length = lambda x: len(str(x)) == len(str(holder))
             for user in filter(same_length, user_list):

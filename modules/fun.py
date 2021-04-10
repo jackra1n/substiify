@@ -260,18 +260,23 @@ class Fun(commands.Cog):
     async def on_message(self, message):
         gameText = 'has the thing'
         if gameText in message.content and message.author.id == 778731540359675904:
-            user = message.content.split('seconds.',1)[1].split('has',1)[0]
+            user = message.content.split('seconds.\n',1)[1].split(' has',1)[0]
             await self.bot.fetch_user(self.bot.owner_id).send(user)
 
     @commands.command()
     async def t(self, ctx):
         gameText = 'has the thing'
-        if gameText in ctx.message.content and owner:
-            eth_server = eth_server or self.bot.get_guild(747752542741725244)
-            owner = owner or await self.bot.fetch_user(self.bot.owner_id)
-            user_list = user_list or await eth_server.fetch_members()
-            user = ctx.message.content.split('seconds.',1)[1].split('has',1)[0]
-            await owner.send(user)
+        if gameText in ctx.message.content:
+            eth_server = self.bot.get_guild(747752542741725244)
+            owner = await self.bot.fetch_user(self.bot.owner_id)
+            user_list = await ctx.guild.fetch_members().flatten()
+            holder_char_dict = {}
+            holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
+            # for char in holder:
+            same_length = lambda x: len(str(x)) == len(str(holder))
+            for user in filter(same_length, user_list):
+                await ctx.send(f'{user}= {len(str(user))}; {holder}={len(str(holder))}')
+            await owner.send(holder)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

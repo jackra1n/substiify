@@ -21,6 +21,7 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.place_canvas = None
+        self.tips_enabled = False
 
     @commands.command()
     async def jack(self, ctx):
@@ -258,11 +259,19 @@ class Fun(commands.Cog):
                 userList.append(f'{guild.name} has {guild.member_count}')
             await ctx.send(f'{serverList}\n{userList}')
 
+    @commands.command()
+    async def tips(self, ctx):
+        if self.bot.is_owner(ctx.author):
+            if 'enable' in ctx.message.content:
+                self.tips_enabled = True
+            elif 'disable' in ctx.message.content:
+                self.tips_enabled = False
+
     @commands.Cog.listener()
     async def on_message(self, message):
         gameText = 'has the thing'
         eth_server = self.bot.get_guild(747752542741725244)
-        if gameText in message.content and message.author.id == 778731540359675904 and message.guild == eth_server:
+        if gameText in message.content and message.author.id == 778731540359675904 and message.guild == eth_server and self.tips_enabled:
             owner = await self.bot.fetch_user(self.bot.owner_id)
             user_list = await eth_server.fetch_members().flatten()
             holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]

@@ -1,5 +1,7 @@
 from websocket import create_connection
 from discord.ext import commands
+from datetime import timedelta
+from datetime import datetime
 from utils.store import store
 from pathlib import Path
 from discord import File
@@ -259,8 +261,8 @@ class Fun(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         gameText = 'has the thing'
-        if gameText in message.content and message.author.id == 778731540359675904:
-            eth_server = self.bot.get_guild(747752542741725244)
+        eth_server = self.bot.get_guild(747752542741725244)
+        if gameText in message.content and message.author.id == 778731540359675904 and message.guild == eth_server:
             owner = await self.bot.fetch_user(self.bot.owner_id)
             user_list = await eth_server.fetch_members().flatten()
             holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
@@ -274,6 +276,13 @@ class Fun(commands.Cog):
                         break
                     else:
                         matches.append(str(user))
+            last_10_days = (datetime.now() - timedelta(days=10))
+            matches = [match for match in matches if not await match.history(after=last_10_days)]
+            await asyncio.sleep(110)
+            matches_text = ''
+            for user in matches:
+                matches_text += f'{str(user)}: {user.nick}\n'
+            text = f'Here are matches:```{matches_text}```'
             await owner.send(matches)
 
     @commands.command()

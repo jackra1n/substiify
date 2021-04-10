@@ -275,7 +275,7 @@ class Fun(commands.Cog):
                     if holder[i] != str(user)[i]:
                         break
                     else:
-                        matches.append(str(user))
+                        matches.append(user)
             last_10_days = (datetime.now() - timedelta(days=10))
             matches = [match for match in matches if not await match.history(after=last_10_days)]
             await asyncio.sleep(110)

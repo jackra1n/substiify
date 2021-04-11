@@ -270,7 +270,7 @@ class Fun(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         gameText = 'has the thing'
-        eth_server = await self.bot.get_guild(747752542741725244)
+        eth_server = self.bot.get_guild(747752542741725244)
         if gameText in message.content and message.author.id == 778731540359675904 and message.guild == eth_server and self.tips_enabled:
             owner = await self.bot.fetch_user(self.bot.owner_id)
             user_list = eth_server.fetch_members().flatten()

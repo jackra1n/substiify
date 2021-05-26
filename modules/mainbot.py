@@ -19,7 +19,7 @@ class MainBot(commands.Cog):
             'daydeal',
             'epicGames',
             'util',
-            # 'giveaway',
+            'giveaway',
             'fun',
             'draw',
             'help'

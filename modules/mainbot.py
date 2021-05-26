@@ -21,6 +21,7 @@ class MainBot(commands.Cog):
             'util',
             # 'giveaway',
             'fun',
+            'draw',
             'help'
         ]
 

@@ -1,17 +1,11 @@
-from websocket import create_connection
 from discord.ext import commands
 from datetime import timedelta
 from datetime import datetime
 from utils.store import store
 from pathlib import Path
-from discord import File
-from PIL import Image
-import requests
 import logging
 import discord
 import random
-import asyncio
-import os
 
 async def lineChooser(filename):
     lines = open(f'{store.resources_path}/{filename}').read().splitlines()
@@ -20,7 +14,6 @@ async def lineChooser(filename):
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.place_canvas = None
         self.tips_enabled = False
 
     @commands.command()
@@ -79,175 +72,13 @@ class Fun(commands.Cog):
     @commands.cooldown(6, 5)
     @commands.command(aliases=['8ball'], brief='AKA 8ball, Ask the bot a question that you dont want the answer to.')
     async def eightball(self, ctx,*,question):
-        responses = ['It is certain.',
-                    'It is decidedly so.',
-                    'Without a doubt.',
-                    'Yes - definitely.',
-                    'You may rely on it.',
-                    'As I see it, yes.',
-                    'Most likely.',
-                    'Outlook good.',
-                    'Yes.',
-                    'Signs point to yes.',
-                    'Reply hazy, try again.',
-                    'Ask again later.',
-                    'Better not tell you now.',
-                    'Cannot predict now.',
-                    'Concentrate and ask again.',
-                    "Don't count on it.",
-                    'My reply is no.',
-                    'My sources say no.',
-                    'Outlook not so good.',
-                    'Very doubtful.']
         embed = discord.Embed(
-            title=random.choice(responses),
+            title=await lineChooser('8ball.txt'),
             description=f'Question: {question}',
             colour = discord.Colour.orange()
         )
         embed.set_footer(text=f'Question by {ctx.author}', icon_url=ctx.author.avatar_url)
         await ctx.channel.send(embed=embed)
-
-
-    @commands.command()
-    async def secretDraw(self, ctx, offsetX: int, offsetY: int, resizeX: int = None, resizeY: int = None):
-        if await self.bot.is_owner(ctx.author):
-            imageToDraw = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
-            if imageToDraw is not None:
-                if resizeX and resizeY:
-                    imageToDraw = imageToDraw.resize((resizeX,resizeY))
-                width, height = imageToDraw.size
-                pix = list(imageToDraw.getdata())
-                fileTxt = open('pixelart.txt','w')
-                if self.place_canvas is None:
-                    try:
-                        await ctx.invoke(self.get_canvas_ws)
-                    except Exception as e:
-                        print(e)
-                for x in range(width):
-                    badImage = False
-                    for y in range(height):
-                        index = x+y*width
-                        if imageToDraw.mode in ('RGB'):
-                            if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index]:
-                                hexColor = '#%02x%02x%02x' % pix[index]
-                                self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
-                                fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
-                            else:
-                                print('Pixel skipped')
-
-                        elif imageToDraw.mode in ('RGBA'):
-                            if self.place_canvas.getpixel((x+offsetX,y+offsetY)) != pix[index][:-1]:
-                                if pix[index] != (0,0,0,0):
-                                    self.place_canvas.putpixel((x+offsetX, y+offsetY), pix[index])
-                                    hexColor = '#%02x%02x%02x' % pix[index][:-1]
-                                    fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
-                            else:
-                                print('Pixel skipped')
-
-                        elif imageToDraw.mode in ('L'):
-                            self.place_canvas.putpixel((x+offsetX, y+offsetY), (pix[index], pix[index], pix[index]))
-                            hexColor = f'#{pix[index]:02x}{pix[index]:02x}{pix[index]:02x}'
-                            fileTxt.write(f"{x+offsetX} {y+offsetY} {hexColor}|")
-                        else:
-                            await ctx.send(f'image has wrong color mode. cancelling')
-                            badImage = True
-                            break
-                    if badImage:
-                        break
-
-                self.place_canvas.save("place.png")
-                if not badImage:
-                    if os.stat('place.png').st_size <= 8000000:
-                        await ctx.send(file=File(Image.open('place.png').filename))
-                        if os.stat(fileTxt.name).st_size <= 8000000:
-                             await ctx.send(file=File(fileTxt.name))
-                    else:
-                        await ctx.send('file too big')
-                fileTxt.close()
-            else:
-                await ctx.send('No image to draw')
-
-    @commands.command()
-    async def spamDraw2(self, ctx, offsetX: int, offsetY: int, resizeX:int=None, resizeY:int=None):
-        if await self.bot.is_owner(ctx.author):
-            await self.draw_loop(ctx, ctx.channel, offsetX, offsetY, resizeX, resizeY)
-
-    @commands.command()
-    async def spamDraw(self, ctx, offsetX: int, offsetY: int, resizeX:int=None, resizeY:int=None):
-        if await self.bot.is_owner(ctx.author):
-            server = self.bot.get_guild(747752542741725244)
-            channelToSpam = server.get_channel(819966095070330950)
-            await self.draw_loop(ctx, channelToSpam, offsetX, offsetY, resizeX, resizeY)
-            
-    async def draw_loop(self, ctx, channel, offX, offY, resX, resY):
-        image = Image.open(requests.get(ctx.message.attachments[0].url, stream=True).raw)
-        if image is not None:
-            if resX and resY:
-                image = image.resize((resX,resY))
-            await ctx.invoke(self.get_canvas_ws)
-            width, height = image.size
-            pix = list(image.getdata())
-            for x in range(width):
-                for y in range(height):
-                    await self.place(ctx, image, channel, x+offX, y+offY, pix[x+y*width])
-
-    async def place(self, ctx, image, channel, x, y, clr):
-        canvas_clr = self.place_canvas.getpixel((x,y))
-        if clr != canvas_clr and clr != (0,0,0,0):
-            hex_color = ''
-            if image.mode in ('RGB'):
-                hex_color = '#%02x%02x%02x' % clr
-            elif image.mode in ('RGBA'):
-                hex_color = '#%02x%02x%02x' % clr[:-1]
-            elif image.mode in ('L'):
-                hex_color = f'#{clr:02x}{clr:02x}{clr:02x}'
-            else:
-                await ctx.send(f'image has wrong color mode. skipping')
-                return
-            if hex_color:
-                await channel.send(f".place setpixel {x} {y} {hex_color}")
-
-    @commands.command()
-    async def get_canvas_ws(self, ctx):
-        if await self.bot.is_owner(ctx.author) and self.place_canvas is None:
-            try:
-                ws = create_connection("ws://52.142.4.222:9000/place")
-                ws.send('\x01')
-                byteArray = bytearray(ws.recv())
-                ws.close()
-                del byteArray[0]
-                self.place_canvas = Image.new('RGB', (1000,1000))
-
-                width, height = 1000, 1000
-                index = 0
-                for i in range(width):
-                    for j in range (height):
-                        r = byteArray[index]
-                        index += 1
-                        g = byteArray[index]
-                        index += 1
-                        b = byteArray[index]
-                        index += 1
-                        color = (r, g, b)
-                        self.place_canvas.putpixel((j,i), color)
-                self.place_canvas.save('place.png')
-                await ctx.send('Got the newest canvas', delete_after=60)
-            except Exception as e:
-                await ctx.send(f'Problem while getting canvas: {e}\nTrying again...')
-                await ctx.invoke(self.get_canvas_ws)
-
-    @commands.command()
-    async def get_canvas(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            server = self.bot.get_guild(747752542741725244)
-            channel = server.get_channel(768600365602963496)
-            rushs_helper = server.get_member(774276700557148170)
-            await channel.send('.place view', delete_after=1)
-            await asyncio.sleep(3)
-            for message in rushs_helper.history(limit=30):
-                if message.attachments[0].filename == 'place.png':
-                    self.place_canvas = Image.open(requests.get(message.attachments[0].url, stream=True).raw)
-            await ctx.send('Got the newest canvas', delete_after=20)
 
     @commands.command()
     async def serversInfo(self, ctx):
@@ -267,44 +98,66 @@ class Fun(commands.Cog):
             elif 'disable' in ctx.message.content:
                 self.tips_enabled = False
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        gameText = 'has the thing'
-        eth_server = self.bot.get_guild(747752542741725244)
-        if gameText in message.content and message.author.id == 778731540359675904 and message.guild == eth_server and self.tips_enabled:
+    @commands.command()
+    async def findUsers(self, ctx, pattern, serverId: int = None):
+        if await self.bot.is_owner(ctx.author):
+            if serverId is None:
+                serverId = ctx.guild.id
             owner = await self.bot.fetch_user(self.bot.owner_id)
-            user_list = eth_server.fetch_members().flatten()
-            holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
-            matches = []
-            same_length = lambda x: len(str(x)) == len(str(holder))
-            for user in filter(same_length, user_list):
-                for i in range(len(str(user))):
-                    if holder[i] == "_":
-                        continue
-                    if holder[i] != str(user)[i]:
-                        break
-                    else:
-                        matches.append(user)
-            last_10_days = (datetime.now() - timedelta(days=10))
-            for match in matches:
-                history = await match.history(after=last_10_days).flatten()
-                if not history:
-                    matches.remove(match)
-            # await asyncio.sleep(110)
+            matches = await self.find_matches(ctx, pattern, serverId)
             matches_text = ''
             for user in matches:
                 matches_text += f'{str(user)}: {user.nick}\n'
             text = f'Here are matches:```{matches_text}```'
             await owner.send(text)
 
+
+    async def find_matches(self, ctx, pattern, serverId: int):
+        pattern = pattern[1:-1]
+        user_list = [user for user in await self.bot.get_guild(serverId).fetch_members().flatten() if not user.bot]
+        matches = []
+        same_length = lambda x: len(str(x)) == len(str(pattern))
+        for user in filter(same_length, user_list):
+            for i in range(len(str(user))):
+                if pattern[i] == "_":
+                    continue
+                if pattern[i] != str(user)[i]:
+                    break
+                else:
+                    matches.append(user)
+        return matches
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        gameText = 'has the thing'
+        eth_serverId = 747752542741725244
+        if gameText in message.content and message.author.id == 778731540359675904 and message.guild.id == eth_serverId and self.tips_enabled:
+            ctx = await self.bot.get_context(message)
+            owner = await self.bot.fetch_user(self.bot.owner_id)
+            holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0]
+            matches = self.find_matches(ctx, holder, eth_serverId)
+            # last_10_days = (datetime.now() - timedelta(days=10))
+            # for match in matches:
+            #     if not await match.history(after=last_10_days, limit=10).flatten():
+            #         matches.remove(match)
+            matches_text = ''
+            for user in matches:
+                matches_text += f'{str(user)}: {user.nick}\n'
+            text = f'Here are matches:```{matches_text}```'
+            await owner.send(text)
+            await asyncio.sleep(110)
+            await owner.send('You can grab thing in 10 seconds!')
+            await asyncio.sleep(8)
+            await owner.send('NOW!')
+
     @commands.command()
     async def t(self, ctx):
-        if self.bot.is_owner(ctx.author):
+        if await self.bot.is_owner(ctx.author):
             gameText = 'has the thing'
+            eth_server = self.bot.get_guild(747752542741725244)
             if gameText in ctx.message.content:
-                eth_server = self.bot.get_guild(747752542741725244)
                 owner = await self.bot.fetch_user(self.bot.owner_id)
-                user_list = await ctx.guild.fetch_members().flatten()
+                user_list = [user for user in await eth_server.fetch_members().flatten() if not user.bot]
                 holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
                 matches = []
                 same_length = lambda x: len(str(x)) == len(str(holder))
@@ -315,8 +168,16 @@ class Fun(commands.Cog):
                         if holder[i] != str(user)[i]:
                             break
                         else:
-                            matches.append(str(user))
-                await owner.send(matches)
+                            matches.append(user)
+                last_10_days = (datetime.now() - timedelta(days=10))
+                for match in matches:
+                    if not await match.history(after=last_10_days, limit=10).flatten():
+                        matches.remove(match)
+                matches_text = ''
+                for user in matches:
+                    matches_text += f'{str(user)}: {user.nick}\n'
+                text = f'Here are matches:```{matches_text}```'
+                await owner.send(text)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

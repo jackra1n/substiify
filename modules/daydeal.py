@@ -1,15 +1,16 @@
+from datetime import datetime, timedelta
 from discord.ext import commands, tasks
+from sqlalchemy.sql import select
 from utils.store import store
-from datetime import datetime
 from bs4 import BeautifulSoup
 from utils import db
-from sqlalchemy.sql import select
 import logging
 import asyncio
 import discord
 import requests
 
 URL = "https://www.daydeal.ch/"
+timeOffset = 2
 
 class Daydeal(commands.Cog):
     def __init__(self, bot):
@@ -17,10 +18,13 @@ class Daydeal(commands.Cog):
         self.endTime = self.getDealEndTime()
         self.daydeal_task.start()
 
-    def getDealEndTime(self):
+    def getSoup(self):
         page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        return BeautifulSoup(page.content, 'html.parser')
+
+    def getDealEndTime(self):
+        soup = self.getSoup()
+        return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')  + timedelta(hours=timeOffset)
 
     async def availableBarCreator(self, available):
         toDraw = int(round(available, -1)/10)
@@ -28,9 +32,8 @@ class Daydeal(commands.Cog):
 
     async def createDaydealEmbed(self):
         # Web Scraping
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        self.endTime = datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')
+        soup = self.getSoup()
+        self.endTime = self.getDealEndTime()
         product_description = soup.find('section', class_='product-description')
         title1 = product_description.find('h1', class_='product-description__title1').text
         title2 = product_description.find('h2', class_='product-description__title2').text
@@ -57,6 +60,16 @@ class Daydeal(commands.Cog):
         embed.add_field(name="Available", value=str(await self.availableBarCreator(available)), inline=False)
         embed.add_field(name="Ends in", value=str(ends_in), inline=False)
         return embed
+
+    @commands.command()
+    async def daydealSetTimeOffset(self, ctx):
+        if await self.bot.is_owner(ctx.author):
+            timeOffset = int(ctx)
+    
+    @commands.command()
+    async def daydealGetTimeOffset(self, ctx):
+        if await self.bot.is_owner(ctx.author):
+            await ctx.send(timeOffset)
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)

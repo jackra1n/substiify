@@ -1,19 +1,18 @@
 from discord.ext import commands
-from utils.prepare import prepareFiles
 from utils.db import create_database
 from utils.store import store
+from utils import util
 import discord
 import logging
 import json
 
-prepareFiles()
+util.prepareFiles()
 create_database()
 
 with open(store.settings_path, "r") as settings:
     settings = json.load(settings)
 
-intents = discord.Intents()
-bot = commands.Bot(command_prefix=settings['prefix'], owner_id=276462585690193921, intents=intents.all())
+bot = commands.Bot(command_prefix=util.prefix, owner_id=276462585690193921, intents=discord.Intents().all())
 
 bot.remove_command('help')
 bot.load_extension("modules.mainbot")

@@ -2,6 +2,7 @@ from utils.store import store
 from discord.ext import commands
 from discord import Activity, ActivityType
 from utils import db
+from utils import util
 import subprocess
 import logging
 import discord
@@ -36,7 +37,8 @@ class MainBot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         servers = len(self.bot.guilds)
-        activityName = f"{self.settings['prefix']}help | {servers} servers"
+        prefix = util.prefixById(self.bot)
+        activityName = f"{prefix}help | {servers} servers"
         activity = Activity(type=ActivityType.listening, name=activityName)
         await self.bot.change_presence(activity=activity)
         await self.load_extensions()

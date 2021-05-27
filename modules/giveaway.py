@@ -1,4 +1,5 @@
 from asyncio import TimeoutError, sleep
+from datetime import datetime, timedelta
 from random import choice
 
 import discord
@@ -76,7 +77,8 @@ class Giveaway(commands.Cog):
                       "React with :tada: to enter!",
                       colour=0x00FFFF)
         embed.add_field(name="Hosted By:", value=ctx.author.mention)
-        embed.set_footer(text=f"Giveway ends in {answers[1]} from now")
+        end = (datetime.now() + timedelta(seconds=time)).strftime('%d.%m.%Y %H:%M:%S')
+        embed.set_footer(text=f"Giveway ends on {end}")
         newMsg = await channel.send(embed=embed)
         await newMsg.add_reaction("🎉")
         # Check if Giveaway Cancelled

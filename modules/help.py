@@ -1,17 +1,18 @@
+from discord.ext import commands
+from utils.store import store
+from pathlib import Path
+from utils import util
 import discord
 import time
 import json
 import logging
-from utils.store import store
-from pathlib import Path
-from discord.ext import commands
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
-        self.prefix = self.settings['prefix']
+        self.prefix = util.prefixById(self.bot)
 
     @commands.command()
     async def help(self,ctx):
@@ -20,7 +21,7 @@ class Help(commands.Cog):
                     title=f'{self.bot.user.display_name} Command List',
                     colour = discord.Colour.red()
                 )
-            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner', 'music']
+            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner', 'music', 'util']
             embed.add_field(name='Available categories:', value=await self.help_string(categories))
             await ctx.send(embed=embed)
 
@@ -107,6 +108,17 @@ class Help(commands.Cog):
         embed.add_field(name="`shuffle`", value='Shuffles palylist')
         embed.add_field(name="`queue`, `q`", value='Shows current song queue')
         embed.add_field(name="`now`, `currentsong`", value='Shows currently played song')
+        await ctx.send(embed=embed)
+    
+    @commands.command()
+    async def util(self,ctx):
+        embed = discord.Embed(
+                title="Util",
+                description=f"Useful commands that can help you organize your server",
+                colour = discord.Colour.greyple()
+            )
+        embed.add_field(name="`giveawaycreate`, `gcreate`, `gcr`",value="Initializes setup for a giveaway. After this command you will be asked for more info.", inline=False)
+        embed.add_field(name="`givereroll`, `givrrl`, `grr`",value=f'Allows you to "re-roll" giveaway. This function takes channel and id of the giveaway message as parameters. Example: "{self.prefix}givrrl {ctx.channel.mention} [msgId]"', inline=False)
         await ctx.send(embed=embed)
 
 def setup(bot):

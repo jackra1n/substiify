@@ -46,5 +46,5 @@ def prefix(bot, message):
 
 def prefixById(bot):
     if bot.user.id == 742380498986205234:
-        return "dev<<"
+        return "§§"
     return "<<"

@@ -1,5 +1,6 @@
 from asyncio import TimeoutError, sleep
 from datetime import datetime, timedelta
+from os import name
 from random import choice
 
 import discord
@@ -22,20 +23,29 @@ def convert(time):
 
     return timeVal*time_dict[unit]
 
+def create_giveaway_embed(ctx, prize):
+    embed = Embed(title=":tada: Giveaway :tada:",
+                    description=f"Win **{prize}** today!",
+                    colour=0x00FFFF)
+    embed.add_field(name="Hosted By:", value=ctx.author.mention)
+    return embed
+
+def winning_text(prize, winner):
+    return f'Congratulations {winner.mention}! You won **{prize}**!'
+
 class Giveaway(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cancelled = False
 
-    @command(name="giftcr", aliases=["giveaway", "gcreate", "gcr"])
+    @command(name="giveawaycreate", aliases=["gcreate", "gcr"])
     async def create_giveaway(self, ctx):
-        if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):
-            await ctx.channel.send("You don't have permissions")
+        if not await self.has_permissions(ctx):
             return
 
         # Ask Questions
         questions = ["Setting up your giveaway. Choose what channel you want your giveaway in?",
-                     "For How long should the Giveaway be hosted ? type number followed (s|m|h|d)",
+                     "For How long should the Giveaway be hosted ? type number followed (s|m|h|d). Example: `10m`",
                      "What is the Prize?"]
         answers = []
 
@@ -53,6 +63,7 @@ class Giveaway(commands.Cog):
                 await ctx.send("You didn't answer the questions in Time")
                 return
             answers.append(message.content)
+
         # Check if Channel Id is valid
         try:
             channel_id = int(answers[0][2:-1])
@@ -71,12 +82,9 @@ class Giveaway(commands.Cog):
             return
         prize = answers[2]
 
-        await ctx.send(f"Setup finished. Giveaway for '{prize}' will be in {channel.mention}")
-        embed = Embed(title=":tada: Giveaway :tada:",
-                      description=f"Win a {prize} today!\n" \
-                      "React with :tada: to enter!",
-                      colour=0x00FFFF)
-        embed.add_field(name="Hosted By:", value=ctx.author.mention)
+        await ctx.send(f"Setup finished. Giveaway for **'{prize}'** will be in {channel.mention}")
+        embed = create_giveaway_embed(ctx, prize)
+        embed.description += "\nReact with :tada: to enter!"
         end = (datetime.now() + timedelta(seconds=time)).strftime('%d.%m.%Y %H:%M:%S')
         embed.set_footer(text=f"Giveway ends on {end}")
         newMsg = await channel.send(embed=embed)
@@ -89,58 +97,42 @@ class Giveaway(commands.Cog):
 
             users = await myMsg.reactions[0].users().flatten()
             users.pop(users.index(self.bot.user))
+            embed = create_giveaway_embed(ctx, prize)
             # Check if User list is not empty
             if len(users) <= 0:
-                emptyEmbed = Embed(title=":tada: Giveaway :tada:",
-                                   description=f"Win a {prize} today")
-                emptyEmbed.add_field(name="Hosted By:", value=ctx.author.mention)
-                emptyEmbed.set_footer(text="No one won the Giveaway")
-                await myMsg.edit(embed=emptyEmbed)
+                embed.set_footer(text="No one won the Giveaway")
                 return
-            if len(users) > 0:
+            elif len(users) > 0:
                 winner = choice(users)
-                winnerEmbed = Embed(title=":tada: Giveaway :tada:",
-                                    description=f"Win a {prize} today",
-                                    colour=0x00FFFF)
-                winnerEmbed.add_field(name=f"Congratulations On Winning {prize}", value=winner.mention)
-                await myMsg.edit(embed=winnerEmbed)
-                await channel.send(f"Congratulations {winner.mention}! You won {prize}!")
-                return
+                embed.add_field(name=f"Congratulations on winning {prize}", value=winner.mention)
+                await channel.send(winning_text(prize, winner))
+            await myMsg.edit(embed=embed)
 
-    @command(name="giftrrl", aliases=["gifreroll", "gftroll", "grr"])
+    @command(name="givereroll", aliases=["givrrl", "grr"])
     async def giveaway_reroll(self, ctx, channel: discord.TextChannel, id_: int):
-        if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):
-            await ctx.channel.send("You don't have permissions")
+        if not await self.has_permissions(ctx):
             return
         try:
             msg = await channel.fetch_message(id_)
         except:
             await ctx.send("The channel or ID mentioned was incorrect")
+            return
         users = await msg.reactions[0].users().flatten()
+        users.pop(users.index(self.bot.user))
+        prize = await self.get_giveaway_prize(ctx, channel, id_)
+        embed = create_giveaway_embed(ctx, prize)
         if len(users) <= 0:
-            emptyEmbed = Embed(title=":tada: Giveaway :tada:",
-                               description=f"Win a Prize today")
-            emptyEmbed.add_field(name="Hosted By:", value=ctx.author.mention)
-            emptyEmbed.set_footer(text="No one won the Giveaway")
-            await msg.edit(embed=emptyEmbed)
-            return
-        if len(users) > 0:
+            embed.set_footer(text="No one won the Giveaway")
+        elif len(users) > 0:
             winner = choice(users)
-            winnerEmbed = Embed(title=":tada: Giveaway :tada:",
-                                description=f"Win a Prize today",
-                                colour=0x00FFFF)
-            winnerEmbed.add_field(name=f"Congratulations On Winning Giveaway", value=winner.mention)
-            await msg.edit(embed=winnerEmbed)
-            return
+            embed.add_field(name=f"Congratulations on winning {prize}", value=winner.mention)
+            await channel.send(winning_text(prize, winner))
 
-            # users.pop(users.index(self.bot.user))
-            # winner = choice(users)
-            # await channel.send(f"Congratulations {winner.mention} on winning the Giveaway")
+        await msg.edit(embed=embed)
 
-    @command(name="giftdel", aliases=["gifdel", "gftdel", "gdl"])
+    @command(name="givdel", aliases=["giftdel", "gdl"])
     async def giveaway_stop(self, ctx, channel: discord.TextChannel, id_: int):
-        if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):
-            await ctx.channel.send("You don't have permissions")
+        if not await self.has_permissions(ctx):
             return
         try:
             msg = await channel.fetch_message(id_)
@@ -151,6 +143,19 @@ class Giveaway(commands.Cog):
         except:
             embed = Embed(title="Failure!", description="Cannot cancel Giveaway")
             await ctx.send(emebed=embed)
+
+    async def get_giveaway_prize(self, ctx, channel: discord.TextChannel, id_: int):
+        try:
+            msg = await channel.fetch_message(id_)
+        except:
+            await ctx.send("The channel or ID mentioned was incorrect")
+        return msg.embeds[0].description.split("Win ")[1].split(" today!")[0]
+
+    async def has_permissions(self, ctx):
+        if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):
+            await ctx.send("You don't have permissions")
+            return False
+        return True
 
 
 def setup(bot):

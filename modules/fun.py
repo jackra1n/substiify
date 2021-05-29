@@ -150,34 +150,5 @@ class Fun(commands.Cog):
             await asyncio.sleep(8)
             await owner.send('NOW!')
 
-    @commands.command()
-    async def t(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            gameText = 'has the thing'
-            eth_server = self.bot.get_guild(747752542741725244)
-            if gameText in ctx.message.content:
-                owner = await self.bot.fetch_user(self.bot.owner_id)
-                user_list = [user for user in await eth_server.fetch_members().flatten() if not user.bot]
-                holder = ctx.message.content.split('seconds.\n',1)[1].split(' has',1)[0][1:-1]
-                matches = []
-                same_length = lambda x: len(str(x)) == len(str(holder))
-                for user in filter(same_length, user_list):
-                    for i in range(len(str(user))):
-                        if holder[i] == "_":
-                            continue
-                        if holder[i] != str(user)[i]:
-                            break
-                        else:
-                            matches.append(user)
-                last_10_days = (datetime.now() - timedelta(days=10))
-                for match in matches:
-                    if not await match.history(after=last_10_days, limit=10).flatten():
-                        matches.remove(match)
-                matches_text = ''
-                for user in matches:
-                    matches_text += f'{str(user)}: {user.nick}\n'
-                text = f'Here are matches:```{matches_text}```'
-                await owner.send(text)
-
 def setup(bot):
     bot.add_cog(Fun(bot))

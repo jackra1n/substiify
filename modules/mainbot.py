@@ -1,8 +1,7 @@
 from utils.store import store
 from discord.ext import commands
 from discord import Activity, ActivityType
-from utils import db
-from utils import util
+from utils import db, util
 import subprocess
 import logging
 import discord
@@ -46,7 +45,7 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.startswith('<<'):
+        if message.content.startswith(util.prefixById(self.bot)):
             db.session.add(db.command_history(message))
             db.session.commit()
 

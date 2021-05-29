@@ -1,18 +1,16 @@
-from asyncio import TimeoutError, sleep
 from datetime import datetime, timedelta
-from os import name
+from asyncio import TimeoutError, sleep
+from discord.ext import commands, tasks
 from random import choice
-
+from utils import db
+from os import name
 import discord
 import logging
-from discord import Embed
-from discord.ext import commands
-from discord.ext.commands import command
 
 
 def convert(time):
-    pos = ["s", "m", "h", "d"]
-    time_dict = {"s": 1, "m": 60, "h": 3600, "d": 24*3600}
+    pos = ["m", "h", "d"]
+    time_dict = {"m": 60, "h": 3600, "d": 24*3600}
     unit = time[-1]
     if unit not in pos:
         return -1
@@ -23,29 +21,37 @@ def convert(time):
 
     return timeVal*time_dict[unit]
 
-def create_giveaway_embed(ctx, prize):
-    embed = Embed(title=":tada: Giveaway :tada:",
+def create_giveaway_embed(author, prize):
+    embed = discord.Embed(title=":tada: Giveaway :tada:",
                     description=f"Win **{prize}** today!",
                     colour=0x00FFFF)
-    embed.add_field(name="Hosted By:", value=ctx.author.mention)
+    embed.add_field(name="Hosted By:", value=author.mention)
     return embed
 
 def winning_text(prize, winner):
     return f'Congratulations {winner.mention}! You won **{prize}**!'
 
+def checkIfActiveGiveaways():
+    giveaways = db.session.query(db.active_giveaways).all()
+    if len(giveaways) > 0:
+        return True
+    return False
+
 class Giveaway(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cancelled = False
+        if checkIfActiveGiveaways():
+            self.giveaway_task.start()
 
-    @command(name="giveawaycreate", aliases=["gcreate", "gcr"])
+    @commands.command(name="giveawaycreate", aliases=["gcreate", "gcr"])
     async def create_giveaway(self, ctx):
         if not await self.has_permissions(ctx):
             return
 
         # Ask Questions
         questions = ["Setting up your giveaway. Choose what channel you want your giveaway in?",
-                     "For How long should the Giveaway be hosted ? type number followed (s|m|h|d). Example: `10m`",
+                     "For How long should the Giveaway be hosted ? type number followed (m|h|d). Example: `10m`",
                      "What is the Prize?"]
         answers = []
 
@@ -54,7 +60,7 @@ class Giveaway(commands.Cog):
             return m.author == ctx.author and m.channel == ctx.channel
 
         for i, question in enumerate(questions):
-            embed = Embed(title=f"Question {i}",
+            embed = discord.Embed(title=f"Question {i}",
                           description=question)
             await ctx.send(embed=embed)
             try:
@@ -83,32 +89,20 @@ class Giveaway(commands.Cog):
         prize = answers[2]
 
         await ctx.send(f"Setup finished. Giveaway for **'{prize}'** will be in {channel.mention}")
-        embed = create_giveaway_embed(ctx, prize)
+        embed = create_giveaway_embed(ctx.author, prize)
         embed.description += "\nReact with :tada: to enter!"
-        end = (datetime.now() + timedelta(seconds=time)).strftime('%d.%m.%Y %H:%M:%S')
-        embed.set_footer(text=f"Giveway ends on {end}")
+        end = (datetime.now() + timedelta(seconds=time))
+        end_string = end.strftime('%d.%m.%Y %H:%M')
+        embed.set_footer(text=f"Giveway ends on {end_string}")
         newMsg = await channel.send(embed=embed)
+        creator = ctx.author
         await newMsg.add_reaction("🎉")
-        # Check if Giveaway Cancelled
-        self.cancelled = False
-        await sleep(time)
-        if not self.cancelled:
-            myMsg = await channel.fetch_message(newMsg.id)
+        db.session.add(db.active_giveaways(creator, end, prize, newMsg))
+        db.session.commit()
 
-            users = await myMsg.reactions[0].users().flatten()
-            users.pop(users.index(self.bot.user))
-            embed = create_giveaway_embed(ctx, prize)
-            # Check if User list is not empty
-            if len(users) <= 0:
-                embed.set_footer(text="No one won the Giveaway")
-                return
-            elif len(users) > 0:
-                winner = choice(users)
-                embed.add_field(name=f"Congratulations on winning {prize}", value=winner.mention)
-                await channel.send(winning_text(prize, winner))
-            await myMsg.edit(embed=embed)
+        self.giveaway_task.start()
 
-    @command(name="givereroll", aliases=["givrrl", "grr"])
+    @commands.command(name="givereroll", aliases=["givrrl", "grr"])
     async def giveaway_reroll(self, ctx, channel: discord.TextChannel, id_: int):
         if not await self.has_permissions(ctx):
             return
@@ -120,7 +114,7 @@ class Giveaway(commands.Cog):
         users = await msg.reactions[0].users().flatten()
         users.pop(users.index(self.bot.user))
         prize = await self.get_giveaway_prize(ctx, channel, id_)
-        embed = create_giveaway_embed(ctx, prize)
+        embed = create_giveaway_embed(ctx.author, prize)
         if len(users) <= 0:
             embed.set_footer(text="No one won the Giveaway")
         elif len(users) > 0:
@@ -130,19 +124,45 @@ class Giveaway(commands.Cog):
 
         await msg.edit(embed=embed)
 
-    @command(name="givdel", aliases=["giftdel", "gdl"])
+    @commands.command(name="givdel", aliases=["giftdel", "gdl"])
     async def giveaway_stop(self, ctx, channel: discord.TextChannel, id_: int):
         if not await self.has_permissions(ctx):
             return
         try:
             msg = await channel.fetch_message(id_)
-            newEmbed = Embed(title="Giveaway Cancelled", description="The giveaway has been cancelled!!")
+            newEmbed = discord.Embed(title="Giveaway Cancelled", description="The giveaway has been cancelled!!")
             # Set Giveaway cancelled
             self.cancelled = True
             await msg.edit(embed=newEmbed)
         except:
-            embed = Embed(title="Failure!", description="Cannot cancel Giveaway")
+            embed = discord.Embed(title="Failure!", description="Cannot cancel Giveaway")
             await ctx.send(emebed=embed)
+
+    @tasks.loop(seconds=45.0)
+    async def giveaway_task(self):
+        giveaways = db.session.query(db.active_giveaways).all()
+        for giveaway in giveaways:
+            if datetime.now() >= giveaway.end_date:
+                channel = self.bot.get_channel(giveaway.channel_id)
+                message = await channel.fetch_message(giveaway.message_id)
+                users = await message.reactions[0].users().flatten()
+                author = await self.bot.fetch_user(giveaway.creator_user_id)
+                prize = giveaway.prize
+                embed = create_giveaway_embed(author, prize)
+
+                users.pop(users.index(self.bot.user))
+                # Check if User list is not empty
+                if len(users) <= 0:
+                    embed.remove_field(0)
+                    embed.set_footer(text="No one won the Giveaway")
+                    await channel.send('No one won the Giveaway')
+                elif len(users) > 0:
+                    winner = choice(users)
+                    embed.add_field(name=f"Congratulations on winning {prize}", value=winner.mention)
+                    await channel.send(winning_text(prize, winner))
+                await message.edit(embed=embed)
+                db.session.query(db.active_giveaways).filter_by(message_id=message.id).delete()
+                db.session.commit()
 
     async def get_giveaway_prize(self, ctx, channel: discord.TextChannel, id_: int):
         try:

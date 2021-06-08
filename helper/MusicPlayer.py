@@ -1,7 +1,9 @@
 from helper.YTDLSource import YTDLSource
 from async_timeout import timeout
+import discord
 import logging
 import asyncio
+import os
 
 class MusicPlayer:
     """A class which is assigned to each guild using the bot for Music.
@@ -10,7 +12,7 @@ class MusicPlayer:
     When the bot disconnects from the Voice it's instance will be destroyed.
     """
 
-    __slots__ = ('bot', '_guild', '_channel', '_cog', 'queue', 'next', 'current', 'np', 'volume')
+    __slots__ = ('bot', '_guild', '_channel', '_cog', 'queue', 'next', 'current', 'np', 'volume', 'stopping')
 
     def __init__(self, ctx):
         self.bot = ctx.bot
@@ -24,13 +26,14 @@ class MusicPlayer:
         self.np = None  # Now playing message
         self.volume = .5
         self.current = None
+        self.stopping = False
 
         ctx.bot.loop.create_task(self.player_loop())
 
     async def player_loop(self):
         await self.bot.wait_until_ready()
 
-        while not self.bot.is_closed():
+        while not self.bot.is_closed() and not self.stopping:
             self.next.clear()
 
             try:
@@ -41,6 +44,7 @@ class MusicPlayer:
 
             if not isinstance(source, YTDLSource):
                 try:
+                    print("maybe running")
                     source = await YTDLSource.regather_stream(source, loop=self.bot.loop)
                 except Exception as e:
                     await self._channel.send(f'Error while getting the song: ```\n[{e}]\n```')
@@ -49,13 +53,10 @@ class MusicPlayer:
             source.volume = self.volume
             self.current = source
 
-            self._guild.voice_client.play(source, after=lambda _: self.bot.loop.call_soon_threadsafe(self.next.set))
-            self.np = await self._channel.send(f'**Now Playing:** `{source.title}` requested by '
-                                               f'`{source.requester}`')
+            self._guild.voice_client.play(source.play(), after=lambda _: self.bot.loop.call_soon_threadsafe(self.next.set))
+            self.np = await self._channel.send(f'**Now Playing:** `{source.data["title"]}` requested by `{source.requester}`')
             await self.next.wait()
 
-            # Make sure the FFmpeg process is cleaned up.
-            source.cleanup()
             self.current = None
 
             try:

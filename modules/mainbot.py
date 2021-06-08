@@ -36,8 +36,8 @@ class MainBot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         servers = len(self.bot.guilds)
-        prefix = util.prefixById(self.bot)
-        activityName = f"{prefix}help | {servers} servers"
+        self.prefix = util.prefixById(self.bot)
+        activityName = f"{self.prefix}help | {servers} servers"
         activity = Activity(type=ActivityType.listening, name=activityName)
         await self.bot.change_presence(activity=activity)
         await self.load_extensions()
@@ -45,9 +45,18 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.startswith(util.prefixById(self.bot)):
+        if message.content.startswith(self.prefix):
             db.session.add(db.command_history(message))
             db.session.commit()
+
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx):
+        logging.info(f'command [{ctx.message.content[len(self.prefix):]}] executed for -> [{ctx.author}]')
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await ctx.message.add_reaction('🆘')
+        logging.info(f'command failed to executed for [{ctx.author}] <-> [{error}]')
 
     @commands.command()
     async def reload(self, ctx):
@@ -60,7 +69,7 @@ class MainBot(commands.Cog):
             except Exception as e:
                 exc = f'{type(e).__name__}: {e}'
                 await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-            await ctx.channel.send('Realoded all cogs')
+            await ctx.channel.send('Reloaded all cogs')
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

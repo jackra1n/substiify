@@ -4,19 +4,21 @@ from discord.ext import commands
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from random import shuffle
-import logging
 import itertools
+import logging
 import asyncio
 import discord
+import os
 
-async def isInBotVC(ctx):
-    members = ctx.voice_client.channel.voice_states.keys()
-    if ctx.author.id in members:
-        return True
-    await ctx.send(f'You are not in the VC!')
-    return False
+async def userIsInBotVC(ctx):
+    if not ctx.voice_client == None:
+        members = ctx.voice_client.channel.voice_states.keys()
+        if ctx.author.id in members:
+            return True
+        await ctx.send(f'You are not in the VC!')
+        return False
 
-async def isInAnyVC(ctx):
+async def userIsInAnyVC(ctx):
     if ctx.author.voice:
         return True
     await ctx.send('You are not in a VC!')
@@ -34,7 +36,9 @@ class Music(commands.Cog):
             pass
 
         try:
+            self.players[guild.id].stopping = True
             del self.players[guild.id]
+
         except KeyError:
             pass
 
@@ -53,91 +57,94 @@ class Music(commands.Cog):
         if url.startswith('<'):
             url = url[1:-1]
         if self.checkIfYoutubePlaylist(url):
+            # return
             parsed = urlparse(url)
             newUrl = f'https://youtube.com/playlist?list={parse_qs(parsed.query)["list"][0]}'
             urls = YTDLSource.get_playlist_info(newUrl)['urls']
+            await player.queue.put(YTDLSource(urls.pop(0), ctx.author))
+            await ctx.message.delete()
             for entry in urls:
-                source = await YTDLSource.from_url(ctx, entry, loop=self.bot.loop, stream=True)
-                await player.queue.put(source)
+                await player.queue.put(YTDLSource(entry, ctx.author))
             await ctx.send(f'Queued **{len(urls)}** songs')
         else:
-            source = await YTDLSource.from_url(ctx, url, loop=self.bot.loop, stream=True)
-            if ctx.voice_client.is_playing():
-                await ctx.send(f'**Queued:** {source.title}')
-            await player.queue.put(source)
-        await ctx.message.delete()
+            song = YTDLSource(url, ctx.author)
+            await ctx.message.delete()
+            await player.queue.put(song)
+            await ctx.send(f"Queued **{song.data['title']}**")
+
 
     @commands.command(aliases=["p"])
     async def play(self, ctx, *, url):
         vc = ctx.voice_client
-        if not vc:
-            if await isInAnyVC(ctx):
-                await ctx.invoke(self.connect)
-                player = self.get_player(ctx)
-                await self.parseUrl(ctx, player, url)
-        else:
-            if await isInBotVC(ctx):
-                player = self.get_player(ctx)
-                await self.parseUrl(ctx, player, url)
+        play = False
+        if not vc and await userIsInAnyVC(ctx):
+            await ctx.invoke(self.connect)
+            play = True
+        elif await userIsInBotVC(ctx):
+            play = True
+
+        if play:
+            player = self.get_player(ctx)
+            await self.parseUrl(ctx, player, url)
 
     @commands.command()
-    @commands.check(isInBotVC)
+    @commands.check(userIsInBotVC)
     async def pause(self, ctx):
         """Pause the currently playing song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_playing():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_playing():
             return await ctx.send('I am not currently playing anything!', delete_after=30)
-        elif vc.is_paused():
+        elif botsVc.is_paused():
             return
-        vc.pause()
+        botsVc.pause()
         await ctx.send(f'**`{ctx.author}`**: Paused the song!')
 
     @commands.command()
-    @commands.check(isInBotVC)
+    @commands.check(userIsInBotVC)
     async def resume(self, ctx):
         """Resume the currently paused song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_connected():
             return await ctx.send('I am not currently playing anything!', delete_after=30)
-        elif not vc.is_paused():
+        elif not botsVc.is_paused():
             return
-        vc.resume()
+        botsVc.resume()
         await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
 
     @commands.command()
-    @commands.check(isInBotVC)
+    @commands.check(userIsInBotVC)
     async def skip(self, ctx):
         """Skip the song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_connected():
             return await ctx.send('I am not currently playing anything!', delete_after=30)
-        if vc.is_paused():
+        if botsVc.is_paused():
             pass
-        elif not vc.is_playing():
+        elif not botsVc.is_playing():
             return
-        vc.stop()
+        botsVc.stop()
         await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
 
     @commands.command(name='queue', aliases=['q'])
     async def queue_info(self, ctx):
         """Retrieve a basic queue of upcoming songs."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_connected():
             return await ctx.send('I am not currently connected to voice!', delete_after=30)
         player = self.get_player(ctx)
         if player.queue.empty():
             return await ctx.send('There are currently no more queued songs.')
         # Grab up to 5 entries from the queue...
-        upcoming = list(itertools.islice(player.queue._queue, 0, 5))
-        fmt = '\n'.join(f'**`{song["title"]}`**' for song in upcoming)
+        upcoming = list(itertools.islice(player.queue._queue, 0, 10))
+        fmt = '\n'.join(f'#{index+1} | **`{song.data["title"]}`**' for index, song in enumerate(upcoming))
         embed = discord.Embed(title=f'Upcoming - Next {len(upcoming)}', description=fmt)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['currentsong', 'now'])
     async def now_playing(self, ctx):
         """Display information about the currently playing song."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_connected():
             return await ctx.send('I am not currently connected to voice!', delete_after=30)
         player = self.get_player(ctx)
         if not player.current:
@@ -147,21 +154,20 @@ class Music(commands.Cog):
             await player.np.delete()
         except discord.HTTPException:
             pass
-        player.np = await ctx.send(f'**Now Playing:** `{vc.source.title}` '
-                                   f'requested by `{vc.source.requester}`')
+        player.np = await ctx.send(f'**Now Playing:** `{botsVc.source.title}` requested by `{botsVc.source.requester}`')
 
     @commands.command()
-    @commands.check(isInBotVC)
+    @commands.check(userIsInBotVC)
     async def stop(self, ctx):
         """Stop the currently playing song and destroy the player."""
-        vc = ctx.voice_client
-        if not vc or not vc.is_connected():
+        botsVc = ctx.voice_client
+        if not botsVc or not botsVc.is_connected():
             return await ctx.send('I am not currently playing anything!', delete_after=30)
         await self.cleanup(ctx.guild)
         await ctx.message.delete()
 
     @commands.command()
-    @commands.check(isInBotVC)
+    @commands.check(userIsInBotVC)
     async def shuffle(self, ctx: commands.Context):
         if self.get_player(ctx).queue.qsize() == 0:
             return await ctx.send('Empty queue.')
@@ -178,12 +184,12 @@ class Music(commands.Cog):
             except AttributeError:
                 raise InvalidVoiceChannel('No channel to join. Please either specify a valid channel or join one.')
 
-        vc = ctx.voice_client
-        if vc:
-            if vc.channel.id == channel.id:
+        botsVc = ctx.voice_client
+        if botsVc:
+            if botsVc.channel.id == channel.id:
                 return
             try:
-                await vc.move_to(channel)
+                await botsVc.move_to(channel)
             except asyncio.TimeoutError:
                 raise VoiceConnectionError(f'Moving to channel: <{channel}> timed out.')
         else:

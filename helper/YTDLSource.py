@@ -22,47 +22,49 @@ ytdl_format_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 ffmpeg_options = {
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
     'options': '-vn'
 }
 
-class YTDLSource(PCMVolumeTransformer):
-    def __init__(self, source, *, data, requester, volume=0.5):
-        super().__init__(source, volume)
+class YTDLSource():
+    def __init__(self, url, requester, volume=0.5):
+        try:
+            ## TO DO: 
+            ##
+            ## use google API to get songs info
+            ##
+            data = ytdl.extract_info(url, False)
 
+            if 'entries' in data:
+                # take first item from a playlist
+                data = data['entries'][0]
+            self.data = data
+            self.url = url
+            self.requester = requester
+        except Exception as e:
+            logging.critical(f'***Exception while getting video info***:\n {e}\n')
+
+    def play(self):
+        data = ytdl.extract_info(self.url, False)
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
         self.data = data
-        self.title = data.get('title')
-        self.url = data.get('url')
-        self.requester = requester
-
+        return FFmpegPCMAudio(self.data['url'], **ffmpeg_options)
 
     def __getitem__(self, item: str):
         """Allows us to access attributes similar to a dict.
         This is only useful when you are NOT downloading.
         """
-        return self.__getattribute__(item)
+        return self.__getattribute__(item) 
 
     @classmethod
-    async def from_url(cls, ctx, url, *, loop, stream=False):
-        try:
-            loop = loop or asyncio.get_event_loop()
-            to_run = partial(ytdl.extract_info, url=url, download=not stream)
-            data = await loop.run_in_executor(None, to_run)
-            if 'entries' in data:
-                # take first item from a playlist
-                data = data['entries'][0]
-
-            filename = data['url'] if stream else ytdl.prepare_filename(data)
-            return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
-        except Exception as e:
-            logging.critical(f'***Exception while getting video info***:\n {e}\n')
-
-    @classmethod
-    async def regather_stream(cls, data, *, loop):
+    async def regather_stream(self, data, *, loop):
         loop = loop or asyncio.get_event_loop()
 
         to_run = partial(ytdl.extract_info, url=data['webpage_url'], download=False)
         data = await loop.run_in_executor(None, to_run)
-        return cls(FFmpegPCMAudio(data['url']), data=data)
+        return self(FFmpegPCMAudio(data['url']), data=data)
 
     @classmethod
     def get_playlist_info(self, url: str):

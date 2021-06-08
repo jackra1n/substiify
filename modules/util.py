@@ -59,7 +59,7 @@ class Util(commands.Cog):
     async def specialThanks(self, ctx):
         embed = discord.Embed(
             title="Special thanks for any help to those people",
-            description = f'<@205704051856244736> <@812414532563501077> <@299478604809764876> <@291291715598286848> <@224618877626089483>'
+            description = f'<@205704051856244736> <@812414532563501077> <@299478604809764876> <@291291715598286848> <@224618877626089483> <@231151428167663616>'
         )
         await ctx.channel.send(embed=embed)
 

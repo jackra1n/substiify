@@ -45,7 +45,7 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.startswith(self.prefix):
+        if self.bot.is_ready() and message.content.startswith(self.prefix) :
             db.session.add(db.command_history(message))
             db.session.commit()
 

@@ -10,10 +10,12 @@ import asyncio
 import logging
 import psutil
 import json
+from discordTogether import DiscordTogether
 
 class Util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.togetherControl = DiscordTogether(self.bot)
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
 
@@ -115,6 +117,15 @@ class Util(commands.Cog):
                 await ctx.message.delete()
             embed = discord.Embed(description=f'Version has been set to {version}')
             await ctx.send(embed=embed, delete_after=10)
+
+    @commands.command()
+    async def createRoom(self, ctx, room):
+        link = await self.togetherControl.create_link(ctx.author.voice.channel.id, room)
+        await ctx.send(f'Click the blue link!\n{link}')
+
+    @commands.command()
+    async def possibleRooms(self, ctx):
+        await ctx.send(f'youtube, poker, betrayal, fishing, chess')
 
 def setup(bot):
     bot.add_cog(Util(bot))

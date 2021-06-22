@@ -6,6 +6,8 @@ from utils.store import store
 import logging
 import discord
 
+logger = logging.getLogger(__name__)
+
 engine = create_engine(f'sqlite:///{store.db_path}')
 session = sessionmaker(bind=engine)()
 

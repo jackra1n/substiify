@@ -1,9 +1,10 @@
 from datetime import datetime
-from pathlib import Path
 import discord
 import requests
 from discord.ext import commands
 import logging
+
+logger = logging.getLogger(__name__)
 
 epicStoreFreeGamesAPI = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
 epicGamesLogo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/50px-Epic_Games_logo.svg.png"

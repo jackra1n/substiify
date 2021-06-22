@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
-from sqlalchemy.sql import select
 from utils.store import store
 from bs4 import BeautifulSoup
 from utils import db
 import logging
-import asyncio
 import discord
 import requests
+
+logger = logging.getLogger(__name__)
 
 URL = "https://www.daydeal.ch/"
 timeOffset = 2

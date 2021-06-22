@@ -1,11 +1,11 @@
 from discord.ext import commands
 from utils.store import store
-from pathlib import Path
 from utils import util
 import discord
-import time
 import json
 import logging
+
+logger = logging.getLogger(__name__)
 
 class Help(commands.Cog):
     def __init__(self, bot):

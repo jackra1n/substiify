@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
-from asyncio import TimeoutError, sleep
 from discord.ext import commands, tasks
+from asyncio import TimeoutError
 from random import choice
 from utils import db
-from os import name
 import discord
 import logging
 
+logger = logging.getLogger(__name__)
 
 def convert(time):
     pos = ["m", "h", "d"]

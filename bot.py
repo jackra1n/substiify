@@ -8,6 +8,7 @@ import json
 
 util.prepareFiles()
 create_database()
+logger = logging.getLogger(__name__)
 
 with open(store.settings_path, "r") as settings:
     settings = json.load(settings)
@@ -18,7 +19,7 @@ bot.remove_command('help')
 bot.load_extension("modules.mainbot")
 
 if not settings['token']:
-    logging.error(f'No token in {store.settings_path}! Please add it and try again.')
+    logger.error(f'No token in {store.settings_path}! Please add it and try again.')
     exit()
 
 bot.run(settings['token'])

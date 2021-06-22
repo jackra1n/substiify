@@ -1,14 +1,14 @@
+from utils.store import store
+from discord.ext import commands
 import discord
 import random
 import logging
-from utils.store import store
-from discord.ext import commands
-from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 async def lineChooser(filename):
     lines = open(f'{store.resources_path}/{filename}').read().splitlines()
     return random.choice(lines)
-
 
 async def embedSender(self, ctx, member, text, file):
     member = ctx.author if member is None else member

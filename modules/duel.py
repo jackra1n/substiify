@@ -1,11 +1,12 @@
-import discord
-from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
+from discord.ext import commands
 from enum import Enum
+import discord
 import logging
 import asyncio
 import random
 
+logger = logging.getLogger(__name__)
 
 class Duel(commands.Cog):
     def __init__(self, bot):

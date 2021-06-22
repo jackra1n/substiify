@@ -2,15 +2,15 @@ from utils.store import store
 from discord.ext import commands
 from datetime import datetime
 from pytz import timezone
-from pathlib import Path
 import subprocess
 import platform
 import discord
-import asyncio
 import logging
 import psutil
 import json
 from discordTogether import DiscordTogether
+
+logger = logging.getLogger(__name__)
 
 class Util(commands.Cog):
     def __init__(self, bot):
@@ -68,18 +68,13 @@ class Util(commands.Cog):
     @commands.command()
     async def run_command(self, ctx, *command):
         if ctx.message.author.id == self.bot.owner_id:
-            output = ""
-            try:
-                output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
-                embed = discord.Embed(
-                        title="Command output",
-                        description=f"{output}",
-                        colour = discord.Colour(0x1FE4FF)
-                    )
-                await ctx.channel.send(embed=embed)
-            except subprocess.CalledProcessError:
-                logging.error(output)
-                await ctx.channel.send(output)
+            output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
+            embed = discord.Embed(
+                    title="Command output",
+                    description=f"{output}",
+                    colour = discord.Colour(0x1FE4FF)
+                )
+            await ctx.channel.send(embed=embed)
 
     @commands.command()
     async def info(self, ctx):

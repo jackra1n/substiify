@@ -42,7 +42,7 @@ class MainBot(commands.Cog):
         activity = Activity(type=ActivityType.listening, name=activityName)
         await self.bot.change_presence(activity=activity)
         await self.load_extensions()
-        logger.info(f'[bot.py] {self.bot.user} has connected')
+        logger.info(f'Connected as -> [{self.bot.user}]')
 
     @commands.Cog.listener()
     async def on_message(self, message):

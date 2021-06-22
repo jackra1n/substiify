@@ -1,11 +1,10 @@
 from discord.ext import commands
-from datetime import timedelta
-from datetime import datetime
 from utils.store import store
-from pathlib import Path
 import logging
 import discord
 import random
+
+logger = logging.getLogger(__name__)
 
 async def lineChooser(filename):
     lines = open(f'{store.resources_path}/{filename}').read().splitlines()

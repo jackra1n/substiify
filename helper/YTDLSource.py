@@ -1,8 +1,10 @@
-from discord import PCMVolumeTransformer, FFmpegPCMAudio
+from discord import FFmpegPCMAudio
 from functools import partial
 import youtube_dl
 import logging
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -42,7 +44,7 @@ class YTDLSource():
             self.url = url
             self.requester = requester
         except Exception as e:
-            logging.critical(f'***Exception while getting video info***:\n {e}\n')
+            logger.critical(f'***Exception while getting video info***:\n {e}\n')
 
     def play(self):
         data = ytdl.extract_info(self.url, False)

@@ -8,7 +8,8 @@ import itertools
 import logging
 import asyncio
 import discord
-import os
+
+logger = logging.getLogger(__name__)
 
 async def userIsInBotVC(ctx):
     if not ctx.voice_client == None:

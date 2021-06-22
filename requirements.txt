@@ -9,5 +9,4 @@ requests
 Pillow
 pytz
 sqlalchemy
-coloredlogs
 websocket-client

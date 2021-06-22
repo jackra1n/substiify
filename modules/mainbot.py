@@ -4,8 +4,9 @@ from discord import Activity, ActivityType
 from utils import db, util
 import subprocess
 import logging
-import discord
 import json
+
+logger = logging.getLogger(__name__)
 
 class MainBot(commands.Cog):
     def __init__(self, bot):
@@ -31,7 +32,7 @@ class MainBot(commands.Cog):
                 self.bot.load_extension('modules.'+extension)
             except Exception as e:
                 exc = f'{type(e).__name__}: {e}'
-                logging.warning(f'Failed to load extension {extension}\n{exc}')
+                logger.warning(f'Failed to load extension {extension}\n{exc}')
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -41,7 +42,7 @@ class MainBot(commands.Cog):
         activity = Activity(type=ActivityType.listening, name=activityName)
         await self.bot.change_presence(activity=activity)
         await self.load_extensions()
-        logging.info(f'[bot.py] {self.bot.user} has connected')
+        logger.info(f'[bot.py] {self.bot.user} has connected')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -51,12 +52,12 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-        logging.info(f'command [{ctx.message.content[len(self.prefix):]}] executed for -> [{ctx.author}]')
+        logger.info(f'command [{ctx.message.content[len(self.prefix):]}] executed for -> [{ctx.author}]')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         await ctx.message.add_reaction('🆘')
-        logging.info(f'command failed to executed for [{ctx.author}] <-> [{error}]')
+        logger.info(f'command failed to executed for [{ctx.author}] <-> [{error}]')
 
     @commands.command()
     async def reload(self, ctx):

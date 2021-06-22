@@ -3,7 +3,8 @@ from async_timeout import timeout
 import discord
 import logging
 import asyncio
-import os
+
+logger = logging.getLogger(__name__)
 
 class MusicPlayer:
     """A class which is assigned to each guild using the bot for Music.

@@ -15,7 +15,9 @@ class RemoveNoise(logging.Filter):
         super().__init__(name='discord.gateway')
 
     def filter(self, record):
-        return (record.name != 'discord.gateway' and 'Shard ID' not in record.msg) or any(log in record.msg for log in ignore_logs)
+        if (record.name == 'discord.gateway' and 'Shard ID' in record.msg) or any(log in record.msg for log in ignore_logs):
+            return False
+        return True
 
 def prepareFiles():
 

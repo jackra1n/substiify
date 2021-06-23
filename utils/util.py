@@ -8,10 +8,6 @@ import json
 
 ignore_logs = [
     'Got a request to RESUME the websocket',
-    'Shard ID None has sent the RESUME payload',
-    'Shard ID None has successfully RESUMED session',
-    'Shard ID None has sent the IDENTIFY payload',
-    'Shard ID None has connected to Gateway'
 ]
 
 class RemoveNoise(logging.Filter):
@@ -19,7 +15,7 @@ class RemoveNoise(logging.Filter):
         super().__init__(name='discord.gateway')
 
     def filter(self, record):
-        return record.name != 'discord.gateway' and 'Shard ID' not in record.msg
+        return (record.name != 'discord.gateway' and 'Shard ID' not in record.msg) or any(log in record.msg for log in ignore_logs)
 
 def prepareFiles():
 

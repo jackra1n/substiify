@@ -57,7 +57,7 @@ class MainBot(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         await ctx.message.add_reaction('🆘')
-        logger.info(f'command failed to executed for [{ctx.author}] <-> [{error}]')
+        logger.error(f'command failed to executed for [{ctx.author}] <-> [{error}]')
 
     @commands.command()
     async def reload(self, ctx):

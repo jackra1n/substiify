@@ -6,7 +6,7 @@ import logging
 import json
 
 ignore_logs = [
-    'Got a request to RESUME the websocket',
+    'Got a request',
 ]
 
 class RemoveNoise(logging.Filter):

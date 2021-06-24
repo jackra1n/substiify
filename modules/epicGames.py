@@ -50,13 +50,13 @@ class EpicGames(commands.Cog):
             logger.error(f'Error while getting list of all Epic games: {e}')
 
         currentFreeGames = []
-        try:    
-            for game in allGames:
-                if datetime.strptime(game["effectiveDate"].split('T')[0], "%Y-%m-%d") <= datetime.now() and game["promotions"]:
+        for game in allGames:
+            if datetime.strptime(game["effectiveDate"].split('T')[0], "%Y-%m-%d") <= datetime.now() and game["promotions"]:
+                try:    
                     game = Game(game)
                     currentFreeGames.append(game)
-        except Exception as e:
-            logger.error(f'Error while creating \'Game\' objects: {e}')
+                except Exception as e:
+                    logger.error(f'Error while creating \'Game\' object: {e}')
 
         try:
             for game in currentFreeGames:

@@ -10,3 +10,4 @@ Pillow
 pytz
 sqlalchemy
 websocket-client
+discord-together

@@ -1,7 +1,6 @@
-from utils.store import store
 from helper.CustomLogFormatter import CustomLogFormatter
+from utils.store import store
 from datetime import datetime
-from pytz import timezone
 from pathlib import Path
 import logging
 import json
@@ -41,7 +40,7 @@ def prepareFiles():
     dt_fmt = '%Y-%m-%d %H:%M:%S'
     fileFormatter = logging.Formatter('[{asctime}] [{levelname:<7}] {name}: {message}', dt_fmt, style='{')
 
-    date = datetime.now(timezone('Europe/Zurich')).strftime('%Y-%m-%d')
+    date = datetime.now().strftime('%Y-%m-%d')
     fileHandler = logging.FileHandler(f'{store.logs_path}/{date}.log', encoding='utf-8')
     fileHandler.setFormatter(fileFormatter)
     rootLogger.addHandler(fileHandler)

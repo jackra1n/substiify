@@ -60,17 +60,17 @@ class MainBot(commands.Cog):
         logger.error(f'command failed to executed for [{ctx.author}] <-> [{error}]')
 
     @commands.command()
+    @commands.is_owner()
     async def reload(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            self.bot.get_cog('Daydeal').daydeal_task.stop()
-            subprocess.run(["git","pull","--no-edit"])
-            try:
-                for cog in self.startup_extensions:
-                    self.bot.reload_extension(f'modules.{cog}')
-            except Exception as e:
-                exc = f'{type(e).__name__}: {e}'
-                await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-            await ctx.channel.send('Reloaded all cogs')
+        self.bot.get_cog('Daydeal').daydeal_task.stop()
+        subprocess.run(["git","pull","--no-edit"])
+        try:
+            for cog in self.startup_extensions:
+                self.bot.reload_extension(f'modules.{cog}')
+        except Exception as e:
+            exc = f'{type(e).__name__}: {e}'
+            await ctx.channel.send(f'Failed to reload extensions\n{exc}')
+        await ctx.channel.send('Reloaded all cogs')
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

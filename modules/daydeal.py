@@ -62,14 +62,14 @@ class Daydeal(commands.Cog):
         return embed
 
     @commands.command()
+    @commands.is_owner()
     async def daydealSetTimeOffset(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            timeOffset = int(ctx)
+        timeOffset = int(ctx)
     
     @commands.command()
+    @commands.is_owner()
     async def daydealGetTimeOffset(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            await ctx.send(timeOffset)
+        await ctx.send(timeOffset)
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)

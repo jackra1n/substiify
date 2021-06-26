@@ -80,35 +80,34 @@ class Fun(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @commands.command()
+    @commands.is_owner()
     async def serversInfo(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            serverList = []
-            userList = []
-            for guild in self.bot.guilds:
-                serverList.append(f'{guild.name}::{guild.id}')
-                userList.append(f'{guild.name} has {guild.member_count}')
-            await ctx.send(f'{serverList}\n{userList}')
+        serverList = []
+        userList = []
+        for guild in self.bot.guilds:
+            serverList.append(f'{guild.name}::{guild.id}')
+            userList.append(f'{guild.name} has {guild.member_count}')
+        await ctx.send(f'{serverList}\n{userList}')
 
     @commands.command()
+    @commands.is_owner()
     async def tips(self, ctx):
-        if await self.bot.is_owner(ctx.author):
-            if 'enable' in ctx.message.content:
-                self.tips_enabled = True
-            elif 'disable' in ctx.message.content:
-                self.tips_enabled = False
+        if 'enable' in ctx.message.content:
+            self.tips_enabled = True
+        elif 'disable' in ctx.message.content:
+            self.tips_enabled = False
 
     @commands.command()
+    @commands.is_owner()
     async def findUsers(self, ctx, pattern, serverId: int = None):
-        if await self.bot.is_owner(ctx.author):
-            if serverId is None:
-                serverId = ctx.guild.id
-            owner = await self.bot.fetch_user(self.bot.owner_id)
-            matches = await self.find_matches(ctx, pattern, serverId)
-            matches_text = ''
-            for user in matches:
-                matches_text += f'{str(user)}: {user.nick}\n'
-            text = f'Here are matches:```{matches_text}```'
-            await owner.send(text)
+        if serverId is None:
+            serverId = ctx.guild.id
+        matches = await self.find_matches(ctx, pattern, serverId)
+        matches_text = ''
+        for user in matches:
+            matches_text += f'{str(user)}: {user.nick}\n'
+        text = f'Here are matches:```{matches_text}```'
+        await self.bot.get_user(self.bot.owner_id).send(text)
 
 
     async def find_matches(self, ctx, pattern, serverId: int):

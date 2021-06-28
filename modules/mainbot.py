@@ -63,7 +63,7 @@ class MainBot(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx):
         self.bot.get_cog('Daydeal').daydeal_task.stop()
-        subprocess.run(["git","pull","--no-edit"])
+        subprocess.run(["/bin/git","pull","--no-edit"])
         try:
             for cog in self.startup_extensions:
                 self.bot.reload_extension(f'modules.{cog}')

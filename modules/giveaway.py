@@ -16,7 +16,7 @@ def convert(time):
         return -1
     try:
         timeVal = int(time[:-1])
-    except:
+    except Exception as e:
         return -2
 
     return timeVal*time_dict[unit]
@@ -73,7 +73,7 @@ class Giveaway(commands.Cog):
         # Check if Channel Id is valid
         try:
             channel_id = int(answers[0][2:-1])
-        except:
+        except Exception as e:
             await ctx.send(f"The Channel provided was wrong. The channel should be {ctx.channel.mention}")
             return
 
@@ -108,7 +108,7 @@ class Giveaway(commands.Cog):
             return
         try:
             msg = await channel.fetch_message(id_)
-        except:
+        except Exception as e:
             await ctx.send("The channel or ID mentioned was incorrect")
             return
         users = await msg.reactions[0].users().flatten()
@@ -134,7 +134,7 @@ class Giveaway(commands.Cog):
             # Set Giveaway cancelled
             self.cancelled = True
             await msg.edit(embed=newEmbed)
-        except:
+        except Exception as e:
             embed = discord.Embed(title="Failure!", description="Cannot cancel Giveaway")
             await ctx.send(emebed=embed)
 
@@ -167,7 +167,7 @@ class Giveaway(commands.Cog):
     async def get_giveaway_prize(self, ctx, channel: discord.TextChannel, id_: int):
         try:
             msg = await channel.fetch_message(id_)
-        except:
+        except Exception as e:
             await ctx.send("The channel or ID mentioned was incorrect")
         return msg.embeds[0].description.split("Win ")[1].split(" today!")[0]
 

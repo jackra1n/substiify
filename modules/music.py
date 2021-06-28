@@ -12,7 +12,7 @@ import discord
 logger = logging.getLogger(__name__)
 
 async def userIsInBotVC(ctx):
-    if not ctx.voice_client == None:
+    if not ctx.voice_client is None:
         members = ctx.voice_client.channel.voice_states.keys()
         if ctx.author.id in members:
             return True

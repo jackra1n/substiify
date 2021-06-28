@@ -10,7 +10,7 @@ WORKDIR /bot
 # Copy the source code in last to optimize rebuilding the image
 COPY . .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 ENTRYPOINT ["python3"]
 CMD ["-m", "bot"]

@@ -66,17 +66,6 @@ class Util(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @commands.command()
-    async def run_command(self, ctx, *command):
-        if ctx.message.author.id == self.bot.owner_id:
-            output = subprocess.check_output(" ".join(command[:]), stderr=subprocess.STDOUT, shell=True).decode('utf-8')
-            embed = discord.Embed(
-                    title="Command output",
-                    description=f"{output}",
-                    colour = discord.Colour(0x1FE4FF)
-                )
-            await ctx.channel.send(embed=embed)
-
-    @commands.command()
     async def info(self, ctx):
         bot_time = time_up((datetime.now() - store.script_start).total_seconds()) #uptime of the bot
         cpu_usage = psutil.cpu_percent()
@@ -139,5 +128,4 @@ def time_up(t):
             days = hours // 24
             hours = hours % 24
             return f"{int(days)} days, {int(hours)} hours, {int(minutes)} minutes"
-        else:
-            return f"{int(hours)} hours, {int(minutes)} minutes"
+        return f"{int(hours)} hours, {int(minutes)} minutes"

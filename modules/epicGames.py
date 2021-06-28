@@ -23,8 +23,7 @@ class Game():
         if game_info_json["promotions"] is not None:
             date_str = game_info_json["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]["endDate"]
             return datetime.strptime(date_str.split('T')[0], "%Y-%m-%d")
-        else:
-            logger.info("Couldn't create free epic game. 'promotions' is 'None'")
+        logger.info("Couldn't create free epic game. 'promotions' is 'None'")
 
     def getGameDiscountPrice(self, game_price_str: str) -> str:
         discount_price = game_price_str["totalPrice"]["fmtPrice"]["discountPrice"]

@@ -21,7 +21,7 @@ class Help(commands.Cog):
                     title=f'{self.bot.user.display_name} Command List',
                     colour = discord.Colour.red()
                 )
-            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'owner', 'music', 'util']
+            categories = ['info', 'gifs', 'fun', 'daydeal', 'duel', 'music', 'util']
             embed.add_field(name='Available categories:', value=await self.help_string(categories))
             await ctx.send(embed=embed)
 
@@ -81,16 +81,6 @@ class Help(commands.Cog):
                                             "Max Defense:  30       60      20\n"+
                                             "Max Mana:     30       20      50```", inline=False)
         embed.add_field(name='Description', value="When the duel starts you will be able to choose action you want to do. `punch`, `defend` and `end`. `punch` boosts your attack and `defend` boosts your defense. After you choose an action, you will hit the opponent and he will counter attack. If the defense is higher than the attack damage of the opponent you will block the attack. `end` makes you surrender.", inline=False)
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    async def owner(self,ctx):
-        embed = discord.Embed(
-                title="Owner",
-                description=f"Some commands for the bot owner.",
-                colour = discord.Colour.greyple()
-            )
-        embed.add_field(name="`run_command`",value="Run console commands remotely", inline=False)
         await ctx.send(embed=embed)
 
     @commands.command()

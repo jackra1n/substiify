@@ -58,7 +58,7 @@ class Daydeal(commands.Cog):
         embed.set_author(name='Today\'s deal: ' + title1)
         embed.add_field(name="Price", value=f'~~`{old_price}`~~ ⟶ `{new_price}`', inline=False)
         embed.add_field(name="Available", value=str(await self.availableBarCreator(available)), inline=False)
-        embed.add_field(name="Ends in", value=str(ends_in), inline=False)
+        embed.set_footer(text=f'Ends in: {ends_in}')
         return embed
 
     @commands.command()

@@ -63,8 +63,8 @@ class Daydeal(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def daydealSetTimeOffset(self, ctx):
-        timeOffset = int(ctx)
+    async def daydealSetTimeOffset(self, ctx, offset: int):
+        timeOffset = offset
     
     @commands.command()
     @commands.is_owner()

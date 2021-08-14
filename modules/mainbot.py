@@ -65,6 +65,7 @@ class MainBot(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def reload(self, ctx):
+        ctx.message.add_reaction('<:greenTick:876177251832590348>')
         self.bot.get_cog('Daydeal').daydeal_task.stop()
         subprocess.run(["/bin/git","pull","--no-edit"])
         try:
@@ -73,7 +74,8 @@ class MainBot(commands.Cog):
         except Exception as e:
             exc = f'{type(e).__name__}: {e}'
             await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-        await ctx.channel.send('Reloaded all cogs')
+        await ctx.channel.send('Reloaded all cogs', delete_after=120)
+        await ctx.message.delete()
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

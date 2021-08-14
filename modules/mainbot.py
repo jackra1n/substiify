@@ -65,7 +65,7 @@ class MainBot(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def reload(self, ctx):
-        ctx.message.add_reaction('<:greenTick:876177251832590348>')
+        await ctx.message.add_reaction('<:greenTick:876177251832590348>')
         self.bot.get_cog('Daydeal').daydeal_task.stop()
         subprocess.run(["/bin/git","pull","--no-edit"])
         try:

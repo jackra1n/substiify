@@ -1,3 +1,4 @@
+from helper.ModulesManager import ModulesManager
 from utils.store import store
 from discord.ext import commands
 import discord
@@ -25,23 +26,29 @@ class Gif(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(brief='Hug someone or yourself')
+    @commands.group()
+    async def gif(self, ctx):
+        pass
+
+    @gif.command(brief='Hug someone or yourself')
     async def hug(self, ctx, member: discord.Member = None):
         await embedSender(self, ctx, member, " hugs ", "hug.txt")
 
-    @commands.command(brief='Bite someone or yourself')
+    @gif.command(brief='Bite someone or yourself')
     async def bite(self, ctx, member: discord.Member = None):
         await embedSender(self, ctx, member, " bites ", "bite.txt")
 
-    @commands.command(brief='Cuddle someone or yourself')
+    @gif.command(brief='Cuddle someone or yourself')
     async def cuddle(self, ctx, member: discord.Member = None):
         await embedSender(self, ctx, member, " cuddles ", "cuddle.txt")
 
-    @commands.command(brief='Kiss someone or yourself')
+    @gif.command(brief='Kiss someone or yourself')
+    @ModulesManager.register
+    @commands.check(ModulesManager.is_enabled)
     async def kiss(self, ctx, member: discord.Member = None):
         await embedSender(self, ctx, member, " kisses ", "kiss.txt")
 
-    @commands.command(brief='Slap someone or yourself')
+    @gif.command(brief='Slap someone or yourself')
     async def slap(self, ctx, member: discord.Member = None):
         await embedSender(self, ctx, member, " slaps ", "slap.txt")
 

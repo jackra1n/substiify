@@ -1,6 +1,6 @@
+from helper.ModulesManager import ModuleDisabledException, ModulesManager
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
-from utils.store import store
 from bs4 import BeautifulSoup
 from utils import db
 import logging
@@ -41,10 +41,7 @@ class Daydeal(commands.Cog):
         product_img = soup.find('img', class_='product-img-main-pic')['src']
         new_price = soup.find('h2', class_='product-pricing__prices-new-price').text
         old_price = soup.find('span', class_='js-old-price')
-        if old_price is not None:
-            old_price = old_price.text
-        else:
-            old_price = ""
+        old_price = old_price.text if old_price is not None else ''
         available = int(soup.find('strong', class_='product-progress__availability').text.strip('%'))
         ends_in = self.endTime - datetime.now().replace(microsecond=0)
         description_str = ""
@@ -61,31 +58,35 @@ class Daydeal(commands.Cog):
         embed.set_footer(text=f'Ends in: {ends_in}')
         return embed
 
-    @commands.command()
+    @commands.cooldown(4, 10)
+    @commands.group(invoke_without_command = True)
+    @ModulesManager.register
+    @commands.check(ModulesManager.is_enabled)
+    async def deal(self, ctx):
+        await ctx.channel.send(embed=await self.createDaydealEmbed())
+
+    @deal.command()
     @commands.is_owner()
     async def daydealSetTimeOffset(self, ctx, offset: int):
         timeOffset = offset
     
-    @commands.command()
+    @deal.command()
     @commands.is_owner()
-    async def daydealGetTimeOffset(self, ctx):
+    async def getTimeOffset(self, ctx):
         await ctx.send(timeOffset)
 
-    @commands.command()
+    @deal.command()
+    @commands.check(ModulesManager.is_enabled)
     @commands.has_permissions(manage_channels=True)
-    async def setupDaydeal(self, ctx, channel: discord.TextChannel = None, mention_role: discord.Role = None ):
+    async def setup(self, ctx, channel: discord.TextChannel = None, mention_role: discord.Role = None ):
         channel_id = ctx.channel.id if channel is None else channel.id
         mention_role_id = mention_role.id if mention_role is not None else None
-        result = db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).first()
-        if result is None:
+        if db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).first() is None:
             # Adds new db.Daydeal object to session
             db.session.add(db.Daydeal(ctx.guild.id, channel_id, mention_role_id))
             db.session.commit()     
             channel_to_send = ctx.guild.get_channel(channel_id)
-            if mention_role is not None:
-                content = mention_role.mention
-            else:
-                content = ''
+            content = mention_role.mention if mention_role is not None else ''
             await channel_to_send.send(content=content, embed=await self.createDaydealEmbed())
             await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c), delete_after=5)
         else:
@@ -98,27 +99,21 @@ class Daydeal(commands.Cog):
             for setup in db.session.query(db.Daydeal).all():
                 server = self.bot.get_guild(setup.server_id)
                 channel = self.bot.get_channel(setup.channel_id)
-                if setup.role_id is not None:
-                    role = server.get_role(setup.role_id).mention
-                else:
-                    role = ''
+                role = server.get_role(setup.role_id).mention if setup.role_id is not None else ''
                 await channel.send(content=role,embed=daydealEmbed)
 
-    @commands.command()
+    @deal.command()
+    @commands.check(ModulesManager.is_enabled)
     @commands.has_permissions(manage_channels=True)
-    async def stopDaydeal(self, ctx):
+    async def stop(self, ctx):
         db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).delete()
         db.session.commit()
         await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c), delete_after=5)
 
-    @commands.cooldown(4, 10)
-    @commands.command()
-    async def deal(self, ctx):
-        await ctx.channel.send(embed=await self.createDaydealEmbed())
-
     @deal.error
     async def deal_error(self, ctx, error):
-        await ctx.channel.send('error:  ' + str(error))
+        if not isinstance(error, ModuleDisabledException):
+            await ctx.channel.send('Error:  ' + str(error))
 
 
 def setup(bot):

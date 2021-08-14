@@ -1,3 +1,4 @@
+from helper.ModulesManager import ModuleDisabledException
 from utils.store import store
 from discord.ext import commands
 from discord import Activity, ActivityType
@@ -18,7 +19,7 @@ class MainBot(commands.Cog):
             'music',
             'duel',
             'daydeal',
-            'epicGames',
+            'freeGames',
             'util',
             'giveaway',
             'fun',
@@ -46,7 +47,7 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.bot.is_ready() and message.content.startswith(self.prefix) :
+        if self.bot.is_ready() and message.content.startswith(self.prefix):
             db.session.add(db.command_history(message))
             db.session.commit()
 
@@ -56,7 +57,7 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if 'is not found' in str(error):
+        if 'is not found' in str(error) or isinstance(error, ModuleDisabledException):
             return
         await ctx.message.add_reaction('🆘')
         logger.error(f'command failed to executed for [{ctx.author}] <-> [{error}]')

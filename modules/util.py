@@ -1,21 +1,36 @@
+from helper.ModulesManager import ModulesManager
 from utils.store import store
 from discord.ext import commands
 from datetime import datetime
 from pytz import timezone
+from enum import Enum
+
 import subprocess
 import platform
 import discord
 import logging
 import psutil
 import json
-from discordTogether import DiscordTogether
 
 logger = logging.getLogger(__name__)
+
+async def has_permissions_to_delete(ctx):
+    if not ctx.channel.permissions_for(ctx.author).manage_messages and not await ctx.bot.is_owner(ctx.author):
+        await ctx.send("You don't have permissions to do that", delete_after=10)
+        await ctx.message.delete()
+        return False
+    return True
+
+async def has_permissions_to_manage(ctx):
+    if not ctx.channel.permissions_for(ctx.author).manage_channels and not await ctx.bot.is_owner(ctx.author):
+        await ctx.send("You don't have permissions to do that", delete_after=10)
+        await ctx.message.delete()
+        return False
+    return True
 
 class Util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.togetherControl = DiscordTogether(self.bot)
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
 
@@ -31,14 +46,23 @@ class Util(commands.Cog):
         embed.set_image(url=member.avatar_url)
         await ctx.channel.send(embed=embed)
 
-    @commands.command(brief='Clears messages within the current channel.')
-    @commands.has_permissions(manage_messages=True)
+    @commands.group(brief='Clears messages within the current channel.', invoke_without_command = True)
     async def clear(self, ctx, amount):
+        if not await has_permissions_to_delete(ctx):
+            return
         amount = int(amount)
         if amount <= 100:
             await ctx.channel.purge(limit=amount + 1)
         else:
             await ctx.channel.send('Cannot delete more than 100 messages at a time!')
+
+    @clear.command()
+    async def message(self, ctx, message_id: int):
+        if not await has_permissions_to_delete(ctx):
+            return
+        message = await ctx.fetch_message(message_id)
+        await message.delete()
+        await ctx.message.delete()
 
     @clear.error
     async def clear_error(self, ctx, error):
@@ -90,30 +114,60 @@ class Util(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @commands.command()
+    @commands.is_owner()
     async def setversion(self, ctx, version):
-        if ctx.message.author.id == self.bot.owner_id:
-            with open(store.settings_path, "r") as settings:
-                settings_json = json.load(settings)
-            settings_json['version'] = version
-            with open(store.settings_path, "w") as settings:
-                json.dump(settings_json, settings, indent=2)
-            if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-                await ctx.message.delete()
-            embed = discord.Embed(description=f'Version has been set to {version}')
-            await ctx.send(embed=embed, delete_after=10)
+        with open(store.settings_path, "r") as settings:
+            settings_json = json.load(settings)
+        settings_json['version'] = version
+        with open(store.settings_path, "w") as settings:
+            json.dump(settings_json, settings, indent=2)
+        if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
+        embed = discord.Embed(description=f'Version has been set to {version}')
+        await ctx.send(embed=embed, delete_after=10)
 
-    @commands.command()
-    async def createRoom(self, ctx, room):
-        link = await self.togetherControl.create_link(ctx.author.voice.channel.id, room)
-        await ctx.send(f'Click the blue link!\n{link}')
+    @commands.group()
+    async def module(self, ctx):
+        pass
 
-    @commands.command()
-    async def possibleRooms(self, ctx):
-        await ctx.send(f'youtube, poker, betrayal, fishing, chess')
+    @module.command()
+    @commands.guild_only()
+    async def toggle(self, ctx, module):
+        if not await has_permissions_to_manage(ctx):
+            return
+        if module in ModulesManager.get_commands():
+            result = ModulesManager.toggle_module(ctx.guild.id, module)
+            await ctx.send(f'Module `{module}` has been **{result}**', delete_after=10)
+        else:
+            await ctx.send(f'Module \'{module}\' not found', delete_after=10)
+
+    @toggle.error
+    async def command_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.channel.send('Argument required:')
+
+    @module.command()
+    async def list(self, ctx):
+        if not await has_permissions_to_manage(ctx):
+            return
+        commandStatuses = ''
+        commandNames = ''
+        for command in ModulesManager.get_commands():
+            if ModulesManager._is_enabled(ctx.guild.id, command):
+                commandStatuses += '`enabled ` <:greenTick:876177251832590348>\n'  
+            else:
+                commandStatuses += '`disabled` <:redCross:876177262813278288>\n'
+            commandNames += f'{command}\n'
+        embed = discord.Embed(
+            title='Module List',
+            colour=discord.Colour.blurple()
+        )
+        embed.add_field(name='Command', value=commandNames, inline=True)
+        embed.add_field(name='Status', value=commandStatuses, inline=True)
+        await ctx.send(embed=embed, delete_after=180)
 
 def setup(bot):
     bot.add_cog(Util(bot))
-
 
 def time_up(t):
     if t <= 60:

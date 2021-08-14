@@ -44,8 +44,12 @@ class Giveaway(commands.Cog):
         if checkIfActiveGiveaways():
             self.giveaway_task.start()
 
-    @commands.command(name="giveawaycreate", aliases=["gcreate", "gcr"])
-    async def create_giveaway(self, ctx):
+    @commands.group()
+    async def giveaway():
+        pass
+
+    @giveaway.command()
+    async def create(self, ctx):
         if not await self.has_permissions(ctx):
             return
 
@@ -102,8 +106,8 @@ class Giveaway(commands.Cog):
 
         self.giveaway_task.start()
 
-    @commands.command(name="givereroll", aliases=["givrrl", "grr"])
-    async def giveaway_reroll(self, ctx, channel: discord.TextChannel, id_: int):
+    @giveaway.command()
+    async def reroll(self, ctx, channel: discord.TextChannel, id_: int):
         if not await self.has_permissions(ctx):
             return
         try:
@@ -124,8 +128,8 @@ class Giveaway(commands.Cog):
 
         await msg.edit(embed=embed)
 
-    @commands.command(name="givdel", aliases=["giftdel", "gdl"])
-    async def giveaway_stop(self, ctx, channel: discord.TextChannel, id_: int):
+    @giveaway.command()
+    async def stop(self, ctx, channel: discord.TextChannel, id_: int):
         if not await self.has_permissions(ctx):
             return
         try:
@@ -173,7 +177,7 @@ class Giveaway(commands.Cog):
 
     async def has_permissions(self, ctx):
         if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):
-            await ctx.send("You don't have permissions")
+            await ctx.send("You don't have permissions to do that", delete_after=10)
             return False
         return True
 

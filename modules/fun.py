@@ -1,3 +1,4 @@
+from helper.ModulesManager import ModulesManager
 from discord.ext import commands
 from utils.store import store
 import logging
@@ -35,6 +36,8 @@ class Fun(commands.Cog):
 
     @commands.cooldown(6, 5)
     @commands.command(brief='Wanna hit on someone? Let me be your wingman!')
+    @ModulesManager.register
+    @commands.check(ModulesManager.is_enabled)
     async def pickup(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
         author = self.bot.user if member is ctx.author else ctx.author
@@ -47,6 +50,8 @@ class Fun(commands.Cog):
 
     @commands.cooldown(6, 5)
     @commands.command(aliases=['insult','burn'], brief='Insult someone until they cry')
+    @ModulesManager.register
+    @commands.check(ModulesManager.is_enabled)
     async def roast(self, ctx, member : discord.Member=None):
         member = ctx.author if member is None else member
         author = self.bot.user if member is ctx.author else ctx.author
@@ -88,65 +93,6 @@ class Fun(commands.Cog):
             serverList.append(f'{guild.name}::{guild.id}')
             userList.append(f'{guild.name} has {guild.member_count}')
         await ctx.send(f'{serverList}\n{userList}')
-
-    @commands.command()
-    @commands.is_owner()
-    async def tips(self, ctx):
-        if 'enable' in ctx.message.content:
-            self.tips_enabled = True
-        elif 'disable' in ctx.message.content:
-            self.tips_enabled = False
-
-    @commands.command()
-    @commands.is_owner()
-    async def findUsers(self, ctx, pattern, serverId: int = None):
-        if serverId is None:
-            serverId = ctx.guild.id
-        matches = await self.find_matches(ctx, pattern, serverId)
-        matches_text = ''
-        for user in matches:
-            matches_text += f'{str(user)}: {user.nick}\n'
-        text = f'Here are matches:```{matches_text}```'
-        await self.bot.get_user(self.bot.owner_id).send(text)
-
-
-    async def find_matches(self, ctx, pattern, serverId: int):
-        pattern = pattern[1:-1]
-        user_list = [user for user in await self.bot.get_guild(serverId).fetch_members().flatten() if not user.bot]
-        matches = []
-        same_length = lambda x: len(str(x)) == len(str(pattern))
-        for user in filter(same_length, user_list):
-            for i in range(len(str(user))):
-                if pattern[i] == "_":
-                    continue
-                if pattern[i] != str(user)[i]:
-                    break
-                else:
-                    matches.append(user)
-        return matches
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        gameText = 'has the thing'
-        eth_serverId = 747752542741725244
-        if gameText in message.content and message.author.id == 778731540359675904 and message.guild.id == eth_serverId and self.tips_enabled:
-            ctx = await self.bot.get_context(message)
-            owner = await self.bot.fetch_user(self.bot.owner_id)
-            holder = message.content.split('seconds.\n',1)[1].split(' has',1)[0]
-            matches = self.find_matches(ctx, holder, eth_serverId)
-            # last_10_days = (datetime.now() - timedelta(days=10))
-            # for match in matches:
-            #     if not await match.history(after=last_10_days, limit=10).flatten():
-            #         matches.remove(match)
-            matches_text = ''
-            for user in matches:
-                matches_text += f'{str(user)}: {user.nick}\n'
-            text = f'Here are matches:```{matches_text}```'
-            await owner.send(text)
-            await asyncio.sleep(110)
-            await owner.send('You can grab thing in 10 seconds!')
-            await asyncio.sleep(8)
-            await owner.send('NOW!')
 
 def setup(bot):
     bot.add_cog(Fun(bot))

@@ -36,7 +36,7 @@ class Game():
             if image["type"] == 'Thumbnail':
                 return image["url"]
 
-class EpicGames(commands.Cog):
+class FreeGames(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -72,4 +72,4 @@ class EpicGames(commands.Cog):
             logger.error(f'Fail while sending free game: {e}')
 
 def setup(bot):
-    bot.add_cog(EpicGames(bot))
+    bot.add_cog(FreeGames(bot))

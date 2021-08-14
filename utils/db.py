@@ -70,6 +70,17 @@ class active_giveaways(Base):
         self.channel_id = giveaway_message.channel.id
 
 
+class enabled_commands(Base):
+    __tablename__ = 'enabled_commands'
+
+    id = Column(Integer, primary_key=True)
+    server_id = Column(Integer)
+    command = Column(String)
+
+    def __init__(self, server_id, command):
+        self.server_id = server_id
+        self.command = command
+
 # Creates database tables if the don't exist
 def create_database():
     if not engine.has_table(Daydeal.__tablename__):
@@ -106,5 +117,15 @@ def create_database():
             Column('server_id', Integer),
             Column('channel_id', Integer), 
             Column('message_id', Integer)
+            )
+        metadata.create_all()
+
+
+    if not engine.has_table(enabled_commands.__tablename__):
+        metadata = MetaData(engine)
+        Table(enabled_commands.__tablename__, metadata,
+            Column('id', Integer, primary_key=True, nullable=False),
+            Column('server_id', Integer),
+            Column('command', String)
             )
         metadata.create_all()

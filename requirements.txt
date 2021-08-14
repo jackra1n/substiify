@@ -10,4 +10,3 @@ Pillow
 pytz
 sqlalchemy
 websocket-client
-pynacl

@@ -140,6 +140,7 @@ class Util(commands.Cog):
             await ctx.send(f'Module `{module}` has been **{result}**', delete_after=10)
         else:
             await ctx.send(f'Module \'{module}\' not found', delete_after=10)
+        await ctx.message.delete()
 
     @toggle.error
     async def command_error(self, ctx, error):

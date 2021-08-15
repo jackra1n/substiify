@@ -84,15 +84,5 @@ class Fun(commands.Cog):
         embed.set_footer(text=f'Question by {ctx.author}', icon_url=ctx.author.avatar_url)
         await ctx.channel.send(embed=embed)
 
-    @commands.command()
-    @commands.is_owner()
-    async def serversInfo(self, ctx):
-        serverList = []
-        userList = []
-        for guild in self.bot.guilds:
-            serverList.append(f'{guild.name}::{guild.id}')
-            userList.append(f'{guild.name} has {guild.member_count}')
-        await ctx.send(f'{serverList}\n{userList}')
-
 def setup(bot):
     bot.add_cog(Fun(bot))

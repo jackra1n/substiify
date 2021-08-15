@@ -62,20 +62,20 @@ class Daydeal(commands.Cog):
     @commands.group(invoke_without_command = True)
     @ModulesManager.register
     @commands.check(ModulesManager.is_enabled)
-    async def deal(self, ctx):
+    async def daydeal(self, ctx):
         await ctx.channel.send(embed=await self.createDaydealEmbed())
 
-    @deal.command()
+    @daydeal.command()
     @commands.is_owner()
     async def daydealSetTimeOffset(self, ctx, offset: int):
         timeOffset = offset
     
-    @deal.command()
+    @daydeal.command()
     @commands.is_owner()
     async def getTimeOffset(self, ctx):
         await ctx.send(timeOffset)
 
-    @deal.command()
+    @daydeal.command()
     @commands.check(ModulesManager.is_enabled)
     @commands.has_permissions(manage_channels=True)
     async def setup(self, ctx, channel: discord.TextChannel = None, mention_role: discord.Role = None ):
@@ -102,7 +102,7 @@ class Daydeal(commands.Cog):
                 role = server.get_role(setup.role_id).mention if setup.role_id is not None else ''
                 await channel.send(content=role,embed=daydealEmbed)
 
-    @deal.command()
+    @daydeal.command()
     @commands.check(ModulesManager.is_enabled)
     @commands.has_permissions(manage_channels=True)
     async def stop(self, ctx):
@@ -110,8 +110,8 @@ class Daydeal(commands.Cog):
         db.session.commit()
         await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c), delete_after=5)
 
-    @deal.error
-    async def deal_error(self, ctx, error):
+    @daydeal.error
+    async def daydeal_error(self, ctx, error):
         if not isinstance(error, ModuleDisabledException):
             await ctx.channel.send('Error:  ' + str(error))
 

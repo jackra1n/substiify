@@ -15,6 +15,7 @@ class MainBot(commands.Cog):
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
         self.startup_extensions = [
+            'submit',
             'gif',
             'music',
             'duel',

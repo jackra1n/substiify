@@ -3,9 +3,7 @@ from utils.store import store
 from discord.ext import commands
 from datetime import datetime
 from pytz import timezone
-from enum import Enum
 
-import subprocess
 import platform
 import discord
 import logging
@@ -37,6 +35,7 @@ class Util(commands.Cog):
     @commands.cooldown(6, 5)
     @commands.command(aliases=['avatar'],brief='Enlarge and view your profile picture or another member')
     async def av(self, ctx, member: discord.Member = None):
+        await ctx.message.delete()
         member = ctx.author if member is None else member
         embed = discord.Embed(
             title=str(member.display_name),
@@ -60,9 +59,9 @@ class Util(commands.Cog):
     async def message(self, ctx, message_id: int):
         if not await has_permissions_to_delete(ctx):
             return
+        await ctx.message.delete()
         message = await ctx.fetch_message(message_id)
         await message.delete()
-        await ctx.message.delete()
 
     @clear.error
     async def clear_error(self, ctx, error):
@@ -91,6 +90,7 @@ class Util(commands.Cog):
 
     @commands.command()
     async def info(self, ctx):
+        await ctx.message.delete()
         bot_time = time_up((datetime.now() - store.script_start).total_seconds()) #uptime of the bot
         cpu_usage = psutil.cpu_percent()
         ram_usage = psutil.virtual_memory().percent
@@ -135,12 +135,12 @@ class Util(commands.Cog):
     async def toggle(self, ctx, module):
         if not await has_permissions_to_manage(ctx):
             return
+        await ctx.message.delete()
         if module in ModulesManager.get_commands():
             result = ModulesManager.toggle_module(ctx.guild.id, module)
             await ctx.send(f'Module `{module}` has been **{result}**', delete_after=10)
         else:
             await ctx.send(f'Module \'{module}\' not found', delete_after=10)
-        await ctx.message.delete()
 
     @toggle.error
     async def command_error(self, ctx, error):
@@ -151,6 +151,7 @@ class Util(commands.Cog):
     async def list(self, ctx):
         if not await has_permissions_to_manage(ctx):
             return
+        await ctx.message.delete()
         commandStatuses = ''
         commandNames = ''
         for command in ModulesManager.get_commands():

@@ -1,9 +1,8 @@
+from helper.ModulesManager import ModulesManager
+from utils.store import store
 from discord.ext import commands
 from datetime import datetime
 from pytz import timezone
-
-from helper.ModulesManager import ModulesManager
-from utils.store import store
 
 import platform
 import discord
@@ -116,7 +115,7 @@ class Util(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def version(self, ctx, version):
+    async def setversion(self, ctx, version):
         with open(store.settings_path, "r") as settings:
             settings_json = json.load(settings)
         settings_json['version'] = version
@@ -168,30 +167,6 @@ class Util(commands.Cog):
         embed.add_field(name='Command', value=commandNames, inline=True)
         embed.add_field(name='Status', value=commandStatuses, inline=True)
         await ctx.send(embed=embed, delete_after=180)
-
-    @commands.group()
-    @commands.is_owner()
-    async def server(self, ctx):
-        pass
-
-    @server.command()
-    @commands.is_owner()
-    async def list(self, ctx):
-        servers = ''
-        user_count = ''
-        server_ids = ''
-        for guild in self.bot.guilds:
-            servers += f'{guild.name}\n'
-            user_count += f'{guild.member_count}\n'
-            server_ids += f'{guild.id}\n'
-        embed = discord.Embed(
-            title='Server Infos',
-            colour=discord.Colour.blurple()
-        )
-        embed.add_field(name='Name', value=servers, inline=True)
-        embed.add_field(name='User count', value=user_count, inline=True)
-        embed.add_field(name='Id', value=server_ids, inline=True)
-        await ctx.send(embed=embed, delete_after=60)
 
 def setup(bot):
     bot.add_cog(Util(bot))

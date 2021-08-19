@@ -10,7 +10,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
-class Util(commands.Cog):
+class Submit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bug_channel = bot.get_channel(876412993498398740)
@@ -125,7 +125,7 @@ class Util(commands.Cog):
         await ctx.message.delete()
 
 def setup(bot):
-    bot.add_cog(Util(bot))
+    bot.add_cog(Submit(bot))
 
 def time_up(t):
     if t <= 60:

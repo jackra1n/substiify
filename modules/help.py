@@ -25,7 +25,7 @@ class Help(commands.Cog):
         categories = ['modules', 'music', 'giveaway', 'util', 'fun', 'submissions', 'gifs', 'duel']
         if ModulesManager._is_enabled(ctx.guild.id, 'daydeal'):
             categories.append('daydeal') 
-        if self.bot.is_owner(ctx.author):
+        if await self.bot.is_owner(ctx.author):
             categories.append('owner') 
         embed.add_field(name='Available categories:', value=await self.help_string(categories))
         embed.set_footer(text=f'Use: `{self.prefix}help <category>`')

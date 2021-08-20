@@ -2,7 +2,9 @@ from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+
 from utils.store import store
+
 import logging
 import discord
 
@@ -81,6 +83,17 @@ class enabled_commands(Base):
         self.server_id = server_id
         self.command = command
 
+class vote_channels(Base):
+    __tablename__ = 'vote_channels'
+
+    id = Column(Integer, primary_key=True)
+    server_id = Column(Integer)
+    channel_id = Column(Integer)
+
+    def __init__(self, server_id, channel_id):
+        self.server_id = server_id
+        self.channel_id = channel_id
+
 # Creates database tables if the don't exist
 def create_database():
     if not engine.has_table(Daydeal.__tablename__):
@@ -127,5 +140,14 @@ def create_database():
             Column('id', Integer, primary_key=True, nullable=False),
             Column('server_id', Integer),
             Column('command', String)
+            )
+        metadata.create_all()
+
+    if not engine.has_table(vote_channels.__tablename__):
+        metadata = MetaData(engine)
+        Table(vote_channels.__tablename__, metadata,
+            Column('id', Integer, primary_key=True, nullable=False),
+            Column('server_id', Integer),
+            Column('channel_id', Integer)
             )
         metadata.create_all()

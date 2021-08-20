@@ -4,8 +4,8 @@ from utils import db, util
 
 from discord import Activity, ActivityType
 from discord.ext import commands, tasks
+from os import walk, path
 
-import subprocess
 import logging
 import json
 
@@ -16,19 +16,12 @@ class MainBot(commands.Cog):
         self.bot = bot
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
-        self.startup_extensions = [
-            'submit',
-            'gif',
-            'music',
-            'duel',
-            'daydeal',
-            'freeGames',
-            'util',
-            'giveaway',
-            'fun',
-            'draw',
-            'help'
-        ]
+        self.startup_extensions = self.get_modules()
+
+    def get_modules(self):
+        filenames = next(walk("modules"), (None, None, []))[2] 
+        filenames.remove(path.basename(__file__))
+        return [name.replace('.py','') for name in filenames]
 
     async def load_extensions(self):
         for extension in self.startup_extensions:
@@ -60,29 +53,14 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-        logger.info(f'[{ctx.message.content[len(self.prefix):]}] executed for -> [{ctx.author}]')
+        logger.info(f'[{ctx.command.name}] executed for -> [{ctx.author}]')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if 'is not found' in str(error) or isinstance(error, ModuleDisabledException):
             return
         await ctx.message.add_reaction('🆘')
-        logger.error(f'failed to executed for [{ctx.author}] <-> [{error}]')
-
-    @commands.command()
-    @commands.is_owner()
-    async def reload(self, ctx):
-        await ctx.message.add_reaction('<:greenTick:876177251832590348>')
-        self.bot.get_cog('Daydeal').daydeal_task.stop()
-        subprocess.run(["/bin/git","pull","--no-edit"])
-        try:
-            for cog in self.startup_extensions:
-                self.bot.reload_extension(f'modules.{cog}')
-        except Exception as e:
-            exc = f'{type(e).__name__}: {e}'
-            await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-        await ctx.channel.send('Reloaded all cogs', delete_after=120)
-        await ctx.message.delete()
+        logger.error(f'[{ctx.command.name}] failed for [{ctx.author}] <-> [{error}]')
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

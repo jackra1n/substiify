@@ -12,20 +12,6 @@ import json
 
 logger = logging.getLogger(__name__)
 
-async def has_permissions_to_delete(ctx):
-    if not ctx.channel.permissions_for(ctx.author).manage_messages and not await ctx.bot.is_owner(ctx.author):
-        await ctx.send("You don't have permissions to do that", delete_after=10)
-        await ctx.message.delete()
-        return False
-    return True
-
-async def has_permissions_to_manage(ctx):
-    if not ctx.channel.permissions_for(ctx.author).manage_channels and not await ctx.bot.is_owner(ctx.author):
-        await ctx.send("You don't have permissions to do that", delete_after=10)
-        await ctx.message.delete()
-        return False
-    return True
-
 class Util(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -92,15 +78,17 @@ class Util(commands.Cog):
     async def info(self, ctx):
         await ctx.message.delete()
         bot_time = time_up((datetime.now() - store.script_start).total_seconds()) #uptime of the bot
-        cpu_usage = psutil.cpu_percent()
-        ram_usage = psutil.virtual_memory().percent
+        cpu_percent = psutil.cpu_percent()
+        ram = psutil.virtual_memory()
+        ram_used = format_bytes((ram.total - ram.available))
+        ram_percent = psutil.virtual_memory().percent
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
 
         content = f'**Instance uptime:** `{bot_time}`\n' \
             f'**Version:** `{self.settings["version"]}`\n' \
             f'**Python:** `{platform.python_version()}` | **discord.py:** `{discord.__version__}`\n\n' \
-            f'**CPU:** `{cpu_usage}%` | **RAM:** `{ram_usage}%`\n\n' \
+            f'**CPU:** `{cpu_percent}%` | **RAM:** `{ram_used} ({ram_percent}%)`\n\n' \
             f'**Made by:** <@{self.bot.owner_id}>\n' \
             f'**Source:** No link yet' 
 
@@ -112,19 +100,6 @@ class Util(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.set_footer(text=f"Requested by by {ctx.author.display_name}")
         await ctx.channel.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()
-    async def version(self, ctx, version):
-        with open(store.settings_path, "r") as settings:
-            settings_json = json.load(settings)
-        settings_json['version'] = version
-        with open(store.settings_path, "w") as settings:
-            json.dump(settings_json, settings, indent=2)
-        if ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.message.delete()
-        embed = discord.Embed(description=f'Version has been set to {version}')
-        await ctx.send(embed=embed, delete_after=10)
 
     @commands.group()
     async def module(self, ctx):
@@ -168,29 +143,6 @@ class Util(commands.Cog):
         embed.add_field(name='Status', value=commandStatuses, inline=True)
         await ctx.send(embed=embed, delete_after=180)
 
-    @commands.group()
-    async def server(self, ctx):
-        pass
-
-    @commands.is_owner()
-    @server.command(aliases=['list'])
-    async def server_list(self, ctx):
-        servers = ''
-        user_count = ''
-        server_ids = ''
-        for guild in self.bot.guilds:
-            servers += f'{guild.name}\n'
-            user_count += f'{guild.member_count}\n'
-            server_ids += f'{guild.id}\n'
-        embed = discord.Embed(
-            title='Server Infos',
-            colour=discord.Colour.blurple()
-        )
-        embed.add_field(name='Name', value=servers, inline=True)
-        embed.add_field(name='User count', value=user_count, inline=True)
-        embed.add_field(name='Id', value=server_ids, inline=True)
-        await ctx.send(embed=embed, delete_after=60)
-
 def setup(bot):
     bot.add_cog(Util(bot))
 
@@ -208,3 +160,27 @@ def time_up(t):
             hours = hours % 24
             return f"{int(days)} days, {int(hours)} hours, {int(minutes)} minutes"
         return f"{int(hours)} hours, {int(minutes)} minutes"
+
+def format_bytes(size: int) -> str:
+    # 2**10 = 1024
+    power = 2**10
+    n = 0
+    power_labels = {0 : '', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB'}
+    while size > power:
+        size /= power
+        n += 1
+    return f'{round(size, 2)}{power_labels[n]}'
+
+async def has_permissions_to_delete(ctx):
+    if not ctx.channel.permissions_for(ctx.author).manage_messages and not await ctx.bot.is_owner(ctx.author):
+        await ctx.send("You don't have permissions to do that", delete_after=10)
+        await ctx.message.delete()
+        return False
+    return True
+
+async def has_permissions_to_manage(ctx):
+    if not ctx.channel.permissions_for(ctx.author).manage_channels and not await ctx.bot.is_owner(ctx.author):
+        await ctx.send("You don't have permissions to do that", delete_after=10)
+        await ctx.message.delete()
+        return False
+    return True

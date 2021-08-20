@@ -25,6 +25,8 @@ class Help(commands.Cog):
         categories = ['modules', 'music', 'giveaway', 'util', 'fun', 'submissions', 'gifs', 'duel']
         if ModulesManager._is_enabled(ctx.guild.id, 'daydeal'):
             categories.append('daydeal') 
+        if self.bot.is_owner(ctx.author):
+            categories.append('owner') 
         embed.add_field(name='Available categories:', value=await self.help_string(categories))
         embed.set_footer(text=f'Use: `{self.prefix}help <category>`')
         await ctx.send(embed=embed, delete_after=120)
@@ -155,6 +157,22 @@ class Help(commands.Cog):
         embed.add_field(name="`clear message`",value=f'Clears message with given ID. Use: `{self.prefix}clear message <message_id>`', inline=False)
         embed.add_field(name="`ping`",value=f'Ping between bot and discord', inline=False)
         await ctx.send(embed=embed, delete_after=120)
+
+    @help.command()
+    @commands.is_owner()
+    async def owner(self,ctx):
+        embed = discord.Embed(
+                title="Owner",
+                description=f"Commands for the bot owner",
+                colour = discord.Colour.greyple()
+            )
+        embed.add_field(name="`reload`",value=f'Does git pull and reloads cogs', inline=False)
+        embed.add_field(name="`status count`",value=f'Allows you to set count of the servers in the bot status. Use: `{self.prefix}status count <number>`', inline=False)
+        embed.add_field(name="`status set`",value=f'Allows you to set completely custom bot status. Use: `{self.prefix}status set <text>`', inline=False)
+        embed.add_field(name="`status reset`",value=f'Resets the bot status to the original one.', inline=False)
+        embed.add_field(name="`version`",value=f'Set version of the bot. Use: `{self.prefix}version <version>`', inline=False)
+        embed.add_field(name="`server list`",value=f'Show the list of servers that the bot is in. Shows server name, amount of users and server id.', inline=False)
+        await ctx.send(embed=embed, delete_after=20)
 
 def setup(bot):
     bot.add_cog(Help(bot))

@@ -19,10 +19,10 @@ class Help(commands.Cog):
     async def help(self, ctx):
         await ctx.message.delete()
         embed = discord.Embed(
-                title=f'{self.bot.user.display_name} Command List',
-                colour = discord.Colour.red()
-            )
-        categories = ['modules', 'music', 'giveaway', 'util', 'fun', 'submissions', 'gifs', 'duel']
+            title=f'{self.bot.user.display_name} Command List',
+            colour = discord.Colour.red()
+        )
+        categories = ['modules', 'music', 'votes', 'giveaway', 'util', 'fun', 'submissions', 'gifs', 'duel']
         if ModulesManager._is_enabled(ctx.guild.id, 'daydeal'):
             categories.append('daydeal') 
         if await self.bot.is_owner(ctx.author):
@@ -42,10 +42,10 @@ class Help(commands.Cog):
     @help.command()
     async def modules(self,ctx):
         embed = discord.Embed(
-                title="Modules manager",
-                description=f"Allows you to enable and disable some commands",
-                colour = discord.Colour.greyple()
-            )
+            title="Modules manager",
+            description=f"Allows you to enable and disable some commands",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`list`",value="Shows all the modules that can be toggled and their status", inline=False)
         embed.add_field(name="`toggle`",value="Disables or enables module depending on its current state ", inline=False)
         embed.set_footer(text=f'Use: `{self.prefix}module <command>`')
@@ -54,10 +54,10 @@ class Help(commands.Cog):
     @help.command()
     async def submissions(self,ctx):
         embed = discord.Embed(
-                title="Submissions",
-                description=f"Submit a bug or a suggestion to improve the bot",
-                colour = discord.Colour.greyple()
-            )
+            title="Submissions",
+            description=f"Submit a bug or a suggestion to improve the bot",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`submit bug`",value=f'If you find any bugs/error you can use this command to submit the bug to the dev team. Use: `{self.prefix}submit bug <text_describing_bug>`.', inline=False)
         embed.add_field(name="`submit suggestion`",value=f'Use this command you have any idea for improvement or change that will make something better. Use: `{self.prefix}submit suggestion <suggestion_for_change_or_improvement>`.', inline=False)
         await ctx.send(embed=embed, delete_after=120)
@@ -65,10 +65,10 @@ class Help(commands.Cog):
     @help.command()
     async def gifs(self,ctx):
         embed = discord.Embed(
-                title="Gifs",
-                description=f"Use any of the available gif commands and tag a person in order to send a GIF of that action",
-                colour = discord.Colour.greyple()
-            )
+            title="Gifs",
+            description=f"Use any of the available gif commands and tag a person in order to send a GIF of that action",
+            colour = discord.Colour.greyple()
+        )
         gifsList = ['slap', 'hug', 'cuddle', 'bite']
         if ModulesManager._is_enabled(ctx.guild.id, 'kiss'):
             gifsList.append('kiss')
@@ -79,10 +79,10 @@ class Help(commands.Cog):
     @help.command()
     async def fun(self,ctx):
         embed = discord.Embed(
-                title="Fun",
-                description=f"Some fun command to play around.",
-                colour = discord.Colour.greyple()
-            )
+            title="Fun",
+            description=f"Some fun command to play around.",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`8ball`",value="Ask the bot a question that you dont want the answer to.", inline=False)
         embed.add_field(name="`pp`",value="Tells how long is your pp :)", inline=False)
         if ModulesManager._is_enabled(ctx.guild.id, 'pickup'):
@@ -94,10 +94,10 @@ class Help(commands.Cog):
     @help.command()
     async def daydeal(self,ctx):
         embed = discord.Embed(
-                title="Daydeal",
-                description=f"Super duper cool https://daydeal.ch integration in discord",
-                colour = discord.Colour.green()
-            )
+            title="Daydeal",
+            description=f"Super duper cool https://daydeal.ch integration in discord",
+            colour = discord.Colour.green()
+        )
         embed.add_field(name="`daydeal`",value="Sends current daydeal", inline=False)
         embed.add_field(name="`daydeal setup`",value=f"Setups the daydeal to send it whenever a new one is available. Use it like `{self.prefix}deal setup <channel> <roleToPing>`. Channel and role are optional. Requires'manage_channels' permission to use this command.", inline=False)
         embed.add_field(name="`daydeal stop`",value="Stops automatic sending od daydeals", inline=False)
@@ -106,10 +106,10 @@ class Help(commands.Cog):
     @help.command()
     async def duel(self,ctx):
         embed = discord.Embed(
-                title="Duel",
-                description=f"To start a duel use command `{self.prefix}fight <userOfYourChoice>` and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
-                colour = discord.Colour.greyple()
-            )
+            title="Duel",
+            description=f"To start a duel use command `{self.prefix}fight <userOfYourChoice>` and ping a person you want to fight. There are 3 classes and each one has different stats. There is Berserker, Tank and Wizard. ",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name='Stats', value="```Statistics: Berserker  Tank  Wizard\n"+
                                             "Health:       1000     1200    700\n"+
                                             "Max Attack:   140      100     200\n"+
@@ -121,10 +121,10 @@ class Help(commands.Cog):
     @help.command()
     async def music(self,ctx):
         embed = discord.Embed(
-                title="Music",
-                description=f"Music module commands.",
-                colour = discord.Colour.greyple()
-            )
+            title="Music",
+            description=f"Music module commands.",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`play`", value='Play music or add to queue')
         embed.add_field(name="`skip`", value='Skip currently played song')
         embed.add_field(name="`pause`", value='Pause the song song')
@@ -138,19 +138,31 @@ class Help(commands.Cog):
     @help.command()
     async def giveaway(self, ctx):
         embed = discord.Embed(
-                title="Giveaway",
-                colour = discord.Colour.greyple()
-            )
+            title="Giveaway",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`giveaway create`",value="Initializes setup for a giveaway. After this command you will be asked for more info.", inline=False)
         embed.add_field(name="`giveaway reroll`",value=f'Allows you to "re-roll" giveaway. This function takes channel and id of the giveaway message as parameters. Example: `{self.prefix}giveaway reroll <channel_mention> <msg_id>`', inline=False)
     
     @help.command()
+    async def votes(self,ctx):
+        embed = discord.Embed(
+            title="Voting system",
+            description=f"Like Reddits voting or youtubes like but for discordd",
+            colour = discord.Colour.greyple()
+        )
+        embed.add_field(name="`votes`", value=f'Tells you if the current channel has voting system enabled', inline=False)
+        embed.add_field(name="`votes setup`", value=f'Activates voting in a channel. Use: `{self.prefix}vote setup <channel_id>`. Parameter channel_id is optional. If no parameter provided voting will be enabled for the current channel.', inline=False)
+        embed.add_field(name="`votes stop`", value=f'Stops voting system. Use: `{self.prefix}vote stop <channel_id>`. Parameter channel_id is optional. If no parameter provided voting will be stopped in the current channel.', inline=False)
+        await ctx.send(embed=embed, delete_after=120)
+
+    @help.command()
     async def util(self,ctx):
         embed = discord.Embed(
-                title="Util",
-                description=f"Useful commands that can help you organize your server",
-                colour = discord.Colour.greyple()
-            )
+            title="Util",
+            description=f"Useful commands that can help you organize your server",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`av`",value=f'Shows user avatar. `{self.prefix}av` shows your avatar. `{self.prefix}av <id/mention>` shows avatar of other user.', inline=False)
         embed.add_field(name="`info`",value=f'Shows some infos about the bot like uptime, versions etc.', inline=False)
         embed.add_field(name="`clear`",value=f'Clears last X messages in the channel. Use: `{self.prefix}clear <amount_of_messages>`', inline=False)
@@ -162,10 +174,10 @@ class Help(commands.Cog):
     @commands.is_owner()
     async def owner(self,ctx):
         embed = discord.Embed(
-                title="Owner",
-                description=f"Commands for the bot owner",
-                colour = discord.Colour.greyple()
-            )
+            title="Owner",
+            description=f"Commands for the bot owner",
+            colour = discord.Colour.greyple()
+        )
         embed.add_field(name="`reload`",value=f'Does git pull and reloads cogs', inline=False)
         embed.add_field(name="`status count`",value=f'Allows you to set count of the servers in the bot status. Use: `{self.prefix}status count <number>`', inline=False)
         embed.add_field(name="`status set`",value=f'Allows you to set completely custom bot status. Use: `{self.prefix}status set <text>`', inline=False)

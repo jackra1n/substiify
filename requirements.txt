@@ -1,5 +1,6 @@
 #install with "pip3 install -r requirements.txt"
 
+numpy
 discord.py
 youtube_dl
 colour

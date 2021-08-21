@@ -1,7 +1,8 @@
 from helper.CustomLogFormatter import CustomLogFormatter
+from logging.handlers import TimedRotatingFileHandler
 from utils.store import store
-from datetime import datetime
 from pathlib import Path
+
 import logging
 import json
 
@@ -40,8 +41,8 @@ def prepareFiles():
     dt_fmt = '%Y-%m-%d %H:%M:%S'
     fileFormatter = logging.Formatter('[{asctime}] [{levelname:<7}] {name}: {message}', dt_fmt, style='{')
 
-    date = datetime.now().strftime('%Y-%m-%d')
-    fileHandler = logging.FileHandler(f'{store.logs_path}/{date}.log', encoding='utf-8')
+    fileHandler = TimedRotatingFileHandler(f'{store.logs_path}/substiify_', when="midnight", interval=1, encoding='utf-8')
+    fileHandler.suffix = "%Y-%m-%d.log"
     fileHandler.setFormatter(fileFormatter)
     rootLogger.addHandler(fileHandler)
 

@@ -141,7 +141,7 @@ class Util(commands.Cog):
         )
         embed.add_field(name='Command', value=commandNames, inline=True)
         embed.add_field(name='Status', value=commandStatuses, inline=True)
-        await ctx.send(embed=embed, delete_after=180)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Util(bot))

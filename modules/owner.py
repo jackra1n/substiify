@@ -25,7 +25,7 @@ class Owner(commands.Cog):
         self.bot.get_cog('Daydeal').daydeal_task.stop()
         subprocess.run(["/bin/git","pull","--no-edit"])
         try:
-            for cog in self.startup_extensions:
+            for cog in self.bot.get_cog('MainBot').startup_extensions:
                 self.bot.reload_extension(f'modules.{cog}')
         except Exception as e:
             exc = f'{type(e).__name__}: {e}'

@@ -1,7 +1,6 @@
 from discord.ext.commands import BucketType
 from discord.ext import commands
 
-from helper.ModulesManager import ModulesManager
 from utils.store import store
 
 import discord

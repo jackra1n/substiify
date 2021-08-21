@@ -15,7 +15,7 @@ session = sessionmaker(bind=engine)()
 
 Base = declarative_base()
 
-class Daydeal(Base):
+class daydeal(Base):
     __tablename__ = 'daydeal'
 
     id = Column(Integer, primary_key=True)
@@ -71,7 +71,6 @@ class active_giveaways(Base):
         self.server_id = giveaway_message.guild.id
         self.channel_id = giveaway_message.channel.id
 
-
 class enabled_commands(Base):
     __tablename__ = 'enabled_commands'
 
@@ -96,9 +95,9 @@ class vote_channels(Base):
 
 # Creates database tables if the don't exist
 def create_database():
-    if not engine.has_table(Daydeal.__tablename__):
+    if not engine.has_table(daydeal.__tablename__):
         metadata = MetaData(engine)
-        Table(Daydeal.__tablename__, metadata,
+        Table(daydeal.__tablename__, metadata,
             Column('id', Integer, primary_key=True, nullable=False), 
             Column('server_id', Integer),
             Column('channel_id', Integer), 
@@ -132,7 +131,6 @@ def create_database():
             Column('message_id', Integer)
             )
         metadata.create_all()
-
 
     if not engine.has_table(enabled_commands.__tablename__):
         metadata = MetaData(engine)

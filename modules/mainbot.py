@@ -1,10 +1,9 @@
+from discord.ext import commands
+from os import walk, path
+
 from helper.ModulesManager import ModuleDisabledException
 from utils.store import store
 from utils import db, util
-
-from discord import Activity, ActivityType
-from discord.ext import commands, tasks
-from os import walk, path
 
 import logging
 import json
@@ -33,17 +32,9 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.load_extensions()
-        self.status_task.start()
-        logger.info(f'Connected as -> [{self.bot.user}]')
-
-    @tasks.loop(minutes=30)
-    async def status_task(self):
-        servers = len(self.bot.guilds)
         self.prefix = util.prefixById(self.bot)
-        activityName = f"{self.prefix}help | {servers} servers"
-        activity = Activity(type=ActivityType.listening, name=activityName)
-        await self.bot.change_presence(activity=activity)
+        await self.load_extensions()
+        logger.info(f'Connected as -> [{self.bot.user}]')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -53,14 +44,14 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-        logger.info(f'[{ctx.command.name}] executed for -> [{ctx.author}]')
+        logger.info(f'[{ctx.command.qualified_name}] executed for -> [{ctx.author}]')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if 'is not found' in str(error) or isinstance(error, ModuleDisabledException):
             return
         await ctx.message.add_reaction('🆘')
-        logger.error(f'[{ctx.command.name}] failed for [{ctx.author}] <-> [{error}]')
+        logger.error(f'[{ctx.command.qualified_name}] failed for [{ctx.author}] <-> [{error}]')
 
 def setup(bot):
     bot.add_cog(MainBot(bot))

@@ -99,6 +99,7 @@ class Help(commands.Cog):
             colour = discord.Colour.green()
         )
         embed.add_field(name="`daydeal`",value="Sends current daydeal", inline=False)
+        embed.add_field(name="`daydeal weekly`",value="Sends current deal of the week", inline=False)
         embed.add_field(name="`daydeal setup`",value=f"Setups the daydeal to send it whenever a new one is available. Use it like `{self.prefix}deal setup <channel> <roleToPing>`. Channel and role are optional. Requires'manage_channels' permission to use this command.", inline=False)
         embed.add_field(name="`daydeal stop`",value="Stops automatic sending od daydeals", inline=False)
         await ctx.send(embed=embed, delete_after=120)
@@ -178,6 +179,7 @@ class Help(commands.Cog):
             description=f"Commands for the bot owner",
             colour = discord.Colour.greyple()
         )
+        embed.add_field(name="`shutdown`",value=f'Shuts down the bot', inline=False)
         embed.add_field(name="`reload`",value=f'Does git pull and reloads cogs', inline=False)
         embed.add_field(name="`status count`",value=f'Allows you to set count of the servers in the bot status. Use: `{self.prefix}status count <number>`', inline=False)
         embed.add_field(name="`status set`",value=f'Allows you to set completely custom bot status. Use: `{self.prefix}status set <text>`', inline=False)

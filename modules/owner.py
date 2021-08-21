@@ -1,7 +1,7 @@
-from os import stat
 from discord import Activity, ActivityType
+from discord.ext import commands, tasks
+
 from utils.store import store
-from discord.ext import commands
 from utils import util
 from os import walk, path
 
@@ -15,9 +15,28 @@ logger = logging.getLogger(__name__)
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.status_task.start()
         self.prefix = util.prefixById(self.bot)
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
+
+    async def set_default_status(self):
+        servers = len(self.bot.guilds)
+        self.prefix = util.prefixById(self.bot)
+        activityName = f"{self.prefix}help | {servers} servers"
+        activity = Activity(type=ActivityType.listening, name=activityName)
+        await self.bot.change_presence(activity=activity)
+
+    @tasks.loop(minutes=30)
+    async def status_task(self):
+        await self.set_default_status()
+
+    @commands.command()
+    async def shutdown(self, ctx):
+        if ctx.author.id == 276462585690193921 or ctx.author.id == 205704051856244736:
+            embed = discord.Embed(description=f'Shutting down...', colour=0xf66045)
+            await ctx.send(embed=embed)
+            await self.bot.close()
 
     @commands.command()
     @commands.is_owner()
@@ -41,7 +60,7 @@ class Owner(commands.Cog):
     @status.command()
     @commands.is_owner()
     async def count(self, ctx, count):
-        self.bot.get_cog('MainBot').status_task.stop()
+        self.status_task.stop()
         activityName = f"{self.prefix}help | {count} servers"
         activity = Activity(type=ActivityType.listening, name=activityName)
         await self.bot.change_presence(activity=activity)
@@ -49,7 +68,7 @@ class Owner(commands.Cog):
     @status.command()
     @commands.is_owner()
     async def set(self, ctx, *text: str):
-        self.bot.get_cog('MainBot').status_task.stop()
+        self.status_task.stop()
         status = " ".join(text[:])
         activity = Activity(type=ActivityType.listening, name=status)
         await self.bot.change_presence(activity=activity)
@@ -57,7 +76,8 @@ class Owner(commands.Cog):
     @status.command()
     @commands.is_owner()
     async def reset(self, ctx):
-        self.bot.get_cog('MainBot').status_task.restart()
+        await self.set_default_status()
+        self.status_task.restart()
 
     @commands.group()
     async def server(self, ctx):

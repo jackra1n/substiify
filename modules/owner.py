@@ -3,6 +3,7 @@ from discord import Activity, ActivityType
 from utils.store import store
 from discord.ext import commands
 from utils import util
+from os import walk, path
 
 import discord
 import subprocess
@@ -25,7 +26,7 @@ class Owner(commands.Cog):
         self.bot.get_cog('Daydeal').daydeal_task.stop()
         subprocess.run(["/bin/git","pull","--no-edit"])
         try:
-            for cog in self.bot.get_cog('MainBot').startup_extensions:
+            for cog in self.get_modules():
                 self.bot.reload_extension(f'modules.{cog}')
         except Exception as e:
             exc = f'{type(e).__name__}: {e}'
@@ -93,6 +94,11 @@ class Owner(commands.Cog):
             await ctx.message.delete()
         embed = discord.Embed(description=f'Version has been set to {version}')
         await ctx.send(embed=embed, delete_after=10)
+
+    def get_modules(self):
+        filenames = next(walk("modules"), (None, None, []))[2] 
+        filenames.remove(path.basename(__file__))
+        return [name.replace('.py','') for name in filenames]
 
 def setup(bot):
     bot.add_cog(Owner(bot))

@@ -88,9 +88,9 @@ class Daydeal(commands.Cog):
             channel_to_send = ctx.guild.get_channel(channel_id)
             content = mention_role.mention if mention_role is not None else ''
             await channel_to_send.send(content=content, embed=await self.createDaydealEmbed())
-            await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c), delete_after=5)
+            await ctx.channel.send(embed=discord.Embed(description='Setup successful', colour=0x23b40c))
         else:
-            await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c), delete_after=5)
+            await ctx.channel.send(embed=discord.Embed(description='Daydeal is already set up', colour=0x23b40c), delete_after=10)
 
     @tasks.loop(seconds=60.0)
     async def daydeal_task(self):
@@ -108,7 +108,7 @@ class Daydeal(commands.Cog):
     async def stop(self, ctx):
         db.session.query(db.Daydeal).filter_by(server_id=ctx.guild.id).delete()
         db.session.commit()
-        await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c), delete_after=5)
+        await ctx.channel.send(embed=discord.Embed(description='Daydeal stopped', colour=0x23b40c))
 
     @daydeal.error
     async def daydeal_error(self, ctx, error):

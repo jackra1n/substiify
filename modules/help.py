@@ -29,7 +29,7 @@ class Help(commands.Cog):
             categories.append('owner') 
         embed.add_field(name='Available categories:', value=await self.help_string(categories))
         embed.set_footer(text=f'Use: `{self.prefix}help <category>`')
-        await ctx.send(embed=embed, delete_after=120)
+        await ctx.send(embed=embed)
 
     async def help_string(self, categories):
         mainString = ''

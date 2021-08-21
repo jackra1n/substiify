@@ -113,9 +113,9 @@ class Util(commands.Cog):
         await ctx.message.delete()
         if module in ModulesManager.get_commands():
             result = ModulesManager.toggle_module(ctx.guild.id, module)
-            await ctx.send(f'Module `{module}` has been **{result}**', delete_after=10)
+            await ctx.send(f'Module `{module}` has been **{result}**')
         else:
-            await ctx.send(f'Module \'{module}\' not found', delete_after=10)
+            await ctx.send(f'Module \'{module}\' not found', delete_after=30)
 
     @toggle.error
     async def command_error(self, ctx, error):

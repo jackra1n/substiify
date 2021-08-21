@@ -65,7 +65,7 @@ class Votes(commands.Cog):
             description=f'Votes **enabled** in {channel.mention}!',
             colour=0x23b40c
         )
-        await ctx.send(embed=embed, delete_after=10)
+        await ctx.send(embed=embed)
 
     @votes.command()
     async def stop(self, ctx, channel: discord.TextChannel = None):
@@ -78,7 +78,7 @@ class Votes(commands.Cog):
             index = np.argwhere(self.vote_channels==channel.id)
             self.vote_channels = np.delete(self.vote_channels, index)
         await ctx.message.delete()
-        await ctx.channel.send(embed=discord.Embed(description='Votes has been stopped!', colour=0xf66045), delete_after=10)
+        await ctx.channel.send(embed=discord.Embed(description=f'Votes has been stopped in {channel.mention}!', colour=0xf66045))
 
     async def has_permissions(self, ctx):
         if not ctx.channel.permissions_for(ctx.author).manage_channels and not await self.bot.is_owner(ctx.author):

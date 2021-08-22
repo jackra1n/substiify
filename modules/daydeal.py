@@ -21,14 +21,14 @@ class Daydeal(commands.Cog):
         self.bot = bot
         self.end_time = ''
         self.end_time_weekly = ''
-        self.prepare_task.start()
-        if self.end_time and self.end_time_weekly:
-            self.daydeal_task.start()
+        self.prepare_task.start()            
 
     @tasks.loop(seconds=60, count=1)
     async def prepare_task(self):
         self.end_time = await self.get_deal_end_time(DAYDEAL_URL)
         self.end_time_weekly = await self.get_deal_end_time(DAYDEAL_URL_WEEKLY)
+        self.daydeal_task.start()
+        logger.info('[daydeal_task]: started')
 
     async def get_soup(self, url):
         async with aiohttp.ClientSession() as session:

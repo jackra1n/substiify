@@ -16,10 +16,8 @@ docker build -t substiify .
 
 Run docker 
 `-d`: runs container in the backfround
-`-i`: keeps STDIN open even if not attached to conainer
-`-t`: allocates pseudo-TTY
 ```bash
-docker run --name substiify -d -it substiify
+docker-compose up -d
 ```
 
 If you want to see past output of the bot run

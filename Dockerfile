@@ -7,6 +7,9 @@ ENV PIP_NO_CACHE_DIR=false \
 # Create the working directory
 WORKDIR /bot
 
+# Create volumes so that data can be binded from host
+VOLUME /bot/data /bot/logs
+
 # Copy the source code in last to optimize rebuilding the image
 COPY . .
 

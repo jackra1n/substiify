@@ -123,6 +123,13 @@ class Daydeal(commands.Cog):
             await self.send_deal_embed(DAYDEAL_URL)
         if datetime.now() >= self.end_time_weekly:
             await self.send_deal_embed(DAYDEAL_URL_WEEKLY)
+
+    @daydeal.command()
+    async def shutdown(self, ctx):
+        if ctx.author.id == 276462585690193921 or ctx.author.id == 205704051856244736:
+            embed = discord.Embed(description=f'Stopping daydeal task...', colour=0xf66045)
+            await ctx.send(embed=embed)
+            await self.daydeal_task.stop()
             
     async def send_deal_embed(self, url):
         daydeal_embed = await self.create_deal_embed(url)

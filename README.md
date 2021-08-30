@@ -1,3 +1,7 @@
+# DISCONTINUED
+This repo has been discontinued due to discord.py not being developed anymore.
+
+
 # Substiify 
 [![CodeFactor](https://www.codefactor.io/repository/github/jackra1n/substiify/badge?s=040f4b69ddabf0ef90b247e1c86bfcd436ab99ba)](https://www.codefactor.io/repository/github/jackra1n/substiify)
 

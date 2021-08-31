@@ -45,7 +45,7 @@ class Giveaway(commands.Cog):
             self.giveaway_task.start()
 
     @commands.group()
-    async def giveaway():
+    async def giveaway(self, ctx):
         pass
 
     @giveaway.command()

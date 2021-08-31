@@ -144,6 +144,7 @@ class Help(commands.Cog):
         )
         embed.add_field(name="`giveaway create`",value="Initializes setup for a giveaway. After this command you will be asked for more info.", inline=False)
         embed.add_field(name="`giveaway reroll`",value=f'Allows you to "re-roll" giveaway. This function takes channel and id of the giveaway message as parameters. Example: `{self.prefix}giveaway reroll <channel_mention> <msg_id>`', inline=False)
+        await ctx.send(embed=embed, delete_after=120)
     
     @help.command()
     async def votes(self,ctx):

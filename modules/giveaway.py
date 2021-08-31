@@ -23,7 +23,7 @@ def convert(time):
 
 def create_giveaway_embed(author, prize):
     embed = discord.Embed(title=":tada: Giveaway :tada:",
-                    description=f"Win **{prize}** today!",
+                    description=f"Win **{prize}**!",
                     colour=0x00FFFF)
     embed.add_field(name="Hosted By:", value=author.mention)
     return embed

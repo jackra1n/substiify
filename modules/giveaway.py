@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 from asyncio import TimeoutError
-from random import choice
+from random import choice, seed
+from time import time
 from utils import db
 import discord
 import logging
@@ -41,6 +42,7 @@ class Giveaway(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cancelled = False
+        self.random_seed_value = time()
         if checkIfActiveGiveaways():
             self.giveaway_task.start()
 
@@ -145,6 +147,7 @@ class Giveaway(commands.Cog):
     @tasks.loop(seconds=45.0)
     async def giveaway_task(self):
         giveaways = db.session.query(db.active_giveaways).all()
+        self.random_seed_value = time()
         for giveaway in giveaways:
             if datetime.now() >= giveaway.end_date:
                 channel = self.bot.get_channel(giveaway.channel_id)
@@ -161,7 +164,9 @@ class Giveaway(commands.Cog):
                     embed.set_footer(text="No one won the Giveaway")
                     await channel.send('No one won the Giveaway')
                 elif len(users) > 0:
+                    seed(self.random_seed_value)
                     winner = choice(users)
+                    self.random_seed_value += 1
                     embed.add_field(name=f"Congratulations on winning {prize}", value=winner.mention)
                     await channel.send(winning_text(prize, winner))
                 await message.edit(embed=embed)

@@ -12,6 +12,8 @@ import json
 
 logger = logging.getLogger(__name__)
 
+reload_capable_users = ["276462585690193921", "307685227751276545", "510183286547546132", "464861706665984010"]
+
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -39,19 +41,19 @@ class Owner(commands.Cog):
             await self.bot.close()
 
     @commands.command()
-    @commands.is_owner()
     async def reload(self, ctx):
-        await ctx.message.add_reaction('<:greenTick:876177251832590348>')
-        self.bot.get_cog('Daydeal').daydeal_task.stop()
-        subprocess.run(["/bin/git","pull","--no-edit"])
-        try:
-            for cog in self.get_modules():
-                self.bot.reload_extension(f'modules.{cog}')
-        except Exception as e:
-            exc = f'{type(e).__name__}: {e}'
-            await ctx.channel.send(f'Failed to reload extensions\n{exc}')
-        await ctx.channel.send('Reloaded all cogs', delete_after=120)
-        await ctx.message.delete()
+        if ctx.author.id in reload_capable_users:
+            await ctx.message.add_reaction('<:greenTick:876177251832590348>')
+            self.bot.get_cog('Daydeal').daydeal_task.stop()
+            subprocess.run(["/bin/git","pull","--no-edit"])
+            try:
+                for cog in self.get_modules():
+                    self.bot.reload_extension(f'modules.{cog}')
+            except Exception as e:
+                exc = f'{type(e).__name__}: {e}'
+                await ctx.channel.send(f'Failed to reload extensions\n{exc}')
+            await ctx.channel.send('Reloaded all cogs', delete_after=120)
+            await ctx.message.delete()
 
     @commands.group()
     async def status(self, ctx):

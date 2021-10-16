@@ -38,11 +38,12 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.prefix is None:
+        try:
+            if self.bot.is_ready() and message.content.startswith(self.prefix):
+                db.session.add(db.command_history(message))
+                db.session.commit()
+        except AttributeError:
             self.prefix = util.prefixById(self.bot)
-        if self.bot.is_ready() and message.content.startswith(self.prefix):
-            db.session.add(db.command_history(message))
-            db.session.commit()
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):

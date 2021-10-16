@@ -12,7 +12,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
-reload_capable_users = ["276462585690193921", "307685227751276545", "510183286547546132", "464861706665984010"]
+reload_capable_users = [276462585690193921, 307685227751276545, 510183286547546132, 464861706665984010]
 
 class Owner(commands.Cog):
     def __init__(self, bot):

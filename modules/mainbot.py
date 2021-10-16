@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class MainBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.prefix = util.prefixById(self.bot)
         with open(store.settings_path, "r") as settings:
             self.settings = json.load(settings)
         self.startup_extensions = self.get_modules()
@@ -32,7 +33,6 @@ class MainBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.prefix = util.prefixById(self.bot)
         await self.load_extensions()
         logger.info(f'Connected as -> [{self.bot.user}]')
 

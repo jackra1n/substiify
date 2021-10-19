@@ -132,10 +132,12 @@ class Music(commands.Cog):
         """Retrieve a basic queue of upcoming songs."""
         botsVc = ctx.voice_client
         if not botsVc or not botsVc.is_connected():
-            return await ctx.send('I am not currently connected to voice!', delete_after=30)
+            await ctx.message.delete()
+            return await ctx.send('I am not currently connected to voice!', delete_after=60)
         player = self.get_player(ctx)
         if player.queue.empty():
-            return await ctx.send('There are currently no more queued songs.')
+            await ctx.message.delete()
+            return await ctx.send('There are currently no more queued songs.', delete_after=60)
         # Grab up to 5 entries from the queue...
         upcoming = list(itertools.islice(player.queue._queue, 0, 10))
         fmt = '\n'.join(f'#{index+1} | **`{song.data["title"]}`**' for index, song in enumerate(upcoming))
@@ -148,16 +150,20 @@ class Music(commands.Cog):
         """Display information about the currently playing song."""
         botsVc = ctx.voice_client
         if not botsVc or not botsVc.is_connected():
-            return await ctx.send('I am not currently connected to voice!', delete_after=30)
+            await ctx.message.delete()
+            return await ctx.send('I am not currently connected to voice!', delete_after=60)
         player = self.get_player(ctx)
         if not player.current:
-            return await ctx.send('I am not currently playing anything!')
+            await ctx.message.delete()
+            return await ctx.send('I am not currently playing anything!', delete_after=60)
         try:
             # Remove our previous now_playing message.
-            await player.np.delete()
+            if player.np:
+                await player.np.delete()
         except discord.HTTPException:
             pass
-        player.np = await ctx.send(f'**Now Playing:** `{botsVc.source.title}` requested by `{botsVc.source.requester}`')
+        player.np = await ctx.send(f'**Now Playing:** `{player.current.data["title"]}` requested by `{player.current.requester}`')
+        await ctx.message.delete()
 
     @commands.command()
     @commands.check(userIsInBotVC)

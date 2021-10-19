@@ -124,7 +124,8 @@ class Music(commands.Cog):
         elif not botsVc.is_playing():
             return
         botsVc.stop()
-        await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
+        await ctx.message.delete()
+        await ctx.send(f'**`{ctx.author}`**: Skipped the song!', delete_after=60)
 
     @commands.command(name='queue', aliases=['q'])
     async def queue_info(self, ctx):
@@ -139,7 +140,8 @@ class Music(commands.Cog):
         upcoming = list(itertools.islice(player.queue._queue, 0, 10))
         fmt = '\n'.join(f'#{index+1} | **`{song.data["title"]}`**' for index, song in enumerate(upcoming))
         embed = discord.Embed(title=f'Upcoming - Next {len(upcoming)}', description=fmt)
-        await ctx.send(embed=embed)
+        await ctx.message.delete()
+        await ctx.send(embed=embed, delete_after=120)
 
     @commands.command(aliases=['currentsong', 'now'])
     async def now_playing(self, ctx):

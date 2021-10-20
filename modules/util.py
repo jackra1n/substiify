@@ -59,11 +59,11 @@ class Util(commands.Cog):
         title = 'Pong!'
         if 'dink' in ctx.message.content.lower():
             title = 'Donk!'
-        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:')
         start = datetime.now()
-        ping = await ctx.send(embed=embed)
+        ping = await ctx.trigger_typing()
         end = datetime.now()
         embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start).microseconds / 1000)}` ms')
+        ctx.send(embed=embed)
         await ping.edit(embed=embed)
 
     @commands.command()

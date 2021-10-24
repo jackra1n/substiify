@@ -1,3 +1,4 @@
+from random import shuffle
 from helper.ModulesManager import ModulesManager
 from utils.store import store
 from discord.ext import commands
@@ -60,17 +61,17 @@ class Util(commands.Cog):
         if 'dink' in ctx.message.content.lower():
             title = 'Donk!'
         start = datetime.now()
-        ping = await ctx.trigger_typing()
+        await ctx.trigger_typing()
         end = datetime.now()
         embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start).microseconds / 1000)}` ms')
-        ctx.send(embed=embed)
-        await ping.edit(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def specialThanks(self, ctx):
+        peeople_who_helped = ["<@205704051856244736>", "<@812414532563501077>", "<@299478604809764876>", "<@291291715598286848>", "<@224618877626089483>", "<@231151428167663616>"]
         embed = discord.Embed(
             title="Special thanks for any help to those people",
-            description = f'<@205704051856244736> <@812414532563501077> <@299478604809764876> <@291291715598286848> <@224618877626089483> <@231151428167663616>'
+            description = f" ".join(shuffle(peeople_who_helped))
         )
         await ctx.channel.send(embed=embed)
 

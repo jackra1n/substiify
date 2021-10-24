@@ -2,13 +2,10 @@
 
 numpy
 discord.py
-youtube_dl
-colour
 psutil
 bs4
 lxml
 requests
-Pillow
 pytz
 sqlalchemy
-websocket-client
+wavelink

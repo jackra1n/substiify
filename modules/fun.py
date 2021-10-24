@@ -46,7 +46,7 @@ class Fun(commands.Cog):
             description = str(author.display_name) + ' says: ay ' + str(member.display_name) + ', ' + await lineChooser("pickup.txt"),
             colour = discord.Colour.orange()
         )
-        await ctx.channel.send(embed=embed, delete_after = 20)
+        await ctx.channel.send(embed=embed, delete_after = 45)
         await ctx.message.delete()
 
     @commands.cooldown(6, 5)

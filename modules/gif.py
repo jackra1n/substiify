@@ -19,7 +19,7 @@ async def embedSender(self, ctx, member, text, file):
         colour=discord.Colour.from_rgb(0, 0, 0)
     )
     embed.set_image(url=await lineChooser(file))
-    await ctx.channel.send(embed=embed, delete_after = 20)
+    await ctx.channel.send(embed=embed)
     await ctx.message.delete()
 
 

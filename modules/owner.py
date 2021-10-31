@@ -104,6 +104,28 @@ class Owner(commands.Cog):
         embed.add_field(name='Id', value=server_ids, inline=True)
         await ctx.send(embed=embed, delete_after=60)
 
+    @commands.is_owner()
+    @commands.command()
+    async def checkVCs(self, ctx, server_id : int):
+        if server_id is None:
+            return await ctx.send("Please provide a server ID to be checked", delete_after = 5)
+        await ctx.send(f"trying to get server with id `{server_id}`...", delete_after = 5)
+        server = self.bot.get_guild(server_id)
+        await ctx.send(f"server is {server.name}", delete_after = 5)
+        if len(server.voice_channels) == 0:
+            return await ctx.send(f"No voice channels on {server.name}", delete_after = 20)
+        for vc in server.voice_channels:
+            if len(vc.members) > 0:
+                members = ""
+                for member in vc.members:
+                    members += f"{member.display_name}\n"
+                embed = discord.Embed(
+                    title = vc.name,
+                    description = members,
+                    colour = discord.Colour.blurple()
+                )
+                await ctx.send(embed=embed, delete_after = 300)
+
     @commands.command()
     @commands.is_owner()
     async def version(self, ctx, version):

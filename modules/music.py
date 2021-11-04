@@ -27,6 +27,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         if not member.bot and after.channel is None:
+            # check if the bot is in the before voice channel
+            if not self.bot.user in before.channel.members:
+                return
             if not [m for m in before.channel.members if not m.bot]:
                 logger.info('[music]: on_voice_state_update disconnecting the player')
                 await self.get_player(member.guild).teardown()

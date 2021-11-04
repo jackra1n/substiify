@@ -354,31 +354,7 @@ class NoPreviousTracks(commands.CommandError):
 class InvalidRepeatMode(commands.CommandError):
     pass
 
-class VolumeTooLow(commands.CommandError):
-    pass
-
-class VolumeTooHigh(commands.CommandError):
-    pass
-
-class MaxVolume(commands.CommandError):
-    pass
-
-class MinVolume(commands.CommandError):
-    pass
-
 class NoLyricsFound(commands.CommandError):
-    pass
-
-class InvalidEQPreset(commands.CommandError):
-    pass
-
-class NonExistentEQBand(commands.CommandError):
-    pass
-
-class EQGainOutOfBounds(commands.CommandError):
-    pass
-
-class InvalidTimeString(commands.CommandError):
     pass
 
 

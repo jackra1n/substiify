@@ -60,10 +60,8 @@ class Util(commands.Cog):
         title = 'Pong!'
         if 'dink' in ctx.message.content.lower():
             title = 'Donk!'
-        start = datetime.now()
-        await ctx.trigger_typing()
-        end = datetime.now()
-        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round((end - start).microseconds / 1000)}` ms')
+        embed = discord.Embed(title=f'{title} 🏓', description=f'⏱️Ping:`{round(self.bot.latency*1000)}` ms')
+        await ctx.message.delete()
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -74,7 +72,8 @@ class Util(commands.Cog):
             title="Special thanks for any help to those people",
             description = f" ".join(peeople_who_helped)
         )
-        await ctx.channel.send(embed=embed)
+        await ctx.message.delete()
+        await ctx.channel.send(embed=embed, delete_after=120)
 
     @commands.command()
     async def info(self, ctx):

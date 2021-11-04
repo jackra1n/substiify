@@ -69,9 +69,10 @@ class Util(commands.Cog):
     @commands.command()
     async def specialThanks(self, ctx):
         peeople_who_helped = ["<@205704051856244736>", "<@812414532563501077>", "<@299478604809764876>", "<@291291715598286848>", "<@224618877626089483>", "<@231151428167663616>"]
+        shuffle(peeople_who_helped)
         embed = discord.Embed(
             title="Special thanks for any help to those people",
-            description = f" ".join(shuffle(peeople_who_helped))
+            description = f" ".join(peeople_who_helped)
         )
         await ctx.channel.send(embed=embed)
 

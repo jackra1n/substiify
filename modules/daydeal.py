@@ -14,13 +14,13 @@ logger = logging.getLogger(__name__)
 
 DAYDEAL_URL = 'https://www.daydeal.ch'
 DAYDEAL_URL_WEEKLY = f'{DAYDEAL_URL}/deal-of-the-week'
-timeOffset = 2
 
 class Daydeal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.end_time = ''
         self.end_time_weekly = ''
+        self.time_offset = 2
         self.prepare_task.start()            
 
     @tasks.loop(seconds=60, count=1)
@@ -38,7 +38,7 @@ class Daydeal(commands.Cog):
 
     async def get_deal_end_time(self, url):
         soup = await self.get_soup(url)
-        return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')  + timedelta(hours=timeOffset)
+        return datetime.strptime(soup.find('div', class_='product-bar__offer-ends').findChild()['data-next-deal'], '%Y-%m-%d %H:%M:%S')  + timedelta(hours=self.time_offset)
 
     async def availableBarCreator(self, available):
         toDraw = int(round(available, -1)/10)
@@ -92,12 +92,12 @@ class Daydeal(commands.Cog):
     @daydeal.command()
     @commands.is_owner()
     async def set_time_offset(self, ctx, offset: int):
-        time_offset = offset
+        self.time_offset = offset
     
     @daydeal.command()
     @commands.is_owner()
     async def get_time_offset(self, ctx):
-        await ctx.send(timeOffset)
+        await ctx.send(self.time_offset)
 
     @daydeal.command()
     @commands.check(ModulesManager.is_enabled)

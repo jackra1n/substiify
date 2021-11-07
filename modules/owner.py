@@ -124,7 +124,8 @@ class Owner(commands.Cog):
                     description = members,
                     colour = discord.Colour.blurple()
                 )
-                await ctx.send(embed=embed, delete_after = 300)
+                await ctx.send(embed=embed)
+                await ctx.message.delete()
 
     @commands.command()
     @commands.is_owner()

@@ -45,10 +45,10 @@ class Player(wavelink.Player):
 
         if isinstance(tracks, wavelink.TrackPlaylist):
             self.queue.add(*tracks.tracks)
-            await ctx.send(f"Added `{len(tracks.tracks)}` songs to the queue.")
+            await ctx.send(f"Added `{len(tracks.tracks)}` songs to the queue by `{ctx.author}`")
         else:
             self.queue.add(tracks[0])
-            await ctx.send(f"Added `{tracks[0].title}` to the queue.")
+            await ctx.send(f"Added `{tracks[0].title}` to the queue by `{ctx.author}`")
 
         if not self.is_playing and not self.queue.is_empty:
             await self.start_playback()

@@ -7,6 +7,7 @@ from helper.music.player import Player
 import datetime as dt
 import re
 import typing as t
+import asyncio
 
 import logging
 import aiohttp
@@ -188,40 +189,132 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.send("Please provide one of the repeat modes: `1`, `none`, `all`", delete_after = 30)
             await ctx.message.delete()
 
-    @commands.command(name="queue", aliases=["q"])
-    async def queue_command(self, ctx, show: t.Optional[int] = 10):
+    @commands.group(name="queue", aliases=["q"], invoke_without_command = True)
+    async def queue_command(self, ctx):
+        player = self.get_player(ctx)
+        show_index = 0
+
+        if player.queue.is_empty:
+            raise QueueIsEmpty
+
+        embed = await self.create_queue_embed(ctx, player.queue, show_index)
+        queue_message = await ctx.send(embed=embed, delete_after = 60)
+        await ctx.message.delete()
+        
+        await queue_message.add_reaction("⏮")
+        await queue_message.add_reaction("⏭")
+
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) in ("⏮", "⏭") and reaction.message.id == queue_message.id
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                break
+            else:
+                if str(reaction.emoji) == "⏮":
+                    if show_index <= 9:
+                        show_index = 0
+                    else:
+                        show_index -= 10
+                elif str(reaction.emoji) == "⏭":
+                    if show_index + 10 <= player.queue.length:
+                        show_index += 10
+                print(f"reacted. index = {show_index}")
+                edit_embed = await self.create_queue_embed(ctx, player.queue, show_index)
+                print("created edited embed")
+                await queue_message.edit(embed=edit_embed)
+                print("edited embed")
+
+    async def create_queue_embed(self, ctx, queue, show_index):
+        embed = discord.Embed(
+            title=f"Queue ({queue.length})",
+            description=f"Showing up to next 10 tracks",
+            colour=ctx.author.colour,
+            timestamp=dt.datetime.utcnow()
+        )
+        embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+        embed.add_field(
+            name="Currently playing",
+            value=getattr(queue.current_track, "title", "No tracks currently playing."),
+            inline=False
+        )
+        if upcoming := queue.upcoming:
+            upcoming_songs_string = ""
+            show_to = show_index + 10 if show_index + 10 < queue.length else queue.length
+            print(f"from {show_index} to {show_to}")
+            for index, track in enumerate(upcoming[show_index:show_to]):
+                upcoming_songs_string += f"`{index + 1 + show_index}`. {track.title}\n"
+            embed.add_field(
+                name="Next up",
+                value=upcoming_songs_string,
+                inline=False
+            )
+        return embed
+
+    @queue_command.command(name="song", aliases=["track"])
+    async def queue_song_command(self, ctx, index: int):
         player = self.get_player(ctx)
 
         if player.queue.is_empty:
             raise QueueIsEmpty
 
+        if index < 1 or index > len(player.queue.upcoming):
+            raise InvalidIndex
+
+        track = player.queue.upcoming[index - 1]
         embed = discord.Embed(
-            title="Queue",
-            description=f"Showing up to next {show} tracks",
+            title=f"{index}. {track.title}",
+            description=f"{track.author}",
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow()
         )
         embed.set_author(name="Query Results")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         embed.add_field(
-            name="Currently playing",
-            value=getattr(player.queue.current_track, "title", "No tracks currently playing."),
+            name="Duration",
+            value=f"{track.duration / 1000}s",
             inline=False
         )
-        if upcoming := player.queue.upcoming:
-            embed.add_field(
-                name="Next up",
-                value="\n".join(t.title for t in upcoming[:show]),
-                inline=False
-            )
+        embed.add_field(
+            name="URL",
+            value=f"[Click here]({track.uri})",
+            inline=False
+        )
 
         await ctx.send(embed=embed, delete_after = 60)
+        await ctx.message.delete()
+
+    @queue_command.command(name="move")
+    async def queue_move_command(self, ctx, index: int, new_index: int):
+        player = self.get_player(ctx)
+
+        if index < 0 or new_index < 0:
+            raise InvalidIndex
+
+        if index >= player.queue.length:
+            raise InvalidIndex
+
+        if new_index >= player.queue.length:
+            raise InvalidIndex
+
+        moved_track = player.queue.move_track(index+1, new_index+1)
+        await ctx.send(f"Track `{moved_track}` moved.", delete_after = 30)
         await ctx.message.delete()
 
     @queue_command.error
     async def queue_command_error(self, ctx, exc):
         if isinstance(exc, QueueIsEmpty):
             await ctx.send("The queue is currently empty.", delete_after = 30)
+        elif isinstance(exc, InvalidIndex):
+            await ctx.send("Please provide valid position.", delete_after = 30)
+            await ctx.message.delete()
+
+    @queue_move_command.error
+    async def queue_command_error(self, ctx, exc):      
+        if isinstance(exc, InvalidIndex):
+            await ctx.send("Please provide valid position.", delete_after = 30)
 
     # Requests -----------------------------------------------------------------
 
@@ -329,6 +422,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if isinstance(exc, QueueIsEmpty):
             await ctx.send("There are no tracks in the queue.", delete_after = 30)
 
+
+class InvalidIndex(commands.CommandError):
+    pass
 
 class AlreadyConnectedToChannel(commands.CommandError):
     pass

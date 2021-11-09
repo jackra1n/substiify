@@ -7,6 +7,9 @@ import random
 class QueueIsEmpty(commands.CommandError):
     pass
 
+class InvalidIndex(commands.CommandError):
+    pass
+
 class RepeatMode(Enum):
     NONE = 0
     ONE = 1
@@ -66,6 +69,19 @@ class Queue:
                 return None
 
         return self._queue[self.position]
+
+    def move_track(self, track_index, new_index):
+        if track_index < 0 or track_index > len(self._queue) - 1:
+            raise InvalidIndex
+
+        if new_index < 0 or new_index > len(self._queue) - 1:
+            raise InvalidIndex
+
+        track = self._queue[track_index]
+
+        self._queue.remove(track)
+        self._queue.insert(new_index, track)
+        return track
 
     def shuffle(self):
         if not self._queue:

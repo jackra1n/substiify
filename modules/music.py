@@ -226,7 +226,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     async def create_queue_embed(self, ctx, queue, show_index):
         embed = discord.Embed(
-            title=f"Queue ({queue.length})",
+            title=f"Queue ({len(queue.upcoming)})",
             description=f"Showing up to next 10 tracks",
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow()

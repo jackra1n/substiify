@@ -198,7 +198,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             raise QueueIsEmpty
 
         embed = await self.create_queue_embed(ctx, player.queue, show_index)
-        queue_message = await ctx.send(embed=embed, delete_after = 60)
+        queue_message = await ctx.send(embed=embed, delete_after = 150)
         await ctx.message.delete()
         
         await queue_message.add_reaction("⏮")
@@ -221,11 +221,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
                 elif str(reaction.emoji) == "⏭":
                     if show_index + 10 <= player.queue.length:
                         show_index += 10
-                print(f"reacted. index = {show_index}")
                 edit_embed = await self.create_queue_embed(ctx, player.queue, show_index)
-                print("created edited embed")
                 await queue_message.edit(embed=edit_embed)
-                print("edited embed")
 
     async def create_queue_embed(self, ctx, queue, show_index):
         embed = discord.Embed(

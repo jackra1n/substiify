@@ -37,7 +37,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @wavelink.WavelinkMixin.listener()
     async def on_node_ready(self, node):
-        print(f" Wavelink node `{node.identifier}` ready.")
+        logger.info(f"Wavelink node `{node.identifier}` ready.")
 
     @wavelink.WavelinkMixin.listener("on_track_stuck")
     @wavelink.WavelinkMixin.listener("on_track_end")
@@ -240,7 +240,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if upcoming := queue.upcoming:
             upcoming_songs_string = ""
             show_to = show_index + 10 if show_index + 10 < queue.length else queue.length
-            print(f"from {show_index} to {show_to}")
             for index, track in enumerate(upcoming[show_index:show_to]):
                 upcoming_songs_string += f"`{index + 1 + show_index}`. {track.title}\n"
             embed.add_field(
@@ -348,7 +347,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if isinstance(exc, NoLyricsFound):
             await ctx.send("No lyrics could be found.", delete_after = 30)
 
-    @commands.command(name="currentsong", aliases=["now"])
+    @commands.command(name="now", aliases=["currentsong"])
     async def playing_command(self, ctx):
         player = self.get_player(ctx)
 
@@ -360,18 +359,17 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             colour=ctx.author.colour,
             timestamp=dt.datetime.utcnow(),
         )
-        embed.set_author(name="Playback Information")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         embed.add_field(name="Track title", value=player.queue.current_track.title, inline=False)
-        embed.add_field(name="Artist", value=player.queue.current_track.author, inline=False)
 
         position = divmod(player.position, 60000)
         length = divmod(player.queue.current_track.length, 60000)
         embed.add_field(
-            name="Position",
+            name="Timestamp",
             value=f"{int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}",
-            inline=False
+            inline=True
         )
+        embed.add_field(name="Artist", value=player.queue.current_track.author, inline=True)
 
         await ctx.send(embed=embed, delete_after = 30)
         await ctx.message.delete()

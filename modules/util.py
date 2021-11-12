@@ -91,7 +91,7 @@ class Util(commands.Cog):
             f'**Python:** `{platform.python_version()}` | **discord.py:** `{discord.__version__}`\n\n' \
             f'**CPU:** `{cpu_percent}%` | **RAM:** `{ram_used} ({ram_percent}%)`\n\n' \
             f'**Made by:** <@{self.bot.owner_id}>\n' \
-            f'**Source:** No link yet' 
+            f'**Source:** [Link](https://github.com/jackra1n/substiify)' 
 
         embed = discord.Embed(
             title=f'Info about {self.bot.user.display_name}',

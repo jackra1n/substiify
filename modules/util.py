@@ -25,8 +25,8 @@ class Util(commands.Cog):
         await ctx.message.delete()
         member = ctx.author if member is None else member
         embed = discord.Embed(
-            title=str(member.display_name),
-            description='Avatar',
+            title=f"{str(member.display_name)}'s avatar",
+            url=member.avatar_url,
             colour=discord.Colour.light_grey()
         )
         embed.set_image(url=member.avatar_url)

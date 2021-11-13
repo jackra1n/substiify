@@ -7,7 +7,6 @@ from helper.music.player import Player
 import datetime as dt
 import re
 import typing as t
-import asyncio
 
 import logging
 import aiohttp
@@ -203,26 +202,26 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         
         await queue_message.add_reaction("⏮")
         await queue_message.add_reaction("⏭")
+        await queue_message.add_reaction("❌")
 
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) in ("⏮", "⏭") and reaction.message.id == queue_message.id
 
         while True:
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
-            except asyncio.TimeoutError:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)
+            if str(reaction.emoji) == "❌":
+                await queue_message.delete()
                 break
-            else:
-                if str(reaction.emoji) == "⏮":
-                    if show_index <= 9:
-                        show_index = 0
-                    else:
-                        show_index -= 10
-                elif str(reaction.emoji) == "⏭":
-                    if show_index + 10 <= player.queue.length:
-                        show_index += 10
-                edit_embed = await self.create_queue_embed(ctx, player.queue, show_index)
-                await queue_message.edit(embed=edit_embed)
+            elif str(reaction.emoji) == "⏮":
+                if show_index <= 9:
+                    show_index = 0
+                else:
+                    show_index -= 10
+            elif str(reaction.emoji) == "⏭":
+                if show_index + 10 <= player.queue.length:
+                    show_index += 10
+            edit_embed = await self.create_queue_embed(ctx, player.queue, show_index)
+            await queue_message.edit(embed=edit_embed)
 
     async def create_queue_embed(self, ctx, queue, show_index):
         embed = discord.Embed(
@@ -268,16 +267,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         )
         embed.set_author(name="Query Results")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-        embed.add_field(
-            name="Duration",
-            value=f"{track.duration / 1000}s",
-            inline=False
-        )
-        embed.add_field(
-            name="URL",
-            value=f"[Click here]({track.uri})",
-            inline=False
-        )
+        embed.add_field(name="Duration", value=f"{track.duration / 1000}s", inline=False)
+        embed.add_field(name="URL", value=f"[Click here]({track.uri})", inline=False)
 
         await ctx.send(embed=embed, delete_after = 60)
         await ctx.message.delete()
@@ -308,7 +299,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             await ctx.message.delete()
 
     @queue_move_command.error
-    async def queue_command_error(self, ctx, exc):      
+    async def queue_command_error(self, ctx, exc):
         if isinstance(exc, InvalidIndex):
             await ctx.send("Please provide valid position.", delete_after = 30)
 

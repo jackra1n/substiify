@@ -133,7 +133,7 @@ class Help(commands.Cog):
         embed.add_field(name="`stop`,`leave`", value='Stop playing music and leave (deletes queue)')
         embed.add_field(name="`shuffle`", value='Shuffles palylist')
         embed.add_field(name="`queue`, `q`", value='Shows current song queue')
-        embed.add_field(name="`q move [from_index] [to_index]`")
+        embed.add_field(name="`q move [from_index] [to_index]`", value='Move song from one index to another')
         embed.add_field(name="`q track/song [index]`", value='Shows info about song in queue')
         embed.add_field(name="`now`, `currentsong`", value='Shows currently played song')
         embed.add_field(name="`repeat [1, all, none]`", value='Repeat current song, all songs or none')

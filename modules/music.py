@@ -205,7 +205,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await queue_message.add_reaction("❌")
 
         def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ("⏮", "⏭") and reaction.message.id == queue_message.id
+            return user == ctx.author and str(reaction.emoji) in ("⏮", "⏭", "❌") and reaction.message.id == queue_message.id
 
         while True:
             reaction, user = await self.bot.wait_for("reaction_add", timeout=120.0, check=check)

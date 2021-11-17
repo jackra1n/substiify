@@ -15,19 +15,6 @@ session = sessionmaker(bind=engine)()
 
 Base = declarative_base()
 
-class daydeal(Base):
-    __tablename__ = 'daydeal'
-
-    id = Column(Integer, primary_key=True)
-    server_id = Column(Integer)
-    channel_id = Column(Integer)
-    role_id = Column(Integer)
-
-    def __init__(self, server_id, channel_id, role_id):
-        self.server_id = server_id
-        self.channel_id = channel_id
-        self.role_id = role_id
-
 class command_history(Base):
     __tablename__ = 'command_history'
 
@@ -93,59 +80,15 @@ class vote_channels(Base):
         self.server_id = server_id
         self.channel_id = channel_id
 
+class user_rank(Base):
+    __tablename__ = 'user_rank'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    server_id = Column(Integer)
+    vc_rank_points = Column(Integer)
+    message_rank_points = Column(Integer)
+
 # Creates database tables if the don't exist
 def create_database():
-    if not engine.has_table(daydeal.__tablename__):
-        metadata = MetaData(engine)
-        Table(daydeal.__tablename__, metadata,
-            Column('id', Integer, primary_key=True, nullable=False), 
-            Column('server_id', Integer),
-            Column('channel_id', Integer), 
-            Column('role_id', Integer)
-            )
-        metadata.create_all()
-
-    if not engine.has_table(command_history.__tablename__):
-        metadata = MetaData(engine)
-        Table(command_history.__tablename__, metadata,
-            Column('id', Integer, primary_key=True, nullable=False), 
-            Column('command', String),
-            Column('date', DateTime),
-            Column('user_id', Integer),
-            Column('server_id', Integer),
-            Column('channel_id', Integer), 
-            Column('message_id', Integer)
-            )
-        metadata.create_all()
-
-    if not engine.has_table(active_giveaways.__tablename__):
-        metadata = MetaData(engine)
-        Table(active_giveaways.__tablename__, metadata,
-            Column('id', Integer, primary_key=True, nullable=False), 
-            Column('start_date', DateTime),
-            Column('end_date', DateTime),
-            Column('prize', String),
-            Column('creator_user_id', Integer),
-            Column('server_id', Integer),
-            Column('channel_id', Integer), 
-            Column('message_id', Integer)
-            )
-        metadata.create_all()
-
-    if not engine.has_table(enabled_commands.__tablename__):
-        metadata = MetaData(engine)
-        Table(enabled_commands.__tablename__, metadata,
-            Column('id', Integer, primary_key=True, nullable=False),
-            Column('server_id', Integer),
-            Column('command', String)
-            )
-        metadata.create_all()
-
-    if not engine.has_table(vote_channels.__tablename__):
-        metadata = MetaData(engine)
-        Table(vote_channels.__tablename__, metadata,
-            Column('id', Integer, primary_key=True, nullable=False),
-            Column('server_id', Integer),
-            Column('channel_id', Integer)
-            )
-        metadata.create_all()
+    Base.metadata.create_all(engine)

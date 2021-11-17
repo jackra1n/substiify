@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 with open(store.settings_path, "r") as settings:
     settings = json.load(settings)
 
-bot = commands.Bot(command_prefix=util.prefix, owner_id=276462585690193921, intents=discord.Intents().all())
+prefix = ";"
+bot = commands.Bot(command_prefix=prefix, owner_id=276462585690193921, intents=discord.Intents().all())
 
 bot.remove_command('help')
 bot.load_extension("modules.mainbot")

@@ -1,4 +1,3 @@
-from helper.ModulesManager import ModulesManager
 from discord.ext import commands
 from utils.store import store
 from utils import util
@@ -22,9 +21,7 @@ class Help(commands.Cog):
             title=f'{self.bot.user.display_name} Command List',
             colour = discord.Colour.red()
         )
-        categories = ['modules', 'music', 'votes', 'giveaway', 'util', 'fun', 'submissions', 'gifs', 'duel']
-        if ModulesManager._is_enabled(ctx.guild.id, 'daydeal'):
-            categories.append('daydeal') 
+        categories = ['modules', 'music', 'votes', 'giveaway', 'util', 'submit', 'duel']
         if await self.bot.is_owner(ctx.author):
             categories.append('owner') 
         embed.add_field(name='Available categories:', value=await self.help_string(categories))
@@ -52,7 +49,7 @@ class Help(commands.Cog):
         await ctx.send(embed=embed, delete_after=120)
 
     @help.command()
-    async def submissions(self,ctx):
+    async def submit(self,ctx):
         embed = discord.Embed(
             title="Submissions",
             description=f"Submit a bug or a suggestion to improve the bot",
@@ -60,48 +57,6 @@ class Help(commands.Cog):
         )
         embed.add_field(name="`submit bug`",value=f'If you find any bugs/error you can use this command to submit the bug to the dev team. Use: `{self.prefix}submit bug <text_describing_bug>`.', inline=False)
         embed.add_field(name="`submit suggestion`",value=f'Use this command you have any idea for improvement or change that will make something better. Use: `{self.prefix}submit suggestion <suggestion_for_change_or_improvement>`.', inline=False)
-        await ctx.send(embed=embed, delete_after=120)
-
-    @help.command()
-    async def gifs(self,ctx):
-        embed = discord.Embed(
-            title="Gifs",
-            description=f"Use any of the available gif commands and tag a person in order to send a GIF of that action",
-            colour = discord.Colour.greyple()
-        )
-        gifsList = ['slap', 'hug', 'cuddle', 'bite']
-        if ModulesManager._is_enabled(ctx.guild.id, 'kiss'):
-            gifsList.append('kiss')
-        embed.add_field(name="**Possible categories:** ",value=await self.help_string(gifsList))
-        embed.set_footer(text=f'Use: `{self.prefix}gif <gif_type>`')
-        await ctx.send(embed=embed, delete_after=120)
-
-    @help.command()
-    async def fun(self,ctx):
-        embed = discord.Embed(
-            title="Fun",
-            description=f"Some fun command to play around.",
-            colour = discord.Colour.greyple()
-        )
-        embed.add_field(name="`8ball`",value="Ask the bot a question that you dont want the answer to.", inline=False)
-        embed.add_field(name="`pp`",value="Tells how long is your pp :)", inline=False)
-        if ModulesManager._is_enabled(ctx.guild.id, 'pickup'):
-            embed.add_field(name="`pickup`",value="Wanna hit on someone? Let me be your wingman! Most of them are inappropriate so please use it on people you know well!", inline=False)
-        if ModulesManager._is_enabled(ctx.guild.id, 'roast'):
-            embed.add_field(name="`roast`",value="Insult someone until they cry", inline=False)
-        await ctx.send(embed=embed, delete_after=120)
-
-    @help.command()
-    async def daydeal(self,ctx):
-        embed = discord.Embed(
-            title="Daydeal",
-            description=f"Super duper cool https://daydeal.ch integration in discord",
-            colour = discord.Colour.green()
-        )
-        embed.add_field(name="`daydeal`",value="Sends current daydeal", inline=False)
-        embed.add_field(name="`daydeal weekly`",value="Sends current deal of the week", inline=False)
-        embed.add_field(name="`daydeal setup`",value=f"Setups the daydeal to send it whenever a new one is available. Use it like `{self.prefix}deal setup <channel> <roleToPing>`. Channel and role are optional. Requires'manage_channels' permission to use this command.", inline=False)
-        embed.add_field(name="`daydeal stop`",value="Stops automatic sending od daydeals", inline=False)
         await ctx.send(embed=embed, delete_after=120)
 
     @help.command()

@@ -64,12 +64,3 @@ def prepareFiles():
         open(store.db_path, 'a')
 
     logger.info(f'All files ready')
-
-# if bot is 'substiffy alpha' change prefix
-def prefix(bot, message):
-    return prefixById(bot)
-
-def prefixById(bot):
-    if bot.user.id == 742380498986205234:
-        return "§§"
-    return "<<"

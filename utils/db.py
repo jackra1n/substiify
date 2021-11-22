@@ -93,7 +93,7 @@ class vote_channels(Base):
         self.server_id = server_id
         self.channel_id = channel_id
 
-# Creates database tables if the don't exist
+# Creates database tables if they don't exist
 def create_database():
     if not engine.has_table(daydeal.__tablename__):
         metadata = MetaData(engine)
